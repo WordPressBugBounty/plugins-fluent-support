@@ -82,6 +82,10 @@ class AgentController extends Controller
             'restrictions' => $request->getSafe('restrictions', null, []),
         ];
 
+        if (!$agent->user_id && ($user = get_user_by('email', $agent->email))) {
+            $agent->user_id = $user->ID;
+        }
+
         if ($agent) {
             try {
                 return [

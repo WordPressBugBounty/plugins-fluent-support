@@ -29,7 +29,8 @@ class UploaderController extends Controller
         $maxFileSize = floatval($settings['max_file_size']);
         $mimeHeadings = Helper::getAcceptedMimeHeadings();
         $maxSizeBytes = $maxFileSize * 1024;
-
+        $imageType = $request->type ? $request->type : null;
+        
         $this->validateUploadedFiles($request->files(), $maxSizeBytes, $mimeHeadings, $maxFileSize);
         $ticketId = $this->resolveTicketId($request);
         $person = $this->resolvePerson($ticketId, $request);
@@ -50,7 +51,7 @@ class UploaderController extends Controller
             ]);
         }
 
-        $attachmentHashes = $this->createAttachmentRecords($uploadedFiles, $ticketId, $person);
+        $attachmentHashes = $this->createAttachmentRecords($uploadedFiles, $ticketId, $person, $imageType);
 
         return [
             'attachments' => $attachmentHashes,
@@ -117,9 +118,10 @@ class UploaderController extends Controller
         }
     }
 
-    private function createAttachmentRecords($uploadedFiles, $ticketId, $person)
+    private function createAttachmentRecords($uploadedFiles, $ticketId, $person, $imageType)
     {
         $attachments = [];
+        $full_path = null;
 
         foreach ($uploadedFiles as $file) {
             if (empty($file['file_path'])) continue;
@@ -138,6 +140,10 @@ class UploaderController extends Controller
                 ]
             ];
 
+            if($imageType == 'direct_paste'){
+                $full_path = esc_url($file['url']);
+            }
+            
             try {
                 $attachment = Attachment::create($fileData);
                 $attachments[] = $attachment->file_hash;
@@ -150,7 +156,7 @@ class UploaderController extends Controller
             }
         }
 
-        return $attachments;
+        return $imageType == 'direct_paste' ? $full_path : $attachments;
     }
 
     public function uploadImage(Request $request)

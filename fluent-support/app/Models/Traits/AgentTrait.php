@@ -85,6 +85,7 @@ trait AgentTrait
         PermissionManager::attachPermissions($user, Arr::get($data, 'permissions', []));
 
         $updateData = Arr::only($data, ['first_name', 'last_name', 'title']);
+        $updateData['user_id'] = $user->ID;
         $updateData['email'] = $user->user_email;
 
         static::where('id', $agent->id)

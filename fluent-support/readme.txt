@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.6
-Stable tag: 1.8.1
+Stable tag: 1.8.4
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -234,6 +234,21 @@ Absolutely! Fluent Support offers a customizable support portal, allowing you to
 8. FluentSupport Dashboard
 
 == Changelog ==
+
+= 1.8.4 (Date: Sep 27, 2024) =
+* Hot-fix: Fixed issue with Activity logs cleanup
+
+= 1.8.3 (Date: Sep 25, 2024) =
+* Added: Workflow action sequence (Pro)
+* Added: Direct paste image in WP Editor
+* Fixed: Required sign not visible for product options marked as required during ticket creation
+* Fixed: Reply button toggle option not working in the admin portal
+* Fixed: Issue with the route URL on the All Tickets page
+* Fixed: Filter not refreshing in the Customer Portal after clicking the (❌) icon in the search field
+* Fixed: OpenAI routing issue resolved
+* Fixed: CSS issue related to ticket filter theme in the Customer Portal
+* Fixed: Responsive issue on the view ticket page
+* Fixed: After importing tickets from another SaaS platform, the agent is imported but not synchronized with the system
 
 = 1.8.1 (Date: Sep 10, 2024) =
 * Fixed - Email verification vulnerability issue in signup

@@ -3,6 +3,7 @@
 namespace FluentSupport\App\Hooks\Handlers;
 
 use FluentSupport\App\Models\Activity;
+use FluentSupport\App\Models\AIActivityLogs;
 use FluentSupport\App\Models\Attachment;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Services\EmailNotification\Settings;
@@ -52,15 +53,21 @@ class CleanupHandler
 
     protected function cleanAIActivityLogs()
     {
-        $settings = Helper::getOption('_ai_activity_settings', []);
-
-        if (!$settings && empty($settings['delete_days'])) {
-            $settings['delete_days'] = 14;
+        if (!defined('FLUENT_SUPPORT_PRO_DIR_FILE') || !Helper::AIIntegrationStatus()) {
+            return;
         }
 
-        $oldDateTime = date('Y-m-d H:i:s', current_time('timestamp') - ($settings['delete_days'] * 86400));
+        $settings = Helper::getOption('_ai_activity_settings', []);
 
-        Activity::where('created_at', '<', $oldDateTime)->delete();
+        $defaultDays = 14;
+
+        if (!empty($settings['delete_days'])) {
+            $defaultDays = (int)$settings['delete_days'];
+        }
+
+        $oldDateTime = date('Y-m-d H:i:s', current_time('timestamp') - ($defaultDays * 86400));
+
+        AIActivityLogs::where('created_at', '<', $oldDateTime)->delete();
     }
 
     public function maybeDeleteAttachmentsOnClose($ticket)

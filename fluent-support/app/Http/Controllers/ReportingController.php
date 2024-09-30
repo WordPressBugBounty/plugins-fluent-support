@@ -253,4 +253,17 @@ class ReportingController extends Controller
         ]);
     }
 
+    public function ticketResponseStats(Reporting $reporting, Request $request)
+    {
+
+        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+
+        $filter = [
+            'person_type' => $request->getSafe('person_type', 'sanitize_text_field') ?: null,
+            'person_id' => $request->getSafe('person_id', 'intval') ?: null,
+        ];
+
+        return $reporting->getTicketResponseStats($from, $to, $filter);
+    }
+
 }

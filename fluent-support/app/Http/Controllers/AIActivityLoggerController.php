@@ -66,17 +66,4 @@ class AIActivityLoggerController extends Controller
         }
     }
 
-    public function isAIEnabled()
-    {
-        try {
-            return Helper::isAIEnabled();
-        } catch (\Exception $e) {
-            return $this->sendError([
-                'message' => $e->getMessage()
-            ]);
-        }
-
-    }
-
-
 }

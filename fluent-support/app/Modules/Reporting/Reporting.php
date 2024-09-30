@@ -2,16 +2,17 @@
 
 namespace FluentSupport\App\Modules\Reporting;
 
-use FluentSupport\App\Api\Classes\Tickets;
 use FluentSupport\App\Models\Agent;
 use FluentSupport\App\Models\Conversation;
-use FluentSupport\App\Models\Customer;
 use FluentSupport\App\Models\MailBox;
+use FluentSupport\App\Models\Meta;
+use FluentSupport\App\Models\Person;
 use FluentSupport\App\Models\Product;
 use FluentSupport\App\Models\Ticket;
-use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Services\Helper;
+use FluentSupport\Framework\Database\Orm\Builder;
 use FluentSupport\Framework\Support\Arr;
+use FluentSupport\Framework\Support\DateTime;
 
 /**
  * Reporting class is responsible for getting data related to report
@@ -687,6 +688,35 @@ class Reporting
         }
 
         return $report;
+    }
+
+    public function getTicketResponseStats($from, $to, $filter)
+    {
+        $query = Conversation::query()
+            ->select('id', 'ticket_id', 'person_id', 'created_at', 'content')
+            ->addSelect([
+                'person_type' => Person::select('person_type')
+                    ->whereColumn('id', 'fs_conversations.person_id'),
+                'full_name' => Person::selectRaw("CONCAT(first_name, ' ', last_name)")
+                    ->whereColumn('id', 'fs_conversations.person_id')
+            ])
+            ->where('conversation_type', 'response')
+            ->when(Arr::get($filter, 'person_type'), function (Builder $q, $personType) {
+                return $q->whereHas('person', function ($q) use ($personType) {
+                    return $q->where('person_type', $personType);
+                });
+            })
+            ->when(($from && $to), function ($q) use ($from, $to) {
+                return $q->whereBetween('created_at', [
+                    DateTime::parse($from)->startOfDay(),
+                    DateTime::parse($to)->endOfDay()
+                ]);
+            })
+            ->when(Arr::get($filter, 'person_id'), function ($q, $personId) {
+                return $q->where('person_id', $personId);
+            });
+
+        return $query->get();
     }
 
     public function applyDateFilter($query, $from, $to)

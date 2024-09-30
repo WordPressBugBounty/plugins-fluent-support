@@ -119,10 +119,9 @@ $router->prefix('settings')->withPolicy('AdminSettingsPolicy')->group(function (
     $router->get('/remote-upload-settings', 'SettingsController@getRemoteUploadSettings');
     $router->post('/update-remote-upload-driver', 'SettingsController@updateRemoteUploadDriver');
 
+    $router->get('/openai-integration', 'SettingsController@getOpenAISettings');
     $router->post('/openai-integration', 'SettingsController@saveOpenAISettings');
     $router->post('/openai-integration/disconnect', 'SettingsController@disconnectOpenAI');
-    $router->get('/openai-integration', 'SettingsController@getOpenAISettings');
-
 });
 
 $router->prefix('agents')->withPolicy('AdminSensitivePolicy')->group(function ($router) {
@@ -141,7 +140,7 @@ $router->prefix('reports')->withPolicy('ReportPolicy')->group(function ($router)
     $router->get('/response-growth', 'ReportingController@getResponseChart');
     $router->get('/agents-summary', 'ReportingController@getAgentsSummary');
     $router->get('/day-time-stats', 'ReportingController@dayTimeStats');
-
+    $router->get('/ticket-response-stats', 'ReportingController@ticketResponseStats');
 });
 
 $router->prefix('my-reports')->withPolicy('AgentTicketPolicy')->group(function ($router) {
@@ -216,7 +215,6 @@ $router->prefix('ai-activity-logger')->withPolicy('ActivityLoggerPolicy')->group
     $router->get('/', 'AIActivityLoggerController@getAIActivities');
     $router->post('/settings', 'AIActivityLoggerController@updateSettings');
     $router->get('/settings', 'AIActivityLoggerController@getSettings');
-    $router->get('/is-ai-enabled', 'AIActivityLoggerController@isAIEnabled');
 });
 
 $router->post('signup', 'AuthController@signup')->withPolicy('PublicPolicy');

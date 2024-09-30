@@ -155,7 +155,7 @@ class Menu
 
         if (PermissionManager::currentUserCan('fst_view_activity_logs')) {
             $secondayItems[] = [
-                'key'       => 'activity_logger',
+                'key'       => 'activity',
                 'label'     => __('Activities', 'fluent-support'),
                 'permalink' => $baseUrl . 'activity'
             ];
@@ -380,6 +380,7 @@ class Menu
         $appVars['has_pro'] = defined('FLUENTSUPPORTPRO_PLUGIN_VERSION');
         if ($appVars['has_pro']) {
             $appVars['agent_feedback_rating'] = Helper::getBusinessSettings('agent_feedback_rating', 'no');
+            $appVars['ai_integration'] = Helper::AIIntegrationStatus();
         }
 
         wp_localize_script('fluent_support_admin_app_start', 'fluentSupportAdmin', $appVars);

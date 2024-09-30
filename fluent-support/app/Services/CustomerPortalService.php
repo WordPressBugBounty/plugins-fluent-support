@@ -18,20 +18,19 @@ class CustomerPortalService
     /**
      * This `getTickets` method is responsible for getting tickets for customer
      * @param object $customer
-     * @param array $requestedStatus
+     * @param string $requestedStatus
+     * @param array|null $options
      * @return object
      * @throws Exception
-     * @since 1.5.7
+     * @since 1.8.1
      */
-    public function getTickets($customer, $search, $sorting, $filters= [])
+    public function getTickets($customer, $requestedStatus, $options = [])
     {
         $this->validateCustomer($customer);
 
-        $requestedStatus = Arr::get($filters, 'status_type', 'open');
-
         $statuses = $this->getTicketStatues($requestedStatus);
 
-        return $this->ticketsAdditionalData($customer, $statuses, $search, $sorting, $filters);
+        return $this->ticketsAdditionalData($customer, $statuses, $options);
     }
 
     /**
@@ -272,54 +271,63 @@ class CustomerPortalService
 
     /**
      * This `getTicketStatues` method is responsible for getting ticket statuses
-     * @param array $requestedStatus
+     * @param string $requestedStatus
      * @return array
-     * @since 1.5.7
+     * @since 1.8.1
      */
     private function getTicketStatues($requestedStatus)
     {
-        return Arr::get([
+        $statuses = [
             'open'   => ['new', 'active', 'on-hold'],
             'all'    => [],
             'closed' => ['closed']
-        ], $requestedStatus);
+        ];
+
+        return Arr::get($statuses, $requestedStatus, []);
     }
+
 
     /**
      * This `ticketsAdditionalData` method is responsible for getting tickets with additional data
      * @param object $customer
      * @param array $statuses
+     * @param array|null $options
      * @return object $tickets
      * @since 1.5.7
      */
-    private function ticketsAdditionalData($customer, $statuses, $search, $sorting, $filters= [])
+    private function ticketsAdditionalData($customer, $statuses, $options = [])
     {
-        $ticketsQuery = Ticket::with([
+        $defaultOptions = [
+            'search'  => null,
+            'sorting' => null,
+            'filters' => null
+        ];
+
+        $ticketOptions = wp_parse_args($options, $defaultOptions);
+
+        $tickets = Ticket::with([
             'customer' => function ($query) {
                 $query->select(['first_name', 'last_name', 'id']);
             }, 'agent' => function ($query) {
                 $query->select(['first_name', 'last_name', 'id']);
             }
-        ])
-            ->where('customer_id', $customer->id)
-            ->orderBy($sorting['sortBy'], $sorting['sortType'])
-            ->latest('updated_at');
-
-        $ticketsQuery->where('customer_id', $customer->id);
-
-        if (!empty($filters['product_id'])) {
-            $ticketsQuery->where('product_id', $filters['product_id']);
-        }
-
-        if ($statuses) {
-            $ticketsQuery->whereIn('status', $statuses);
-        }
-
-        if ($search) {
-            $ticketsQuery->searchBy($search);
-        }
-
-        $tickets = $ticketsQuery->paginate();
+        ])->where('customer_id', $customer->id)
+            ->when(!empty($ticketOptions['sorting'] && !empty($ticketOptions['sorting']['sort_by'])), function ($query) use ($ticketOptions) {
+                return $query->orderBy($ticketOptions['sorting']['sort_by'], $ticketOptions['sorting']['sort_type']);
+            })
+            ->when(!empty($options['filters']['product_id']), function ($query) use ($ticketOptions) {
+                return $query->where('product_id', $ticketOptions['filters']['product_id']);
+            })
+            ->when($statuses, function ($query) use ($statuses) {
+                return $query->whereIn('status', $statuses);
+            })
+            ->when($ticketOptions['search'], function ($query) use ($ticketOptions) {
+                return $query->searchBy($ticketOptions['search']);
+            })
+            ->when(empty($ticketOptions['sorting']), function ($query) {
+                return $query->latest('updated_at');
+            })
+            ->paginate();
 
         foreach ($tickets as $ticket) {
             $ticket->human_date = sprintf(__('%s ago', 'fluent-support'), human_time_diff(strtotime($ticket->created_at), current_time('timestamp')));

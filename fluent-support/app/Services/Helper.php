@@ -9,6 +9,7 @@ use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Models\AIActivityLogs;
 use FluentSupport\App\Models\Person;
+use FluentSupport\App\Models\Product;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\Framework\Support\Arr;
 
@@ -631,6 +632,17 @@ class Helper
         return false;
     }
 
+    public static function AIIntegrationStatus() {
+        $chatGPTSettingsData = Meta::where('object_type', '_fs_openai_settings')->value('value');
+
+        if ($chatGPTSettingsData) {
+            $settings = maybe_unserialize($chatGPTSettingsData);
+            return !empty($settings['api_key']);
+        }
+
+        return false;
+    }
+
     public static function showTicketSummaryAdminBar()
     {
         $data = self::getOption('global_business_settings');
@@ -1038,29 +1050,6 @@ class Helper
         ];
     }
 
-    public static function isAIEnabled()
-    {
-        $openAISettingsData = Meta::where('object_type', '_fs_openai_settings')->first();
-
-        if (!$openAISettingsData) {
-            return false;
-        }
-
-        $value = $openAISettingsData->value;
-        if (empty($value)) {
-            return false;
-        }
-
-        $settings = maybe_unserialize($value);
-
-        if (is_array($settings) && !empty($settings)) {
-            return true;
-        }
-
-        return false;
-    }
-
-
     public static function getSettings()
     {
         $settings = Helper::getOption('_ai_activity_settings', []);
@@ -1224,4 +1213,11 @@ class Helper
         include FLUENT_SUPPORT_PLUGIN_PATH . 'app/Views/emails/' . $template . '.php';
         return ob_get_clean();
     }
+
+    public static function isProductRequired()
+    {
+        $settings = Helper::getOption('_ticket_form_settings', []);
+        return Arr::get($settings, 'product_required_field') === 'yes';
+    }
+
 }
