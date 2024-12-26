@@ -143,8 +143,10 @@ class Menu
             ];
         }
 
+        $secondaryItems = [];
+
         if (PermissionManager::currentUserCan('fst_manage_saved_replies')) {
-            $secondayItems = [
+            $secondaryItems = [
                 [
                     'key'       => 'saved_replies',
                     'label'     => __('Saved Replies', 'fluent-support'),
@@ -154,7 +156,7 @@ class Menu
         }
 
         if (PermissionManager::currentUserCan('fst_view_activity_logs')) {
-            $secondayItems[] = [
+            $secondaryItems[] = [
                 'key'       => 'activity',
                 'label'     => __('Activities', 'fluent-support'),
                 'permalink' => $baseUrl . 'activity'
@@ -164,7 +166,7 @@ class Menu
         $canManageSettings = PermissionManager::currentUserCan('fst_manage_settings');
 
         if ($canManageSettings) {
-            $secondayItems[] = [
+            $secondaryItems[] = [
                 'key'       => 'mailboxes',
                 'label'     => __('Business Inboxes', 'fluent-support'),
                 'permalink' => $baseUrl . 'mailboxes'
@@ -172,7 +174,7 @@ class Menu
         }
 
         if (PermissionManager::currentUserCan('fst_manage_workflows')) {
-            $secondayItems[] = [
+            $secondaryItems[] = [
                 'key'       => 'workflows',
                 'label'     => __('Workflows', 'fluent-support'),
                 'permalink' => $baseUrl . 'workflows'
@@ -180,7 +182,7 @@ class Menu
         }
 
         if ($canManageSettings) {
-            $secondayItems[] = [
+            $secondaryItems[] = [
                 'key'       => 'settings',
                 'label'     => __('Global Settings', 'fluent-support'),
                 'permalink' => $baseUrl . 'settings'
@@ -201,13 +203,14 @@ class Menu
          *
          * @since v1.0.0
          *
-         * @param array $secondayItems
+         * @param array $secondaryItems
          */
-        isset($secondayItems) ? $secondayItems = apply_filters('fluent_support/secondary_menu_items', $secondayItems) : [];
+        $secondaryItems = apply_filters('fluent_support/secondary_menu_items', $secondaryItems);
+
 
 
         if (!defined('FLUENT_SUPPORT_PRO_DIR_FILE')) {
-            $secondayItems[] = [
+            $secondaryItems[] = [
                 'key'       => 'upgrade_to_pro',
                 'label'     => 'Upgrade to Pro',
                 'permalink' => 'https://fluentsupport.com'
@@ -222,7 +225,7 @@ class Menu
             'base_url'       => $baseUrl,
             'logo'           => $assets . 'images/logo.svg',
             'menuItems'      => $menuItems,
-            'secondaryItems' => isset($secondayItems) ? $secondayItems : [],
+            'secondaryItems' => isset($secondaryItems) ? $secondaryItems : [],
         ]);
     }
 
@@ -238,6 +241,10 @@ class Menu
         $app = App::getInstance();
 
         $assets = $app['url.assets'];
+
+        add_filter('admin_footer_text', function ($text) {
+            return '<span id="footer-thankyou">We value your feedback! If the plugin is helpful, please rate Fluent Support with <a target="_blank" rel="nofollow" href="https://wordpress.org/support/plugin/fluent-support/reviews/#new-post">★★★★★</a> on WordPress.org. For assistance, check out the <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/navigate-with-the-keyboard-shortcut">keyboard shortcuts</a> and <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/">documentation</a>.</span>';
+        });
 
         wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '2.4.3');
 
@@ -364,6 +371,8 @@ class Menu
             'has_file_upload'            => !!Helper::ticketAcceptedFileMiles(),
             'repost_export_options'      => Helper::getExportOptions(),
             'enable_draft_mode'          => Helper::getBusinessSettings('enable_draft_mode', 'no'),
+            'keyboard_shortcuts'         => Helper::getBusinessSettings('keyboard_shortcuts', 'no'),
+            'agent_time_tracking'        => Helper::getBusinessSettings('agent_time_tracking', 'no'),
             'max_file_upload'            => Helper::getBusinessSettings('max_file_upload', 3),
             'ajaxurl'                    => admin_url('admin-ajax.php'),
             'auth_provider'              => Helper::getAuthProvider()

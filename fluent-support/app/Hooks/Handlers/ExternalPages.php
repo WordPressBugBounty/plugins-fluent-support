@@ -140,7 +140,7 @@ class ExternalPages
         ini_set('user_agent', 'Fluent Support/' . FLUENT_SUPPORT_VERSION . '; ' . get_bloginfo('url'));
         header("Content-Type: {$attachment->file_type}");
         header("Content-Disposition: inline; filename=\"{$attachment->title}\"");
-        echo readfile($attachment->file_path);
+        echo file_get_contents($attachment->file_path);
         die();
     }
 

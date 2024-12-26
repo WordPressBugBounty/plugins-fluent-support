@@ -1,6 +1,7 @@
 <?php
 
 namespace FluentSupport\App\Services\EmailNotification;
+use FluentSupportPro\Database\Migrations\TimeTrackMigrator;
 
 use FluentSupport\App\Services\Helper;
 
@@ -48,6 +49,12 @@ class Settings
             $settings['accepted_file_types'] = [];
         }
 
+        if ($settingsKey == 'global_business_settings' && !empty($settings['agent_time_tracking'])) {
+            if (class_exists(TimeTrackMigrator::class) && $settings['agent_time_tracking'] === 'yes') {
+                TimeTrackMigrator::migrate();
+            }
+        }
+
         return Helper::updateOption($settingsKey, $settings);
     }
 
@@ -74,7 +81,8 @@ class Settings
             'del_files_on_close'    => 'no',
             'enable_admin_bar_summary' => 'no',
             'enable_draft_mode' => 'no',
-            'agent_feedback_rating' => 'no'
+            'agent_feedback_rating' => 'no',
+            'keyboard_shortcuts'   => 'no'
         ];
 
         //Get default/existing settings from database using the key global_business_settings
@@ -159,7 +167,7 @@ class Settings
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
                 'checkbox_label' => __('Delete all attachments on ticket close', 'fluent-support'),
-                'inline_help'    => __('If you enable this then when a ticket get closed it will delete all the attachments associated with the particular ticket.', 'fluent-support')
+                'inline_help'    => __('If you enable this feature, all attachments associated with a ticket will be deleted when the ticket is closed.', 'fluent-support')
             ],
             'enable_admin_bar_summary' => [
                 'type'           => 'inline-checkbox',
@@ -173,7 +181,7 @@ class Settings
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
                 'checkbox_label' => __('Enable Draft Mode', 'fluent-support'),
-                'inline_help'    => __('If you enable this setting, then if an agent close a ticket accidentally then the written response will be saved as draft.', 'fluent-support')
+                'inline_help'    => __('If you enable this setting, any written response will be saved as a draft if an agent accidentally closes a ticket.', 'fluent-support')
             ],
             'custom_registration_form_field'   => [
                 'wrapper_class' => 'inline-checkbox',
@@ -188,6 +196,13 @@ class Settings
                 'checkbox_label' => __('Enable Two-Factor Authentication', 'fluent-support'),
                 'inline_help'    => __('If you enable this setting, users will be required to submit a second form of authentication, such as a code sent to their email, to login.', 'fluent-support')
             ],
+            'keyboard_shortcuts' => [
+                'type'           => 'inline-checkbox',
+                'true_label'     => 'yes',
+                'false-label'    => 'no',
+                'checkbox_label' => __('Enable Keyboard Shortcuts', 'fluent-support'),
+                'inline_help'    => __("If you enable this, agents can use keyboard shortcuts for faster actions.", 'fluent-support')
+            ]
         ];
 
         if (defined('FLUENTSUPPORTPRO_PLUGIN_VERSION')) {
@@ -197,6 +212,14 @@ class Settings
                 'false-label'    => 'no',
                 'checkbox_label' => __('Agent Feedback Rating', 'fluent-support'),
                 'inline_help'    => __("If you enable this setting, users will have the option to provide feedback on an agent's response.", 'fluent-support')
+            ];
+
+            $fields['agent_time_tracking'] = [
+                'type'           => 'inline-checkbox',
+                'true_label'     => 'yes',
+                'false-label'    => 'no',
+                'checkbox_label' => __('Agent Time Tracking', 'fluent-support'),
+                'inline_help' => __("If you enable this setting, the agent can specify the amount of time needed to complete a ticket.", 'fluent-support')
             ];
         }
 

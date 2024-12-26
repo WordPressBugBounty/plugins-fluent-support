@@ -2,6 +2,8 @@
 
 namespace FluentSupport\App\Http\Controllers;
 
+use FluentSupport\App\Models\Meta;
+use FluentSupport\Framework\Support\Arr;
 use FluentSupport\App\Http\Requests\TicketRequest;
 use FluentSupport\App\Http\Requests\TicketResponseRequest;
 use FluentSupport\App\Models\Conversation;
@@ -587,6 +589,45 @@ class TicketController extends Controller
         $type = $request->get('type');
 
         return TicketHelper::getTicketEssentials($type);
+    }
+
+    public function fetchLabelSearch(Ticket $ticket)
+    {
+        try {
+            $agent_id = get_current_user_id();
+            return TicketHelper::getLabelSearch($agent_id);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
+    }
+
+    public function storeOrUpdateLabelSearch(Request $request)
+    {
+        try {
+            $agent_id = get_current_user_id();
+            $searchData = $request->get('query');
+            $filterType = Arr::get($searchData, 'filter_type', '');
+            if ($filterType == 'advanced') {
+                return TicketHelper::saveSearchLabel($agent_id,$searchData,$filterType);
+            } 
+
+            return [
+                'message' => __('Invalid filter type.', 'fluent-support'),
+            ];
+            
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
+    }
+
+    public function deleteLabelSearch(Request $request, $search_id)
+    {
+        try {
+            $agent_id = get_current_user_id();
+            return TicketHelper::deleteSavedSearch($search_id);
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 }
 

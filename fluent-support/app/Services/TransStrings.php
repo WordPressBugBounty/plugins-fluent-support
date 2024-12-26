@@ -690,6 +690,21 @@ class TransStrings
             'oAuth2 Authorised redirect URI' => __('oAuth2 Authorised redirect URI', 'fluent-support'),
             'dropbox_help_text' => __('Please read the documentation first to get ClientID and Client Secret', 'fluent-support'),
             'google_drive_help_text' => __('If you need help or support with Google Drive integration', 'fluent-support'),
+            'Time Tracking' => __('Time Tracking', 'fluent-support'),
+            'Log' => __('Log', 'fluent-support'),
+            'n/a' => __('n/a', 'fluent-support'),
+            'Logged at:' => __('Logged at:', 'fluent-support'),
+            'Work Description:' => __('Work Description:', 'fluent-support'),
+            'Set Estimation' => __('Set Estimation', 'fluent-support'),
+            'Update Estimation' => __('Update Estimation', 'fluent-support'),
+            'Set Estimated Time' => __('Set Estimated Time', 'fluent-support'),
+            'By Tickets' => __('By Tickets', 'fluent-support'),
+            'By Agents' => __('By Agents', 'fluent-support'),
+            'By Customers' => __('By Customers', 'fluent-support'),
+            'Customer Time Sheet Report' => __('Customer Time Sheet Report', 'fluent-support'),
+            'Agent Time Sheet Report' => __('Customer Time Sheet Report', 'fluent-support'),
+            'Time Sheet Report By Tickets' => __('Time Sheet Report By Tickets', 'fluent-support'),
+            'Saved Filters' => __('Saved Filters', 'fluent-support'),
         ];
     }
 }

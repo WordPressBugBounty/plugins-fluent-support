@@ -1054,11 +1054,11 @@ class Ticket extends Model
     public function getTicket($ticketWith, $withCrmData, $ticketId)
     {
         $agent = Helper::getAgentByUserId();
-        $restictedBusinessBoxes = PermissionManager::currentUserRestrictedBusinessBoxes();
+        $restrictedBusinessBoxes = PermissionManager::currentUserRestrictedBusinessBoxes();
 
         $ticket = self::with($ticketWith)->findOrFail($ticketId);
 
-        if (in_array($ticket->mailbox_id, $restictedBusinessBoxes)) {
+        if (in_array($ticket->mailbox_id, $restrictedBusinessBoxes)) {
             throw new \Exception('Ticket cannot be fetched due to restricted mailbox');
         }
 
@@ -1476,17 +1476,42 @@ class Ticket extends Model
 
         $tickets = $query->get();
 
-        $tickets->each(function ($ticket) use ($agent) {
+        $assignedCount = 0;
+        $skippedCount = 0;
+
+        $tickets->each(function ($ticket) use ($agent, &$assignedCount, &$skippedCount) {
             $assigner = Helper::getCurrentAgent();
+            $restrictions = $agent->getMeta('agent_restrictions', []);
+
+            // Skip ticket if mailbox is restricted for the agent
+            if (!empty($restrictions) && in_array($ticket->mailbox_id, $restrictions['restrictedBusinessBoxes'])) {
+                $skippedCount++;
+                return;
+            }
+
             $ticket->agent_id = $agent->id;
             $ticket->save();
+            $assignedCount++;
+
             do_action('fluent_support/agent_assigned_to_ticket', $agent, $ticket, $assigner);
         });
 
+        $assignedMessage =  "$assignedCount tickets have been assigned to {$agent->full_name}.";
+
+        $skippedMessage = $skippedCount > 0
+            ? "$skippedCount tickets were skipped due to mailbox restrictions or already being assigned."
+            : "";
+
         return [
-            'message' => __(count($tickets) . ' tickets has been assigned to', 'fluent-support') . ' ' . $agent->full_name
+            'message' => __(
+                trim($assignedMessage . ' ' . $skippedMessage), // Ensure no extra spaces
+                'fluent-support'
+            )
         ];
+
     }
+
+
 
     /**
      * This `bulkAssignTag` will assign all given or selected tickets to given tag
@@ -1606,10 +1631,5 @@ class Ticket extends Model
 
     }
 
-    // accessor
-//    public function getCreatedAtAttribute($date)
-//    {
-//        return date('Y-m-d H:i:s', strtotime($date));
-//    }
 }
 

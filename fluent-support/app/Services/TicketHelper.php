@@ -251,4 +251,126 @@ class TicketHelper
         return $type ? $data[$type] : $data;
     }
 
+    public static function getLabelSearch($agentId)
+    {
+        $lists = Meta::where('object_id', $agentId)
+                        ->where('object_type', 'search_meta')
+                        ->where('key', 'label_search')
+                        ->first();
+        $unserialize = [];
+        if ($lists) {
+            $unserialize = maybe_unserialize($lists->value);
+        }
+
+        return $unserialize;
+    }
+
+    public static function saveSearchLabel($agent_id, $searchData, $filterType) {
+        
+        $agent_id = get_current_user_id();
+        $existingRecord = Meta::where('object_id', $agent_id)
+                                ->where('object_type', 'search_meta')
+                                ->where('key', 'label_search')
+                                ->first();
+
+        // If record exists, unserialize the data or initialize an empty array
+        $existingData = $existingRecord ? maybe_unserialize($existingRecord->value) ?: [] : [];
+
+        // Check if it's an update or new entry
+        $isUpdate = isset($searchData['id']) && array_filter($existingData, function ($item) use ($searchData) {
+            return isset($item['id']) && $item['id'] == $searchData['id'];
+        });
+
+        // Handle adding or updating
+        $updatedData = self::addOrUpdateSearchData($existingData, $searchData);
+
+        // Save the updated data back to the database
+        if ($existingRecord) {
+            $existingRecord->update([
+                'value' => maybe_serialize($updatedData)
+            ]);
+        } else {
+            Meta::insert([
+                'object_type' => 'search_meta',
+                'key'         => 'label_search',
+                'object_id'   => $agent_id,
+                'value'       => maybe_serialize($updatedData)
+            ]);
+        }
+
+        $message = $isUpdate 
+        ? __('Your saved search has been updated successfully!', 'fluent-support') 
+        : __('Your search has been saved successfully!', 'fluent-support');
+
+        return [
+            'message' => $message,
+        ];
+    }
+
+    private static function addOrUpdateSearchData(array $existingData, array $searchData): array
+    {
+        if (isset($searchData['id'])) {
+            $updated = false;
+
+            // Update the existing record with the matching ID
+            foreach ($existingData as &$record) {
+                if (isset($record['id']) && $record['id'] == $searchData['id']) {
+                    $record = array_merge($record, $searchData);
+                    $updated = true;
+                    break;
+                }
+            }
+
+            // If no matching record found, append the new data
+            if (!$updated) {
+                $existingData[] = $searchData;
+            }
+        } else {
+            // If no ID provided, generate a new one and add the data
+            $newId = self::generateNewId($existingData);
+            $searchData['id'] = $newId;
+            $existingData[] = $searchData;
+        }
+
+        return $existingData;
+    }
+
+    public static function deleteSavedSearch($search_id) {
+        $agent_id = get_current_user_id();
+        $existingRecord = Meta::where('object_id', $agent_id)
+                                ->where('object_type', 'search_meta')
+                                ->where('key', 'label_search')
+                                ->first();
+
+        if ($existingRecord) {
+            $existingData = maybe_unserialize($existingRecord->value) ?: [];
+
+            $updatedData = array_filter($existingData, function ($item) use ($search_id) {
+                return isset($item['id']) && $item['id'] != $search_id;
+            });
+
+            if (count($existingData) !== count($updatedData)) {
+                $existingRecord->update([
+                    'value' => maybe_serialize(array_values($updatedData))
+                ]);
+                return [
+                    'message' => __('Search deleted successfully.', 'fluent-support'),
+                ];
+            }
+
+            return [
+                'message' => __('Search ID not found.', 'fluent-support'),
+            ];
+        }
+    }
+
+    private static function generateNewId(array $existingData): int
+    {
+        if (empty($existingData)) {
+            return 1;
+        }
+
+        $maxId = max(array_column($existingData, 'id'));
+        return $maxId + 1;
+    }
 }

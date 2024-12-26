@@ -58,7 +58,7 @@ class AuthController extends Controller
         do_action('fluent_support/before_signup_validation', $formData);
 
         $checkRecaptchaAvailability = $this->isRecaptchaApplicable('signup_form');
-        if ($checkRecaptchaAvailability) {
+        if ($checkRecaptchaAvailability && !$formData['_email_verification_hash']) {
             $validateCaptcha = ReCaptchaHandler::validateRecaptcha($formData['g-recaptcha-response']);
             if (!$validateCaptcha) {
                 return $this->response([

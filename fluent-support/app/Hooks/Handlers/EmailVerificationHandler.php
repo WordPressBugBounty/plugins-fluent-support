@@ -44,17 +44,17 @@ class EmailVerificationHandler
 
         $pStart = '<p style="font-family: Arial, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">';
 
-        $message = $pStart . sprintf(__('Hello %s,', 'fluent-security'), Arr::get($formData, 'first_name')) . '</p>' .
-            $pStart . __('Thank you for registering with us! To complete the setup of your account, please enter the verification code below on the registration page.', 'fluent-security') . '</p>' .
-            $pStart . '<b>' . sprintf(__('Verification Code: %s', 'fluent-security'), $verifcationCode) . '</b></p>' .
+        $message = $pStart . sprintf(__('Hello %s,', 'fluent-support'), Arr::get($formData, 'first_name')) . '</p>' .
+            $pStart . __('Thank you for registering with us! To complete the setup of your account, please enter the verification code below on the registration page.', 'fluent-support') . '</p>' .
+            $pStart . '<b>' . sprintf(__('Verification Code: %s', 'fluent-support'), $verifcationCode) . '</b></p>' .
             '<br />' .
-            $pStart . __('This code is valid for 10 minutes and is meant to ensure the security of your account. If you did not initiate this request, please ignore this email.', 'fluent-security') . '</p>';
+            $pStart . __('This code is valid for 10 minutes and is meant to ensure the security of your account. If you did not initiate this request, please ignore this email.', 'fluent-support') . '</p>';
 
-        $message = apply_filters('fluent_auth/signup_verification_email_body', $message, $verifcationCode, $formData);
+        $message = apply_filters('fluent_support/signup_verification_email_body', $message, $verifcationCode, $formData);
 
         $data = [
             'body'        => $message,
-            'pre_header'  => __('Activate your account', 'fluent-security'),
+            'pre_header'  => __('Activate your account', 'fluent-support'),
             'show_footer' => false
         ];
 
