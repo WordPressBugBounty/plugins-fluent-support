@@ -125,10 +125,14 @@ class FileSystem
         }
 
         [$destDir, $folderName] = $this->_getCustomDir();
-
         $fileName = basename($source);
         $destFile = $destDir . DIRECTORY_SEPARATOR . $fileName;
 
+        $indexFile = $destDir.DIRECTORY_SEPARATOR.'index.html';
+        if(!is_file($indexFile)) {
+            @file_put_contents($indexFile, '');
+        }
+        
         if (@copy($source, $destFile)) {
             return $this->_updateUploadDirForCopy($fileName, $folderName);
         }
@@ -146,6 +150,8 @@ class FileSystem
             $directory .= $folderName;
             if (!is_dir($directory)) {
                 @mkdir($directory, 0755);
+                // we should add index.php file to prevent directory listing
+                @file_put_contents($directory . DIRECTORY_SEPARATOR . 'index.html', '');
             }
         }
 
@@ -161,6 +167,8 @@ class FileSystem
         $uploadDir['subdir'] = $folderName;
         $uploadDir['url'] = $uploadDir['baseurl'] . DIRECTORY_SEPARATOR . FLUENT_SUPPORT_UPLOAD_DIR . $folderName . DIRECTORY_SEPARATOR . $fileName;
         $uploadDir['baseurl'] = $uploadDir['baseurl'] . DIRECTORY_SEPARATOR . FLUENT_SUPPORT_UPLOAD_DIR . $folderName;
+
+
 
         return $uploadDir;
     }
@@ -212,8 +220,12 @@ class FileSystem
 
         if ($this->subDir) {
             $folderName .= '/' . $this->subDir;
-            if (!is_dir($param['basedir'] . $folderName)) {
-                @mkdir($param['basedir'] . $folderName, 0755);
+            $temFile = $param['basedir'] . $folderName . '/index.html';
+            if(!is_file($temFile)) {
+                if (!is_dir($param['basedir'] . $folderName)) {
+                    @mkdir($param['basedir'] . $folderName, 0755);
+                }
+                @file_put_contents($temFile, '');
             }
         }
 
@@ -221,9 +233,10 @@ class FileSystem
 
         $param['path'] = $param['basedir'] . $folderName;
 
-
         if (!is_dir($param['path'])) {
             @mkdir($param['path'], 0755);
+            // we should add index.php file to prevent directory listing
+            @file_put_contents($param['basedir'] . $folderName . '/index.html', '');
         }
 
         return $param;

@@ -14,10 +14,10 @@ class EmailVerificationHandler
         try {
             $verifcationCode = str_pad(random_int(100123, 900987), 6, 0, STR_PAD_LEFT);
         } catch (\Exception $e) {
-            $verifcationCode = str_pad(mt_rand(100123, 900987), 6, 0, STR_PAD_LEFT);
+            $verifcationCode = str_pad(wp_rand(100123, 900987), 6, 0, STR_PAD_LEFT);
         }
 
-        $string = $formData['email'] . '-' . wp_generate_uuid4() . mt_rand(1, 99999999);
+        $string = $formData['email'] . '-' . wp_generate_uuid4() . wp_rand(1, 99999999);
         $hash = wp_hash_password($string);
         $hash = sanitize_title($hash, '', 'display');
         $hash .= $formData['email'] . '-' . time();
@@ -70,7 +70,7 @@ class EmailVerificationHandler
                     <p><?php echo esc_html(sprintf(__('A verification code has been sent to %s. Please provide the code below:', 'fluent-support'), $formData['email'])); ?></p>
                     <input type="hidden" name="_email_verification_hash" value="<?php echo esc_attr($hash); ?>"/>
                     <div class="fs_field_label is-required">
-                        <label for="fs_field_verification"><?php _e('Verification Code', 'fluent-support'); ?></label>
+                        <label for="fs_field_verification"><?php esc_html_e('Verification Code', 'fluent-support'); ?></label>
                     </div>
                     <div class="fs_input_wrap">
                         <input type="text" id="fs_field_verification" placeholder="" name="_email_verification_token" required>
@@ -79,7 +79,7 @@ class EmailVerificationHandler
                 <button
                     style="display: inline-block; cursor: pointer; border: 0; background: #2271b1; color: #fff; text-decoration: none; text-shadow: none; min-height: 32px; padding: 8px 24px; font-size: 14px; border-radius: 3px; margin-top: 10px;"
                     id="fs_verification_submit" type="submit">
-                    <?php _e('Complete Signup', 'fluent-support'); ?>
+                    <?php esc_html_e('Complete Signup', 'fluent-support'); ?>
                 </button>
             </div>
         <?php

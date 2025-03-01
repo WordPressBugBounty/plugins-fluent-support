@@ -146,6 +146,6 @@ class Customers
             return call_user_func_array([$this->instance, $method], $params);
         }
 
-        throw new \Exception("Method {$method} does not exist.");
+        throw new \Exception(sprintf('Method %s does not exist.', esc_html($method)));
     }
 }

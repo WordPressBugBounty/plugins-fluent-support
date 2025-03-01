@@ -93,7 +93,7 @@ class AuthController extends Controller
             // check if it got expired or not
             if ($logHash['used_count'] > 5 || strtotime($logHash['valid_till']) < current_time('timestamp')) {
                 wp_send_json([
-                    'message' => __('Your verification code has been expired. Please try again', 'fluent-security')
+                    'message' => __('Your verification code has been expired. Please try again', 'fluent-support')
                 ], 422);
             }
 
@@ -105,7 +105,7 @@ class AuthController extends Controller
                 ]);
 
                 wp_send_json([
-                    'message' => __('Please provide a valid verification code that sent to your email address', 'fluent-security')
+                    'message' => __('Please provide a valid verification code that sent to your email address', 'fluent-support')
                 ], 422);
             }
 
@@ -309,8 +309,8 @@ class AuthController extends Controller
         if (!is_wp_error($user_signon) && empty($_COOKIE[LOGGED_IN_COOKIE])) {
             if (headers_sent()) {
                 return $this->response([
-                    'message' => sprintf(__('<strong>ERROR</strong>: Cookies are blocked due to unexpected output. For help, please see <a href="%1$s">this documentation</a> or try the <a href="%2$s">support forums</a>.'),
-                        __('https://codex.wordpress.org/Cookies'), __('https://wordpress.org/support/'))
+                    'message' => sprintf(__('<strong>ERROR</strong>: Cookies are blocked due to unexpected output. For help, please see <a href="%1$s">this documentation</a> or try the <a href="%2$s">support forums</a>.', 'fluent-support'),
+                        'https://codex.wordpress.org/Cookies', 'https://wordpress.org/support/')
                 ], 403);
             }
         }

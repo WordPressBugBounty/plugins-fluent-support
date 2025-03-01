@@ -59,7 +59,7 @@ class Ticket extends Model
                 $model->slug = static::slugify($model->title);
             }
 
-            $model->hash = substr(md5(time() . wp_generate_uuid4()), 0, 8) . mt_rand(1, 99);
+            $model->hash = substr(md5(time() . wp_generate_uuid4()), 0, 8) . wp_rand(1, 99);
             $model->content_hash = md5($model->content);
 
             $model->last_customer_response = current_time('mysql');
@@ -1282,7 +1282,7 @@ class Ticket extends Model
         $this->checkAgentPermission($ticket);
 
         return [
-            'message' => __('Ticket has been closed', 'fluent_support'),
+            'message' => __('Ticket has been closed', 'fluent-support'),
             'ticket'  => (new TicketService())->close($ticket, $agent, '', $closeSilently)
         ];
     }
@@ -1302,7 +1302,7 @@ class Ticket extends Model
 
 
         return [
-            'message' => __('Ticket has been opened again', 'fluent_support'),
+            'message' => __('Ticket has been opened again', 'fluent-support'),
             'ticket'  => (new TicketService())->reopen($ticket, $agent)
         ];
     }
@@ -1354,9 +1354,14 @@ class Ticket extends Model
         $ticket = static::findOrFail($ticketId);
 
         $this->checkAgentPermission($ticket);
-
+        $propName = sanitize_text_field($propName);
+        $message = sprintf(
+            /* translators: %s: The name of the property that was updated */
+            __('%s has been updated', 'fluent-support'),
+            esc_html(str_replace('_', ' ', ucwords($propName)))
+        );
         return [
-            'message'     => __(str_replace('_', ' ', ucwords($propName)) . ' has been updated', 'fluent-support'),
+            'message'     => $message,
             'update_data' => $this->handlePropertyUpdate($propName, $propValue, $ticket, $assigner)
         ];
     }
@@ -1449,8 +1454,13 @@ class Ticket extends Model
             (new TicketService())->close($ticket, $agent);
         });
 
+        // translators: %d represents the number of tickets that have been closed.
         return [
-            'message' => sprintf(__('%d tickets have been closed', 'fluent-support'), count($tickets))
+            'message' => sprintf(
+                /* translators: %d represents the number of closed tickets. */
+                __('%d tickets have been closed.', 'fluent-support'),
+                count($tickets)
+            )
         ];
     }
 
@@ -1496,19 +1506,26 @@ class Ticket extends Model
             do_action('fluent_support/agent_assigned_to_ticket', $agent, $ticket, $assigner);
         });
 
-        $assignedMessage =  "$assignedCount tickets have been assigned to {$agent->full_name}.";
+        // translators: %1$d is the number of assigned tickets, %2$s is the agent's full name.
+        $assignedMessage = sprintf(
+            /* translators: %1$d is the number of tickets assigned, %2$s is the agent's name. */
+            __('%1$d tickets have been assigned to %2$s.', 'fluent-support'),
+            $assignedCount,
+            $agent->full_name
+        );
 
+        // translators: %1$d is the number of skipped tickets.
         $skippedMessage = $skippedCount > 0
-            ? "$skippedCount tickets were skipped due to mailbox restrictions or already being assigned."
+            ? sprintf(
+                /* translators: %1$d is the number of skipped tickets due to mailbox restrictions. */
+                __('%1$d tickets were skipped due to mailbox restrictions or already being assigned.', 'fluent-support'),
+                $skippedCount
+            )
             : "";
 
         return [
-            'message' => __(
-                trim($assignedMessage . ' ' . $skippedMessage), // Ensure no extra spaces
-                'fluent-support'
-            )
+            'message' => trim($assignedMessage . ' ' . $skippedMessage)
         ];
-
     }
 
 

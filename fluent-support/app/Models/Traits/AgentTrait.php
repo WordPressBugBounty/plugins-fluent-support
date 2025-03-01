@@ -272,4 +272,27 @@ trait AgentTrait
 
         return $agent;
     }
+
+    public function agentInsights($search)
+    {
+        $agents = static::latest()
+            ->select('id', 'first_name', 'last_name', 'email', 'user_id')
+            ->searchBy($search)
+            ->get();
+
+        foreach ($agents as $agent) {
+            $agent->permissions = PermissionManager::getUserPermissions($agent->user_id);
+
+            if ($agent->user_id) {
+                $agent->user_profile = admin_url('user-edit.php?user_id=' . $agent->user_id);
+            }
+
+            $agent->restrictions = $agent->getMeta('agent_restrictions', [
+                'restrictedBusinessBoxes' => [],
+                'businessBoxRestrictions' => false
+            ]);
+        }
+
+        return $agents;
+    }
 }

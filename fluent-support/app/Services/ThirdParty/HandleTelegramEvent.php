@@ -112,7 +112,11 @@ class HandleTelegramEvent
              */
             do_action('fluent_support/telegram_payload_error', $responseData, $payload);
 
-            throw new \Exception($responseData->get_error_message(), $responseData->get_error_code());
+            throw new \Exception(
+                esc_html($responseData->get_error_message()),
+                (int) $responseData->get_error_code()
+            );
+
         } else {
             return $responseData;
         }

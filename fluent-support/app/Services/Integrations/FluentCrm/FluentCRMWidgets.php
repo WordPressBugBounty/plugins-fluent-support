@@ -21,8 +21,8 @@ class FluentCRMWidgets
     public function pushProvider($providers)
     {
         $providers['fluent_support'] = [
-            'title' => __('Support Tickets by Fluent Support', 'fluent-crm'),
-            'name'  => __('Fluent Support', 'fluent-crm')
+            'title' => __('Support Tickets by Fluent Support', 'fluent-support'),
+            'name'  => __('Fluent Support', 'fluent-support')
         ];
 
         return $providers;
@@ -43,12 +43,12 @@ class FluentCRMWidgets
         $formattedTickets = [];
         foreach ($tickets as $ticket) {
             $ticketUrl = Helper::getPortalAdminBaseUrl() . 'tickets/' . $ticket->id . '/view';
-            $actionHTML = '<a target="_blank" href="' . $ticketUrl . '">' . __('View Ticket', 'fluent-crm') . '</a>';
+            $actionHTML = '<a target="_blank" href="' . $ticketUrl . '">' . __('View Ticket', 'fluent-support') . '</a>';
             $formattedTickets[] = [
                 'id'           => '#' . $ticket->id,
                 'title'        => $ticket->title,
-                'status'       => '<span class="el-tag">' . __($ticket->status, 'fluent-crm') . '</span>',
-                'Submitted at' => human_time_diff(strtotime($ticket->created_at), current_time('timestamp')) . __(' ago', 'fluent-crm'),
+                'status'       => '<span class="el-tag">' . $ticket->status . '</span>',
+                'Submitted at' => human_time_diff(strtotime($ticket->created_at), current_time('timestamp')) . __(' ago', 'fluent-support'),
                 'action'       => $actionHTML
             ];
         }

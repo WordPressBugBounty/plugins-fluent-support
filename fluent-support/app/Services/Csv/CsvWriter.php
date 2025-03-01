@@ -43,7 +43,7 @@ class CsvWriter
         $f = fopen($this->filePath, $this->fileMode);
 
         if ($f === false) {
-            die('Error opening the file ' . $this->filePath);
+            die('Error opening the file ' . esc_html($this->filePath));
         }
 
         return $f;
@@ -76,6 +76,6 @@ class CsvWriter
             unlink($this->filePath);
             die();
         }
-        die('Error opening the file ' . $this->filePath);
+        die('Error opening the file ' . esc_html($this->filePath));
     }
 }

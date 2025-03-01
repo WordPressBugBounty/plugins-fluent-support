@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Fluent Support\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-23 06:29+0000\n"
+"POT-Creation-Date: 2025-02-28 10:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -21,13 +21,14 @@ msgstr ""
 msgid " Add Task to Fluent Boards"
 msgstr ""
 
+#: app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:51
+#: builds/fluent-support/app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:51
+msgid " ago"
+msgstr ""
+
 #: app/Services/Tickets/TicketService.php:91
 #: builds/fluent-support/app/Services/Tickets/TicketService.php:91
 msgid " assign this ticket to self"
-msgstr ""
-
-#: app/Models/Ticket.php:1359 builds/fluent-support/app/Models/Ticket.php:1359
-msgid " has been updated"
 msgstr ""
 
 #: app/Services/Tickets/TicketService.php:90
@@ -35,9 +36,23 @@ msgstr ""
 msgid " in this ticket"
 msgstr ""
 
-#: app/Services/Tickets/TicketService.php:263
-#: builds/fluent-support/app/Services/Tickets/TicketService.php:263
+#: app/Services/Tickets/TicketService.php:265
+#: builds/fluent-support/app/Services/Tickets/TicketService.php:265
 msgid " tickets have been deleted"
+msgstr ""
+
+#. %1$d is the number of tickets assigned, %2$s is the agent's name.
+#: app/Models/Ticket.php:1512 builds/fluent-support/app/Models/Ticket.php:1512
+#, php-format
+msgid "%1$d tickets have been assigned to %2$s."
+msgstr ""
+
+#. %1$d is the number of skipped tickets due to mailbox restrictions.
+#: app/Models/Ticket.php:1521 builds/fluent-support/app/Models/Ticket.php:1521
+#, php-format
+msgid ""
+"%1$d tickets were skipped due to mailbox restrictions or already being "
+"assigned."
 msgstr ""
 
 #: app/Services/EmailNotification/Settings.php:76
@@ -48,18 +63,25 @@ msgid ""
 "Portal%2s [fluent_support_auth]"
 msgstr ""
 
-#: app/Models/Ticket.php:1453 builds/fluent-support/app/Models/Ticket.php:1453
-msgid "%d tickets have been closed"
+#. %d represents the number of closed tickets.
+#: app/Models/Ticket.php:1461 builds/fluent-support/app/Models/Ticket.php:1461
+msgid "%d tickets have been closed."
 msgstr ""
 
 #: app/Services/CustomerPortalService.php:46
 #: app/Services/CustomerPortalService.php:333
-#: app/Services/CustomerPortalService.php:484
+#: app/Services/CustomerPortalService.php:487
 #: builds/fluent-support/app/Services/CustomerPortalService.php:46
 #: builds/fluent-support/app/Services/CustomerPortalService.php:333
-#: builds/fluent-support/app/Services/CustomerPortalService.php:484
+#: builds/fluent-support/app/Services/CustomerPortalService.php:487
 #, php-format
 msgid "%s ago"
+msgstr ""
+
+#. %s: The name of the property that was updated
+#: app/Models/Ticket.php:1360 builds/fluent-support/app/Models/Ticket.php:1360
+#, php-format
+msgid "%s has been updated"
 msgstr ""
 
 #: app/Services/TransStrings.php:91
@@ -112,6 +134,15 @@ msgstr ""
 msgid "<p>Username: %s</p>"
 msgstr ""
 
+#: app/Http/Controllers/AuthController.php:312
+#: builds/fluent-support/app/Http/Controllers/AuthController.php:312
+#, php-format
+msgid ""
+"<strong>ERROR</strong>: Cookies are blocked due to unexpected output. For "
+"help, please see <a href=\"%1$s\">this documentation</a> or try the <a "
+"href=\"%2$s\">support forums</a>."
+msgstr ""
+
 #: app/Http/Controllers/AuthController.php:437
 #: builds/fluent-support/app/Http/Controllers/AuthController.php:437
 msgid "<strong>Error</strong>: Invalid username or email"
@@ -138,33 +169,33 @@ msgstr ""
 msgid "A"
 msgstr ""
 
-#: app/Services/Helper.php:903
-#: builds/fluent-support/app/Services/Helper.php:903
+#: app/Services/Helper.php:906
+#: builds/fluent-support/app/Services/Helper.php:906
 msgid ""
 "A cloud storage service by Google for storing, syncing, and sharing files."
 msgstr ""
 
-#: app/Services/Helper.php:910
-#: builds/fluent-support/app/Services/Helper.php:910
+#: app/Services/Helper.php:913
+#: builds/fluent-support/app/Services/Helper.php:913
 msgid ""
 "A cloud-based file storage and sharing service that allows users to store "
 "files online and sync them across devices."
 msgstr ""
 
-#: app/Services/Helper.php:931
-#: builds/fluent-support/app/Services/Helper.php:931
+#: app/Services/Helper.php:934
+#: builds/fluent-support/app/Services/Helper.php:934
 msgid ""
 "A project management tool designed to streamline workflows and collaboration "
 "through customizable, kanban-style boards."
 msgstr ""
 
-#: app/Services/Helper.php:826
-#: builds/fluent-support/app/Services/Helper.php:826
+#: app/Services/Helper.php:829
+#: builds/fluent-support/app/Services/Helper.php:829
 msgid "A robust form plugin suitable for any business"
 msgstr ""
 
-#: app/Services/Helper.php:924
-#: builds/fluent-support/app/Services/Helper.php:924
+#: app/Services/Helper.php:927
+#: builds/fluent-support/app/Services/Helper.php:927
 msgid ""
 "A security service by Google designed to protect websites from bots and "
 "abuse by using challenges to distinguish between human and automated access."
@@ -176,8 +207,8 @@ msgstr ""
 msgid "A verification code has been sent to %s. Please provide the code below:"
 msgstr ""
 
-#: app/Services/Helper.php:917
-#: builds/fluent-support/app/Services/Helper.php:917
+#: app/Services/Helper.php:920
+#: builds/fluent-support/app/Services/Helper.php:920
 msgid ""
 "A WordPress plugin that enables the creation and management of membership "
 "sites, including content access control and subscription billing."
@@ -219,10 +250,10 @@ msgstr ""
 msgid "Activate your account"
 msgstr ""
 
-#: app/Services/TransStrings.php:281 app/Services/Helper.php:118
+#: app/Services/TransStrings.php:281 app/Services/Helper.php:121
 #: app/Models/Traits/CustomerTrait.php:91
 #: builds/fluent-support/app/Services/TransStrings.php:281
-#: builds/fluent-support/app/Services/Helper.php:118
+#: builds/fluent-support/app/Services/Helper.php:121
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:91
 msgid "Active"
 msgstr ""
@@ -392,6 +423,16 @@ msgstr ""
 msgid "Add Ticket"
 msgstr ""
 
+#: app/Http/Controllers/SettingsController.php:200
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:200
+msgid "Add to FluentCRM list (optional)"
+msgstr ""
+
+#: app/Http/Controllers/SettingsController.php:211
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:211
+msgid "Add to Tags"
+msgstr ""
+
 #: app/Services/TransStrings.php:351
 #: builds/fluent-support/app/Services/TransStrings.php:351
 msgid "added a note"
@@ -502,15 +543,15 @@ msgstr ""
 msgid "Agent Feedback Rating"
 msgstr ""
 
-#: app/Services/TransStrings.php:115 app/Services/Helper.php:680
+#: app/Services/TransStrings.php:115 app/Services/Helper.php:683
 #: builds/fluent-support/app/Services/TransStrings.php:115
-#: builds/fluent-support/app/Services/Helper.php:680
+#: builds/fluent-support/app/Services/Helper.php:683
 msgid "Agent First Name"
 msgstr ""
 
-#: app/Services/TransStrings.php:117 app/Services/Helper.php:682
+#: app/Services/TransStrings.php:117 app/Services/Helper.php:685
 #: builds/fluent-support/app/Services/TransStrings.php:117
-#: builds/fluent-support/app/Services/Helper.php:682
+#: builds/fluent-support/app/Services/Helper.php:685
 msgid "Agent Full Name"
 msgstr ""
 
@@ -519,9 +560,9 @@ msgstr ""
 msgid "Agent Job Title( ex: Developer, Support Staff )"
 msgstr ""
 
-#: app/Services/TransStrings.php:116 app/Services/Helper.php:681
+#: app/Services/TransStrings.php:116 app/Services/Helper.php:684
 #: builds/fluent-support/app/Services/TransStrings.php:116
-#: builds/fluent-support/app/Services/Helper.php:681
+#: builds/fluent-support/app/Services/Helper.php:684
 msgid "Agent Last Name"
 msgstr ""
 
@@ -540,8 +581,8 @@ msgstr ""
 msgid "Agents Reports"
 msgstr ""
 
-#: app/Services/Helper.php:1046
-#: builds/fluent-support/app/Services/Helper.php:1046
+#: app/Services/Helper.php:1049
+#: builds/fluent-support/app/Services/Helper.php:1049
 msgid "AI Activity settings has been updated"
 msgstr ""
 
@@ -633,8 +674,8 @@ msgstr ""
 msgid "All Workflows"
 msgstr ""
 
-#: app/Services/Helper.php:882
-#: builds/fluent-support/app/Services/Helper.php:882
+#: app/Services/Helper.php:885
+#: builds/fluent-support/app/Services/Helper.php:885
 msgid "All-in-one payment gateway designed for WordPress"
 msgstr ""
 
@@ -646,6 +687,13 @@ msgstr ""
 #: app/Hooks/Handlers/AuthHandler.php:158
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:158
 msgid "Already have an account?"
+msgstr ""
+
+#. %s is the error message from the exception
+#: app/Http/Controllers/SettingsController.php:354
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:354
+#, php-format
+msgid "An error occurred while saving the settings: %s"
 msgstr ""
 
 #: app/Services/TransStrings.php:408
@@ -913,9 +961,9 @@ msgstr ""
 msgid "average"
 msgstr ""
 
-#: app/Services/TransStrings.php:165 app/Services/Helper.php:688
+#: app/Services/TransStrings.php:165 app/Services/Helper.php:691
 #: builds/fluent-support/app/Services/TransStrings.php:165
-#: builds/fluent-support/app/Services/Helper.php:688
+#: builds/fluent-support/app/Services/Helper.php:691
 msgid "Average Waiting"
 msgstr ""
 
@@ -939,8 +987,8 @@ msgstr ""
 msgid "Basic Info"
 msgstr ""
 
-#: app/Services/Helper.php:865
-#: builds/fluent-support/app/Services/Helper.php:865
+#: app/Services/Helper.php:868
+#: builds/fluent-support/app/Services/Helper.php:868
 msgid "BetterDocs"
 msgstr ""
 
@@ -965,8 +1013,13 @@ msgstr ""
 msgid "Bookmarks"
 msgstr ""
 
-#: app/Services/Helper.php:830
-#: builds/fluent-support/app/Services/Helper.php:830
+#: app/Services/TransStrings.php:350
+#: builds/fluent-support/app/Services/TransStrings.php:350
+msgid "bottom"
+msgstr ""
+
+#: app/Services/Helper.php:833
+#: builds/fluent-support/app/Services/Helper.php:833
 msgid "BuddyBoss"
 msgstr ""
 
@@ -985,23 +1038,23 @@ msgstr ""
 msgid "Business Boxes Reports"
 msgstr ""
 
-#: app/Services/Helper.php:875
-#: builds/fluent-support/app/Services/Helper.php:875
+#: app/Services/Helper.php:878
+#: builds/fluent-support/app/Services/Helper.php:878
 msgid "Business communication platform designed for privacy"
 msgstr ""
 
-#: app/Services/Helper.php:812
-#: builds/fluent-support/app/Services/Helper.php:812
+#: app/Services/Helper.php:815
+#: builds/fluent-support/app/Services/Helper.php:815
 msgid "Business communication platform designed for security"
 msgstr ""
 
-#: app/Services/Helper.php:840
-#: builds/fluent-support/app/Services/Helper.php:840
+#: app/Services/Helper.php:843
+#: builds/fluent-support/app/Services/Helper.php:843
 msgid "Business communication platform designed for tech"
 msgstr ""
 
-#: app/Services/Helper.php:791
-#: builds/fluent-support/app/Services/Helper.php:791
+#: app/Services/Helper.php:794
+#: builds/fluent-support/app/Services/Helper.php:794
 msgid "Business communication platform designed to scale"
 msgstr ""
 
@@ -1176,11 +1229,11 @@ msgstr ""
 msgid "Close Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:161 app/Services/Helper.php:119
-#: app/Services/Helper.php:686 app/Hooks/Handlers/CustomerPortalHandler.php:114
+#: app/Services/TransStrings.php:161 app/Services/Helper.php:122
+#: app/Services/Helper.php:689 app/Hooks/Handlers/CustomerPortalHandler.php:114
 #: builds/fluent-support/app/Services/TransStrings.php:161
-#: builds/fluent-support/app/Services/Helper.php:119
-#: builds/fluent-support/app/Services/Helper.php:686
+#: builds/fluent-support/app/Services/Helper.php:122
+#: builds/fluent-support/app/Services/Helper.php:689
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:114
 msgid "Closed"
 msgstr ""
@@ -1339,11 +1392,11 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
-#: app/Services/Helper.php:784 app/Services/Helper.php:805
-#: app/Services/Helper.php:896
-#: builds/fluent-support/app/Services/Helper.php:784
-#: builds/fluent-support/app/Services/Helper.php:805
-#: builds/fluent-support/app/Services/Helper.php:896
+#: app/Services/Helper.php:787 app/Services/Helper.php:808
+#: app/Services/Helper.php:899
+#: builds/fluent-support/app/Services/Helper.php:787
+#: builds/fluent-support/app/Services/Helper.php:808
+#: builds/fluent-support/app/Services/Helper.php:899
 msgid "Course and e-learning platform built for WordPress"
 msgstr ""
 
@@ -1465,9 +1518,9 @@ msgstr ""
 msgid "Created On"
 msgstr ""
 
-#: app/Services/Helper.php:59 app/Services/Helper.php:73
-#: builds/fluent-support/app/Services/Helper.php:59
-#: builds/fluent-support/app/Services/Helper.php:73
+#: app/Services/Helper.php:62 app/Services/Helper.php:76
+#: builds/fluent-support/app/Services/Helper.php:62
+#: builds/fluent-support/app/Services/Helper.php:76
 msgid "Critical"
 msgstr ""
 
@@ -1476,8 +1529,8 @@ msgstr ""
 msgid "critical"
 msgstr ""
 
-#: app/Services/Helper.php:190
-#: builds/fluent-support/app/Services/Helper.php:190
+#: app/Services/Helper.php:193
+#: builds/fluent-support/app/Services/Helper.php:193
 msgid "CSV"
 msgstr ""
 
@@ -1729,13 +1782,13 @@ msgstr ""
 msgid "Disconnect"
 msgstr ""
 
-#: app/Services/Helper.php:837
-#: builds/fluent-support/app/Services/Helper.php:837
+#: app/Services/Helper.php:840
+#: builds/fluent-support/app/Services/Helper.php:840
 msgid "Discord"
 msgstr ""
 
-#: app/Services/Helper.php:694
-#: builds/fluent-support/app/Services/Helper.php:694
+#: app/Services/Helper.php:697
+#: builds/fluent-support/app/Services/Helper.php:697
 msgid "Dislikes"
 msgstr ""
 
@@ -1779,13 +1832,13 @@ msgstr ""
 msgid "Draft response has been successfully approved."
 msgstr ""
 
-#: app/Services/Helper.php:907
-#: builds/fluent-support/app/Services/Helper.php:907
+#: app/Services/Helper.php:910
+#: builds/fluent-support/app/Services/Helper.php:910
 msgid "Dropbox"
 msgstr ""
 
-#: app/Services/Helper.php:851
-#: builds/fluent-support/app/Services/Helper.php:851
+#: app/Services/Helper.php:854
+#: builds/fluent-support/app/Services/Helper.php:854
 msgid "Easy Digital Downloads"
 msgstr ""
 
@@ -1986,8 +2039,8 @@ msgstr ""
 msgid "Failed to create task."
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:373
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:373
+#: app/Http/Controllers/SettingsController.php:377
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:377
 msgid ""
 "Failed to disconnect OpenAI settings. No matching records found or an error "
 "occurred."
@@ -2048,8 +2101,12 @@ msgstr ""
 msgid "File failed to upload"
 msgstr ""
 
-#: app/Services/Includes/UploadService.php:28
-#: builds/fluent-support/app/Services/Includes/UploadService.php:28
+#: app/Hooks/Handlers/ExternalPages.php:143
+msgid "File not found or access denied"
+msgstr ""
+
+#: app/Services/Includes/UploadService.php:42
+#: builds/fluent-support/app/Services/Includes/UploadService.php:42
 msgid "File upload failed"
 msgstr ""
 
@@ -2109,13 +2166,13 @@ msgstr ""
 msgid "First name"
 msgstr ""
 
-#: app/Services/Helper.php:823
-#: builds/fluent-support/app/Services/Helper.php:823
+#: app/Services/Helper.php:826
+#: builds/fluent-support/app/Services/Helper.php:826
 msgid "Fluent FORMS"
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:508
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:508
+#: app/Http/Controllers/SettingsController.php:512
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:512
 msgid "Fluent Forms could not be installed"
 msgstr ""
 
@@ -2126,19 +2183,21 @@ msgid ""
 "Support Plugin"
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:481
-#: app/Http/Controllers/SettingsController.php:503
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:481
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:503
+#: app/Http/Controllers/SettingsController.php:485
+#: app/Http/Controllers/SettingsController.php:507
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:485
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:507
 msgid "Fluent Forms plugin has been installed and activated successfully"
 msgstr ""
 
 #. Name of the plugin
 #: app/Hooks/Handlers/Menu.php:45 app/Hooks/Handlers/Menu.php:46
 #: app/Services/Integrations/FluentCrm/CreateTicketAction.php:49
+#: app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:25
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:45
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:46
 #: builds/fluent-support/app/Services/Integrations/FluentCrm/CreateTicketAction.php:49
+#: builds/fluent-support/app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:25
 msgid "Fluent Support"
 msgstr ""
 
@@ -2192,13 +2251,13 @@ msgstr ""
 msgid "Fluent Support Tickets Exporter"
 msgstr ""
 
-#: app/Services/Helper.php:928
-#: builds/fluent-support/app/Services/Helper.php:928
+#: app/Services/Helper.php:931
+#: builds/fluent-support/app/Services/Helper.php:931
 msgid "FluentBoards"
 msgstr ""
 
-#: app/Services/Helper.php:816
-#: builds/fluent-support/app/Services/Helper.php:816
+#: app/Services/Helper.php:819
+#: builds/fluent-support/app/Services/Helper.php:819
 msgid "FluentCRM"
 msgstr ""
 
@@ -2217,10 +2276,10 @@ msgstr ""
 msgid "FluentCRM Integration Settings"
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:444
-#: app/Http/Controllers/SettingsController.php:466
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:444
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:466
+#: app/Http/Controllers/SettingsController.php:448
+#: app/Http/Controllers/SettingsController.php:470
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:448
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:470
 msgid "FluentCRM plugin has been installed and activated successfully"
 msgstr ""
 
@@ -2332,13 +2391,13 @@ msgstr ""
 msgid "Good Job"
 msgstr ""
 
-#: app/Services/Helper.php:900
-#: builds/fluent-support/app/Services/Helper.php:900
+#: app/Services/Helper.php:903
+#: builds/fluent-support/app/Services/Helper.php:903
 msgid "Google Drive"
 msgstr ""
 
-#: app/Services/Helper.php:921
-#: builds/fluent-support/app/Services/Helper.php:921
+#: app/Services/Helper.php:924
+#: builds/fluent-support/app/Services/Helper.php:924
 msgid "Google reCAPTCHA"
 msgstr ""
 
@@ -2619,10 +2678,10 @@ msgid "Integration Statuses"
 msgstr ""
 
 #: app/Modules/StatModule.php:85 app/Services/TransStrings.php:159
-#: app/Services/Helper.php:684
+#: app/Services/Helper.php:687
 #: builds/fluent-support/app/Modules/StatModule.php:85
 #: builds/fluent-support/app/Services/TransStrings.php:159
-#: builds/fluent-support/app/Services/Helper.php:684
+#: builds/fluent-support/app/Services/Helper.php:687
 msgid "Interactions"
 msgstr ""
 
@@ -2707,8 +2766,8 @@ msgstr ""
 msgid "Job Title"
 msgstr ""
 
-#: app/Services/Helper.php:219
-#: builds/fluent-support/app/Services/Helper.php:219
+#: app/Services/Helper.php:222
+#: builds/fluent-support/app/Services/Helper.php:222
 msgid "JSON"
 msgstr ""
 
@@ -2786,13 +2845,13 @@ msgstr ""
 msgid "Last Week"
 msgstr ""
 
-#: app/Services/Helper.php:886
-#: builds/fluent-support/app/Services/Helper.php:886
+#: app/Services/Helper.php:889
+#: builds/fluent-support/app/Services/Helper.php:889
 msgid "LearnDash"
 msgstr ""
 
-#: app/Services/Helper.php:893
-#: builds/fluent-support/app/Services/Helper.php:893
+#: app/Services/Helper.php:896
+#: builds/fluent-support/app/Services/Helper.php:896
 msgid "LearnPress"
 msgstr ""
 
@@ -2811,13 +2870,13 @@ msgstr ""
 msgid "License Management"
 msgstr ""
 
-#: app/Services/Helper.php:781
-#: builds/fluent-support/app/Services/Helper.php:781
+#: app/Services/Helper.php:784
+#: builds/fluent-support/app/Services/Helper.php:784
 msgid "LifterLMS"
 msgstr ""
 
-#: app/Services/Helper.php:693
-#: builds/fluent-support/app/Services/Helper.php:693
+#: app/Services/Helper.php:696
+#: builds/fluent-support/app/Services/Helper.php:696
 msgid "Likes"
 msgstr ""
 
@@ -2991,9 +3050,9 @@ msgstr ""
 msgid "max wait time"
 msgstr ""
 
-#: app/Services/TransStrings.php:166 app/Services/Helper.php:689
+#: app/Services/TransStrings.php:166 app/Services/Helper.php:692
 #: builds/fluent-support/app/Services/TransStrings.php:166
-#: builds/fluent-support/app/Services/Helper.php:689
+#: builds/fluent-support/app/Services/Helper.php:692
 msgid "Max Waiting"
 msgstr ""
 
@@ -3002,9 +3061,9 @@ msgstr ""
 msgid "Maximum File Upload"
 msgstr ""
 
-#: app/Services/Helper.php:58 app/Services/Helper.php:72
-#: builds/fluent-support/app/Services/Helper.php:58
-#: builds/fluent-support/app/Services/Helper.php:72
+#: app/Services/Helper.php:61 app/Services/Helper.php:75
+#: builds/fluent-support/app/Services/Helper.php:61
+#: builds/fluent-support/app/Services/Helper.php:75
 msgid "Medium"
 msgstr ""
 
@@ -3013,8 +3072,8 @@ msgstr ""
 msgid "medium"
 msgstr ""
 
-#: app/Services/Helper.php:914
-#: builds/fluent-support/app/Services/Helper.php:914
+#: app/Services/Helper.php:917
+#: builds/fluent-support/app/Services/Helper.php:917
 msgid "MemberPress"
 msgstr ""
 
@@ -3079,9 +3138,9 @@ msgstr ""
 msgid "Name:"
 msgstr ""
 
-#: app/Services/TransStrings.php:283 app/Services/Helper.php:117
+#: app/Services/TransStrings.php:283 app/Services/Helper.php:120
 #: builds/fluent-support/app/Services/TransStrings.php:283
-#: builds/fluent-support/app/Services/Helper.php:117
+#: builds/fluent-support/app/Services/Helper.php:120
 msgid "New"
 msgstr ""
 
@@ -3143,9 +3202,9 @@ msgstr ""
 msgid "No support tickets found for this filter"
 msgstr ""
 
-#: app/Services/Helper.php:57 app/Services/Helper.php:71
-#: builds/fluent-support/app/Services/Helper.php:57
-#: builds/fluent-support/app/Services/Helper.php:71
+#: app/Services/Helper.php:60 app/Services/Helper.php:74
+#: builds/fluent-support/app/Services/Helper.php:60
+#: builds/fluent-support/app/Services/Helper.php:74
 msgid "Normal"
 msgstr ""
 
@@ -3234,9 +3293,9 @@ msgstr ""
 msgid "Open Ticket in New Tab"
 msgstr ""
 
-#: app/Services/TransStrings.php:160 app/Services/Helper.php:685
+#: app/Services/TransStrings.php:160 app/Services/Helper.php:688
 #: builds/fluent-support/app/Services/TransStrings.php:160
-#: builds/fluent-support/app/Services/Helper.php:685
+#: builds/fluent-support/app/Services/Helper.php:688
 msgid "Open Tickets"
 msgstr ""
 
@@ -3245,8 +3304,8 @@ msgstr ""
 msgid "OpenAI ChatGPT Integration"
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:369
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:369
+#: app/Http/Controllers/SettingsController.php:373
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:373
 msgid "OpenAI settings have been successfully disconnected."
 msgstr ""
 
@@ -3285,8 +3344,8 @@ msgstr ""
 msgid "Overall Activities"
 msgstr ""
 
-#: app/Services/Helper.php:795
-#: builds/fluent-support/app/Services/Helper.php:795
+#: app/Services/Helper.php:798
+#: builds/fluent-support/app/Services/Helper.php:798
 msgid "Paid Memberships Pro"
 msgstr ""
 
@@ -3313,8 +3372,8 @@ msgstr ""
 msgid "Paste the authorization code here once you get it."
 msgstr ""
 
-#: app/Services/Helper.php:879
-#: builds/fluent-support/app/Services/Helper.php:879
+#: app/Services/Helper.php:882
+#: builds/fluent-support/app/Services/Helper.php:882
 msgid "Paymattic"
 msgstr ""
 
@@ -3323,8 +3382,8 @@ msgstr ""
 msgid "Payment Via"
 msgstr ""
 
-#: app/Services/Helper.php:201
-#: builds/fluent-support/app/Services/Helper.php:201
+#: app/Services/Helper.php:204
+#: builds/fluent-support/app/Services/Helper.php:204
 msgid "PDF/Docs"
 msgstr ""
 
@@ -3348,8 +3407,8 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: app/Services/Helper.php:178
-#: builds/fluent-support/app/Services/Helper.php:178
+#: app/Services/Helper.php:181
+#: builds/fluent-support/app/Services/Helper.php:181
 msgid "Photos"
 msgstr ""
 
@@ -3471,7 +3530,9 @@ msgid "Please provide a valid login code"
 msgstr ""
 
 #: app/Http/Controllers/AuthController.php:89
+#: app/Http/Controllers/AuthController.php:108
 #: builds/fluent-support/app/Http/Controllers/AuthController.php:89
+#: builds/fluent-support/app/Http/Controllers/AuthController.php:108
 msgid ""
 "Please provide a valid verification code that sent to your email address"
 msgstr ""
@@ -3559,11 +3620,11 @@ msgstr ""
 msgid "Portal Page"
 msgstr ""
 
-#: app/Services/Helper.php:833 app/Services/Helper.php:847
-#: app/Services/Helper.php:861
-#: builds/fluent-support/app/Services/Helper.php:833
-#: builds/fluent-support/app/Services/Helper.php:847
-#: builds/fluent-support/app/Services/Helper.php:861
+#: app/Services/Helper.php:836 app/Services/Helper.php:850
+#: app/Services/Helper.php:864
+#: builds/fluent-support/app/Services/Helper.php:836
+#: builds/fluent-support/app/Services/Helper.php:850
+#: builds/fluent-support/app/Services/Helper.php:864
 msgid "Powerful platform for any member-focused business"
 msgstr ""
 
@@ -3894,17 +3955,17 @@ msgstr ""
 
 #: app/Modules/StatModule.php:81 app/Modules/StatModule.php:124
 #: app/Modules/StatModule.php:164 app/Services/TransStrings.php:158
-#: app/Services/Helper.php:683
+#: app/Services/Helper.php:686
 #: builds/fluent-support/app/Modules/StatModule.php:81
 #: builds/fluent-support/app/Modules/StatModule.php:124
 #: builds/fluent-support/app/Modules/StatModule.php:164
 #: builds/fluent-support/app/Services/TransStrings.php:158
-#: builds/fluent-support/app/Services/Helper.php:683
+#: builds/fluent-support/app/Services/Helper.php:686
 msgid "Responses"
 msgstr ""
 
-#: app/Services/Helper.php:858
-#: builds/fluent-support/app/Services/Helper.php:858
+#: app/Services/Helper.php:861
+#: builds/fluent-support/app/Services/Helper.php:861
 msgid "Restrict Content pro"
 msgstr ""
 
@@ -4196,12 +4257,12 @@ msgstr ""
 msgid "Selected response has been updated"
 msgstr ""
 
-#: app/Models/Ticket.php:1536 builds/fluent-support/app/Models/Ticket.php:1536
+#: app/Models/Ticket.php:1553 builds/fluent-support/app/Models/Ticket.php:1553
 msgid "Selected tags has been added to tickets"
 msgstr ""
 
-#: app/Services/Helper.php:819
-#: builds/fluent-support/app/Services/Helper.php:819
+#: app/Services/Helper.php:822
+#: builds/fluent-support/app/Services/Helper.php:822
 msgid "Self-hosted email and marketing automation for WordPress"
 msgstr ""
 
@@ -4324,8 +4385,8 @@ msgstr ""
 msgid "Signup Form"
 msgstr ""
 
-#: app/Services/Helper.php:788 app/Hooks/Handlers/Menu.php:314
-#: builds/fluent-support/app/Services/Helper.php:788
+#: app/Services/Helper.php:791 app/Hooks/Handlers/Menu.php:314
+#: builds/fluent-support/app/Services/Helper.php:791
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:314
 msgid "Slack"
 msgstr ""
@@ -4373,9 +4434,22 @@ msgstr ""
 msgid "Sorry you can not create ticket"
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:470
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:470
+#: app/Http/Controllers/SettingsController.php:474
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:474
 msgid "Sorry! FluentCRM could not be installed. Please install manually"
+msgstr ""
+
+#: app/Services/CustomerPortalService.php:435
+#: builds/fluent-support/app/Services/CustomerPortalService.php:435
+#, php-format
+msgid "Sorry! You cannot %s this ticket"
+msgstr ""
+
+#: app/Http/Controllers/SettingsController.php:454
+#: app/Http/Controllers/SettingsController.php:491
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:454
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:491
+msgid "Sorry! you do not have permission to install plugin"
 msgstr ""
 
 #: app/Services/Tickets/Importer/SupportCandyTickets.php:42
@@ -4390,6 +4464,11 @@ msgstr ""
 #: app/Services/TransStrings.php:634
 #: builds/fluent-support/app/Services/TransStrings.php:634
 msgid "Sorry, this customer has one ticket only"
+msgstr ""
+
+#: app/Services/CustomerPortalService.php:450
+#: builds/fluent-support/app/Services/CustomerPortalService.php:450
+msgid "Sorry, You cannot access this ticket"
 msgstr ""
 
 #: app/Hooks/Handlers/TwoFaHandler.php:120
@@ -4564,6 +4643,11 @@ msgstr ""
 msgid "Support Tickets"
 msgstr ""
 
+#: app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:24
+#: builds/fluent-support/app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:24
+msgid "Support Tickets by Fluent Support"
+msgstr ""
+
 #: app/Services/Tickets/CustomFieldsService.php:12
 #: app/Services/Tickets/CustomFieldsService.php:15
 #: builds/fluent-support/app/Services/Tickets/CustomFieldsService.php:12
@@ -4571,8 +4655,8 @@ msgstr ""
 msgid "Support Type"
 msgstr ""
 
-#: app/Services/Helper.php:171
-#: builds/fluent-support/app/Services/Helper.php:171
+#: app/Services/Helper.php:174
+#: builds/fluent-support/app/Services/Helper.php:174
 #, php-format
 msgid "Supported Types: %s and max file size: %.01fMB"
 msgstr ""
@@ -4607,8 +4691,8 @@ msgstr ""
 msgid "Task successfully added to Fluent Boards"
 msgstr ""
 
-#: app/Services/Helper.php:809 app/Hooks/Handlers/Menu.php:307
-#: builds/fluent-support/app/Services/Helper.php:809
+#: app/Services/Helper.php:812 app/Hooks/Handlers/Menu.php:307
+#: builds/fluent-support/app/Services/Helper.php:812
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:307
 msgid "Telegram"
 msgstr ""
@@ -4655,13 +4739,13 @@ msgid ""
 "Dropbox/Google Drive and paste the link in the response"
 msgstr ""
 
-#: app/Services/Helper.php:889
-#: builds/fluent-support/app/Services/Helper.php:889
+#: app/Services/Helper.php:892
+#: builds/fluent-support/app/Services/Helper.php:892
 msgid "The leading course platform built for WordPress"
 msgstr ""
 
-#: app/Services/Helper.php:777
-#: builds/fluent-support/app/Services/Helper.php:777
+#: app/Services/Helper.php:780
+#: builds/fluent-support/app/Services/Helper.php:780
 msgid "The most popular e-commerce platform for WordPress"
 msgstr ""
 
@@ -4670,8 +4754,8 @@ msgstr ""
 msgid "The OpenAI ChatGPT API can be used to generate and enhance responses."
 msgstr ""
 
-#: app/Services/Helper.php:868
-#: builds/fluent-support/app/Services/Helper.php:868
+#: app/Services/Helper.php:871
+#: builds/fluent-support/app/Services/Helper.php:871
 msgid "The standard plugin for knowledge base and documentation"
 msgstr ""
 
@@ -4680,8 +4764,8 @@ msgstr ""
 msgid "the status will be active"
 msgstr ""
 
-#: app/Services/Helper.php:798
-#: builds/fluent-support/app/Services/Helper.php:798
+#: app/Services/Helper.php:801
+#: builds/fluent-support/app/Services/Helper.php:801
 msgid "The ultimate platform for any member-focused business"
 msgstr ""
 
@@ -4689,8 +4773,8 @@ msgstr ""
 msgid "The Ultimate Support Plugin For Your WordPress."
 msgstr ""
 
-#: app/Services/Helper.php:854
-#: builds/fluent-support/app/Services/Helper.php:854
+#: app/Services/Helper.php:857
+#: builds/fluent-support/app/Services/Helper.php:857
 msgid "The ultimate WordPress platform for digital products"
 msgstr ""
 
@@ -4911,9 +4995,10 @@ msgstr ""
 msgid "Ticket Form Settings"
 msgstr ""
 
-#: app/Services/CustomerPortalService.php:128
+#: app/Models/Ticket.php:1285 app/Services/CustomerPortalService.php:128
 #: app/Services/Tickets/ResponseService.php:118
 #: app/Services/Tickets/TicketService.php:40
+#: builds/fluent-support/app/Models/Ticket.php:1285
 #: builds/fluent-support/app/Services/CustomerPortalService.php:128
 #: builds/fluent-support/app/Services/Tickets/ResponseService.php:118
 #: builds/fluent-support/app/Services/Tickets/TicketService.php:40
@@ -4925,12 +5010,13 @@ msgstr ""
 msgid "Ticket has been created successfully"
 msgstr ""
 
-#: app/Services/Tickets/TicketService.php:252
-#: builds/fluent-support/app/Services/Tickets/TicketService.php:252
+#: app/Services/Tickets/TicketService.php:254
+#: builds/fluent-support/app/Services/Tickets/TicketService.php:254
 msgid "Ticket has been deleted successfully"
 msgstr ""
 
-#: app/Services/CustomerPortalService.php:148
+#: app/Models/Ticket.php:1305 app/Services/CustomerPortalService.php:148
+#: builds/fluent-support/app/Models/Ticket.php:1305
 #: builds/fluent-support/app/Services/CustomerPortalService.php:148
 msgid "Ticket has been opened again"
 msgstr ""
@@ -5185,8 +5271,8 @@ msgstr ""
 msgid "Trigger Type"
 msgstr ""
 
-#: app/Services/Helper.php:802
-#: builds/fluent-support/app/Services/Helper.php:802
+#: app/Services/Helper.php:805
+#: builds/fluent-support/app/Services/Helper.php:805
 msgid "Tutor LMS"
 msgstr ""
 
@@ -5245,6 +5331,12 @@ msgstr ""
 #: builds/fluent-support/app/Services/TransStrings.php:388
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:162
 msgid "Unknown error. Please reload this page"
+msgstr ""
+
+#: app/Services/AvatarUploder.php:62
+#: builds/fluent-support/app/Services/AvatarUploder.php:62
+#, php-format
+msgid "Unsupported file submitted, allowed image file types are: %s"
 msgstr ""
 
 #: app/Services/TransStrings.php:227
@@ -5309,18 +5401,18 @@ msgstr ""
 msgid "Upload a Custom Picture"
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:661
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:661
+#: app/Http/Controllers/SettingsController.php:665
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:665
 msgid "Upload and store the files to your Dropbox Storage."
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:670
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:670
+#: app/Http/Controllers/SettingsController.php:674
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:674
 msgid "Upload and store the files to your Google Drive Storage."
 msgstr ""
 
-#: app/Http/Controllers/SettingsController.php:652
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:652
+#: app/Http/Controllers/SettingsController.php:656
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:656
 msgid "Upload and store the files to your WordPress File System Storage."
 msgstr ""
 
@@ -5400,8 +5492,8 @@ msgstr ""
 msgid "Version 3"
 msgstr ""
 
-#: app/Hooks/Handlers/AdminBarHandler.php:100
-#: builds/fluent-support/app/Hooks/Handlers/AdminBarHandler.php:100
+#: app/Hooks/Handlers/AdminBarHandler.php:102
+#: builds/fluent-support/app/Hooks/Handlers/AdminBarHandler.php:102
 msgid "View"
 msgstr ""
 
@@ -5437,6 +5529,11 @@ msgstr ""
 msgid "View Settings"
 msgstr ""
 
+#: app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:46
+#: builds/fluent-support/app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:46
+msgid "View Ticket"
+msgstr ""
+
 #: app/Services/TransStrings.php:387
 #: app/Hooks/Handlers/CustomerPortalHandler.php:163
 #: builds/fluent-support/app/Services/TransStrings.php:387
@@ -5464,9 +5561,9 @@ msgstr ""
 msgid "Waiting for Reply"
 msgstr ""
 
-#: app/Services/TransStrings.php:164 app/Services/Helper.php:687
+#: app/Services/TransStrings.php:164 app/Services/Helper.php:690
 #: builds/fluent-support/app/Services/TransStrings.php:164
-#: builds/fluent-support/app/Services/Helper.php:687
+#: builds/fluent-support/app/Services/Helper.php:690
 msgid "Waiting Tickets"
 msgstr ""
 
@@ -5512,8 +5609,8 @@ msgstr ""
 msgid "What's this support ticket about?"
 msgstr ""
 
-#: app/Services/Helper.php:872
-#: builds/fluent-support/app/Services/Helper.php:872
+#: app/Services/Helper.php:875
+#: builds/fluent-support/app/Services/Helper.php:875
 msgid "WhatsApp"
 msgstr ""
 
@@ -5538,13 +5635,13 @@ msgid ""
 "agent."
 msgstr ""
 
-#: app/Services/Helper.php:844
-#: builds/fluent-support/app/Services/Helper.php:844
+#: app/Services/Helper.php:847
+#: builds/fluent-support/app/Services/Helper.php:847
 msgid "WishList Member"
 msgstr ""
 
-#: app/Services/Helper.php:774
-#: builds/fluent-support/app/Services/Helper.php:774
+#: app/Services/Helper.php:777
+#: builds/fluent-support/app/Services/Helper.php:777
 msgid "WooCommerce"
 msgstr ""
 
@@ -5659,8 +5756,8 @@ msgstr ""
 msgid "You are already logged in. <a href=\"%s\">Go to support portal</a>"
 msgstr ""
 
-#: app/Services/Tickets/TicketService.php:240
-#: builds/fluent-support/app/Services/Tickets/TicketService.php:240
+#: app/Services/Tickets/TicketService.php:242
+#: builds/fluent-support/app/Services/Tickets/TicketService.php:242
 msgid "You are not allowed to delete this ticket"
 msgstr ""
 
@@ -5711,6 +5808,11 @@ msgstr ""
 #: builds/fluent-support/app/Http/Controllers/UploaderController.php:107
 #: builds/fluent-support/app/Http/Controllers/UploaderController.php:115
 msgid "You do not have permission to upload a file"
+msgstr ""
+
+#: app/Services/CustomerPortalService.php:439
+#: builds/fluent-support/app/Services/CustomerPortalService.php:439
+msgid "You do not have permission to view this support ticket"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:27
@@ -5866,6 +5968,11 @@ msgstr ""
 msgid "Your search has been saved successfully!"
 msgstr ""
 
+#: app/Http/Controllers/AuthController.php:96
+#: builds/fluent-support/app/Http/Controllers/AuthController.php:96
+msgid "Your verification code has been expired. Please try again"
+msgstr ""
+
 #: app/Services/TransStrings.php:458
 #: builds/fluent-support/app/Services/TransStrings.php:458
 msgid "Your Workflow Name"
@@ -5876,10 +5983,10 @@ msgstr ""
 msgid "Zendesk Domain"
 msgstr ""
 
-#: app/Services/Helper.php:213 app/Hooks/Handlers/AuthHandler.php:416
+#: app/Services/Helper.php:216 app/Hooks/Handlers/AuthHandler.php:416
 #: app/Hooks/Handlers/AuthHandler.php:418
 #: app/Hooks/Handlers/PrivacyHandler.php:244
-#: builds/fluent-support/app/Services/Helper.php:213
+#: builds/fluent-support/app/Services/Helper.php:216
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:416
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:418
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:244

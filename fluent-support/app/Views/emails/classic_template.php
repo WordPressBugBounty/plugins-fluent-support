@@ -47,7 +47,7 @@
                                                         <tbody class="mcnTextBlockOuter">
                                                         <tr>
                                                             <td class="fc_email_body"  align="left" valign="top" style="padding-top: 20px;padding-right: 20px;padding-bottom: 10px;padding-left: 20px;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;word-break: break-word;color: #202020;font-size: 16px;line-height: 180%;text-align: left;">
-                                                                <?php echo $email_body;  // WPCS: XSS ok. ?>
+                                                                <?php echo wp_kses_post($email_body);  // WPCS: XSS ok. ?>
                                                             </td>
                                                         </tr>
                                                         </tbody>

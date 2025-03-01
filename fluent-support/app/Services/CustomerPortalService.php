@@ -431,9 +431,12 @@ class CustomerPortalService
 
         if ($ticket->privacy == 'private' && $customer->id != $ticket->customer_id) {
             if ($action) {
-                throw new \Exception("Sorry! You can not {$action} to this ticket");
+                throw new \Exception(sprintf(
+                    esc_html__("Sorry! You cannot %s this ticket", 'fluent-support'),
+                    esc_html($action)
+                ));
             } else {
-                throw new \Exception('You do not have permission to view this support ticket');
+                throw new \Exception(esc_html__('You do not have permission to view this support ticket', 'fluent-support'));
             }
         }
 
@@ -444,10 +447,10 @@ class CustomerPortalService
         }
 
         if (!$result) {
-            throw new \Exception('Sorry, You can not access to this ticket');
+            throw new \Exception(esc_html__('Sorry, You cannot access this ticket', 'fluent-support'));
         }
 
-        throw new \Exception($result->get_error_message());
+        throw new \Exception(esc_html($result->get_error_message()));
     }
 
 

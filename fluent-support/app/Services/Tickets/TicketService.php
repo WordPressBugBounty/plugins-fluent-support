@@ -189,6 +189,8 @@ class TicketService
      */
     public static function addTicketAttachments($data, $disabledFields, $ticket, $customer)
     {
+        Helper::tempImageMoveUploadDir($ticket->id, 'ticket-create');
+
         if (($attachmentsHashes = Arr::get($data, 'attachments')) && !in_array('file_upload', $disabledFields)) {
             $attachments = Attachment::whereIn('file_hash', $attachmentsHashes)
                 ->where('status', 'in-active')
@@ -237,7 +239,7 @@ class TicketService
         $deletePermission = PermissionManager::currentUserCan('fst_delete_tickets');
         $agent = Helper::getAgentByUserId();
         if (!$deletePermission && $ticket->agent_id != $agent->id) {
-            throw new \Exception(__('You are not allowed to delete this ticket', 'fluent-support'));
+            throw new \Exception(esc_html__('You are not allowed to delete this ticket', 'fluent-support'));
         }
 
         $ticketData = [

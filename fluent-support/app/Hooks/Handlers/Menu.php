@@ -363,7 +363,7 @@ class Menu
                 'go_back_after_reply' => 'yes'
             ],
             'notification_integrations'  => $integrationDrivers,
-            'server_time'                => date('Y-m-d\TH:i:sP'),
+            'server_time'                => gmdate('Y-m-d\TH:i:sP'),
             'has_email_parser'           => defined('FLUENTSUPPORTPRO_PLUGIN_VERSION'),
             'ticket_tags'                => $tags,
             'i18n'                       => $i18ns,

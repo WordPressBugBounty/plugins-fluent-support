@@ -4,12 +4,15 @@ namespace FluentSupport\App\Services;
 
 use FluentSupport\App\App;
 use FluentSupport\App\Models\Agent;
+use FluentSupport\App\Models\Ticket;
+use FluentSupport\App\Models\Conversation;
 use FluentSupport\App\Models\Customer;
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Models\AIActivityLogs;
 use FluentSupport\App\Models\Person;
 use FluentSupport\App\Models\Product;
+use FluentSupport\App\Services\Includes\UploadService;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\Framework\Support\Arr;
 
@@ -1224,5 +1227,100 @@ class Helper
                                     ->get();
         return $businessEmailBoxes;
     } 
+
+    public static function tempImageMoveUploadDir($ticketId, $contentType, $replyId = null)
+    {
+        // Fetch content based on the content type
+        $content = self::getContentByType($ticketId, $contentType , $replyId);
+        if (empty($content)) {
+            return;
+        }
+
+        // Extract image URLs from the content
+        $imageUrls = self::extractImageUrls($content);
+        if (empty($imageUrls)) {
+            return;
+        }
+
+        // Move images to the upload directory and update content
+        self::moveImagesAndUpdateContent($imageUrls, $ticketId, $contentType, $content, $replyId);
+    }
+
+    /**
+     * Fetch content based on the content type.
+     */
+    private static function getContentByType($ticketId, $contentType, $replyId)
+    {
+        if ($contentType == 'ticket-create') {
+            $ticket = Ticket::find($ticketId);
+            return $ticket ? $ticket->content : null;
+        }
+
+        $conversation = Conversation::find($replyId);
+        return $conversation ? $conversation->content : null;
+    }
+
+    /**
+     * Extract image URLs from the content.
+     */
+    private static function extractImageUrls($content)
+    {
+        preg_match_all('/<img[^>]+src="([^">]+)"/', $content, $matches);
+        return $matches[1] ?? [];
+    }
+
+    /**
+     * Move images to the upload directory and update content.
+     */
+    private static function moveImagesAndUpdateContent($imageUrls, $ticketId, $contentType, $content, $replyId)
+    {
+        // Get the current site's upload directory
+        $uploadDirInfo = wp_upload_dir();
+        $uploadsDir = $uploadDirInfo['basedir']; 
+        $tempDir = $uploadsDir . '/fluent-support/temp_files/';
+
+        foreach ($imageUrls as $imageUrl) {
+            // Build the absolute path for the temporary file
+            $imageRelativePath = $tempDir . basename($imageUrl);
+            $absolutePath = $imageRelativePath;
+
+            // Move the file to the ticket-specific folder
+            $newFileInfo = UploadService::copyFileTicketFolder($absolutePath, $ticketId);
+
+            // Check if the move was successful
+            if (empty($newFileInfo['file_path'])) {
+                continue; // Skip if the file couldn't be copied
+            }
+
+            // Ensure the new URL is correctly constructed
+            $newFileInfo['url'] = trailingslashit($uploadDirInfo['baseurl']) . 'fluent-support/ticket_' . $ticketId . '/' . basename($newFileInfo['file_path']);
+
+            // Replace the old URL with the new one in the content
+            $content = str_replace($imageUrl, $newFileInfo['url'], $content);
+        }
+
+        // Save the updated content
+        self::saveUpdatedContent($ticketId, $contentType, $content, $replyId);
+    }
+
+    /**
+     * Save the updated content based on the content type.
+     */
+    private static function saveUpdatedContent($ticketId, $contentType, $content, $replyId)
+    {
+        if ($contentType == 'ticket-create') {
+            $ticket = Ticket::find($ticketId);
+            if ($ticket) {
+                $ticket->content = $content;
+                $ticket->save();
+            }
+        } else {
+            $conversation = Conversation::find($replyId);
+            if ($conversation) {
+                $conversation->content = $content;
+                $conversation->save();
+            }
+        }
+    }
 
 }

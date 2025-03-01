@@ -59,8 +59,8 @@ class ExternalPages
 
         // check signature hash
         if (!$this->validateAttachmentSignature($attachment)) {
-            $dieMessage = __('Sorry, Your secure sign is invalid, Please reload the previous page and get new signed url', 'fluent-support');
-            die($dieMessage);
+            $dieMessage = esc_html__('Sorry, Your secure sign is invalid, Please reload the previous page and get new signed url', 'fluent-support');
+            die(esc_html($dieMessage));  // Escaping the die message again for safety
         }
 
         //If external file
@@ -117,7 +117,7 @@ class ExternalPages
 
     private function showInvalidPortalMessage()
     {
-        echo '<h3 style="text-align: center; margin: 50px 0;">' . __('Invalid Support Portal URL', 'fluent-support') . '</h3>';
+        echo '<h3 style="text-align: center; margin: 50px 0;">' . esc_html__('Invalid Support Portal URL', 'fluent-support') . '</h3>';
         die();
     }
 
@@ -136,11 +136,20 @@ class ExternalPages
     // Helper method to serve an attachment
     private function serveLocalAttachment($attachment)
     {
+        $file_path = realpath($attachment->file_path);
+        $uploads_dir = wp_upload_dir()['basedir'];
+        
+        if (!$file_path || strpos($file_path, $uploads_dir) !== 0 || !file_exists($file_path)) {
+            wp_die(esc_html__('File not found or access denied', 'fluent-support'), 403);
+            return;
+        }
+        
         ob_get_clean();
-        ini_set('user_agent', 'Fluent Support/' . FLUENT_SUPPORT_VERSION . '; ' . get_bloginfo('url'));
-        header("Content-Type: {$attachment->file_type}");
-        header("Content-Disposition: inline; filename=\"{$attachment->title}\"");
-        echo file_get_contents($attachment->file_path);
+        ini_set('user_agent', 'Fluent Support/' . FLUENT_SUPPORT_VERSION . '; ' . esc_url(get_bloginfo('url')));
+        
+        header("Content-Type: " . esc_attr($attachment->file_type));
+        header("Content-Disposition: inline; filename=\"" . esc_attr($attachment->title) . "\"");
+        readfile($file_path);
         die();
     }
 

@@ -208,6 +208,13 @@ class AgentController extends Controller
         }
     }
 
+    public function getAgentInsights(Request $request, Agent $agent)
+    {        
+        return [
+            'agents' => $agent->agentInsights($request->getSafe('search','sanitize_text_field')),
+        ];
+    }
+
     public function ping(Request $request)
     {
         return [

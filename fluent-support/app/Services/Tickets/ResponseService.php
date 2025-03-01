@@ -131,6 +131,8 @@ class ResponseService
 
         $ticket->save();
 
+        Helper::tempImageMoveUploadDir($ticket->id, 'conversation', $createdResponse->id);
+
         //If file upload failed to local during create response
         if ($attachmentHashes = Arr::get($data, 'attachments', [])) {
             $attachments = Attachment::where('ticket_id', $ticket->id)

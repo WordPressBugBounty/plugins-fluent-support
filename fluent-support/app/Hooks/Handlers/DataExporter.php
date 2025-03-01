@@ -46,7 +46,7 @@ class DataExporter
         $csvWriter->insertAll($rows);
 
         $currentTime = current_time('timestamp');
-        $csvWriter->output('agent_report-' . date('Y-m-d_H-i-s', $currentTime) . '.csv');
+        $csvWriter->output('agent_report-' . gmdate('Y-m-d_H-i-s', $currentTime) . '.csv');
     }
 
     private function defineColumns($columns)

@@ -29,7 +29,7 @@ class CleanupHandler
     protected function cleanLiveActivities()
     {
         // Delete All Live Activity older than 24 hours
-        $oldDateTime = date('Y-m-d H:i:s', current_time('timestamp') - 86400);
+        $oldDateTime = gmdate('Y-m-d H:i:s', current_time('timestamp') - 86400);
 
         Meta::where('key', '_live_activity')
             ->where('object_type', 'ticket_meta')
@@ -45,7 +45,7 @@ class CleanupHandler
             $settings['delete_days'] = 14;
         }
 
-        $oldDateTime = date('Y-m-d H:i:s', current_time('timestamp') - ($settings['delete_days'] * 86400));
+        $oldDateTime = gmdate('Y-m-d H:i:s', current_time('timestamp') - ($settings['delete_days'] * 86400));
 
         Activity::where('created_at', '<', $oldDateTime)->delete();
     }
@@ -64,7 +64,7 @@ class CleanupHandler
             $defaultDays = (int)$settings['delete_days'];
         }
 
-        $oldDateTime = date('Y-m-d H:i:s', current_time('timestamp') - ($defaultDays * 86400));
+        $oldDateTime = gmdate('Y-m-d H:i:s', current_time('timestamp') - ($defaultDays * 86400));
 
         AIActivityLogs::where('created_at', '<', $oldDateTime)->delete();
     }
@@ -94,7 +94,7 @@ class CleanupHandler
                 if ($attachment->driver != 'local') {
                     do_action('fluent_support/delete_remote_attachment_' . $attachment->driver, $attachment, $ticket->id);
                 } else if (file_exists($attachment->file_path)) {
-                    @unlink($attachment->file_path);
+                    wp_delete_file($attachment->file_path);
                 }
             }
 
@@ -129,7 +129,7 @@ class CleanupHandler
         foreach (glob($dir . '/temp_files/*') as $filename) {
             // check if file was created before last 2 hours
             if (time() - filectime($filename) >= 7200) { // 2 hours
-                @unlink($filename); // delete file
+                wp_delete_file($filename); // delete file
             }
         }
     }
@@ -140,7 +140,7 @@ class CleanupHandler
         global $wpdb;
 
         // Get the timestamp for 7 days ago
-        $cutoff_date = date('Y-m-d H:i:s', strtotime("-{$days_old} days"));
+        $cutoff_date = gmdate('Y-m-d H:i:s', strtotime("-{$days_old} days"));
 
         // Get the group ID
         $group_id = $wpdb->get_var($wpdb->prepare(

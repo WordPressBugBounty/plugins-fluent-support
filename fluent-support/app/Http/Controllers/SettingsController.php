@@ -197,7 +197,7 @@ class SettingsController extends Controller
                 ],
                 'assigned_list'  => [
                     'type'       => 'input-options',
-                    'label'      => __('Add to FluentCRM list (optional)', 'fluent-crm'),
+                    'label'      => __('Add to FluentCRM list (optional)', 'fluent-support'),
                     'options'    => \FluentCrm\App\Models\Lists::select(['id', 'title'])->orderBy('title', 'ASC')->get(),
                     'dependency' => [
                         'depends_on' => 'enabled',
@@ -208,7 +208,7 @@ class SettingsController extends Controller
                 'assigned_tags'  => [
                     'type'       => 'input-options',
                     'multiple'   => true,
-                    'label'      => __('Add to Tags', 'fluent-crm'),
+                    'label'      => __('Add to Tags', 'fluent-support'),
                     'options'    => \FluentCrm\App\Models\Tag::select(['id', 'title'])->orderBy('title', 'ASC')->get(),
                     'dependency' => [
                         'depends_on' => 'enabled',
@@ -350,8 +350,12 @@ class SettingsController extends Controller
                 'message' => __('OpenAI settings have been successfully saved.', 'fluent-support'),
             ]);
         } catch (\Exception $e) {
+            // translators: %s is the error message from the exception
+            $translatedMessage = __('An error occurred while saving the settings: %s', 'fluent-support');
+            $errorMessage = sprintf($translatedMessage, $e->getMessage());
+        
             return $this->sendError([
-                'message' => __('An error occurred while saving the settings: ' . $e->getMessage(), 'fluent-support'),
+                'message' => $errorMessage,
             ]);
         }
     }
@@ -447,7 +451,7 @@ class SettingsController extends Controller
 
         if (!current_user_can('install_plugins')) {
             return $this->sendError([
-                'message' => __('Sorry! you do not have permission to install plugin', 'fluent-crm')
+                'message' => __('Sorry! you do not have permission to install plugin', 'fluent-support')
             ]);
         }
 
@@ -484,7 +488,7 @@ class SettingsController extends Controller
 
         if (!current_user_can('install_plugins')) {
             return $this->sendError([
-                'message' => __('Sorry! you do not have permission to install plugin', 'fluent-crm')
+                'message' => __('Sorry! you do not have permission to install plugin', 'fluent-support')
             ]);
         }
 

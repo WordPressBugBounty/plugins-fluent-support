@@ -87,9 +87,9 @@ class AdminBarHandler
             <table class="fs_dash_table wp-list-table widefat fixed striped">
                 <thead>
                 <tr>
-                    <th><?php _e('Title', 'fluent-support'); ?></th>
-                    <th><?php _e('Count', 'fluent-support'); ?></th>
-                    <th><?php _e('Action', 'fluent-support'); ?></th>
+                    <th><?php esc_html_e('Title', 'fluent-support'); ?></th>
+                    <th><?php esc_html_e('Count', 'fluent-support'); ?></th>
+                    <th><?php esc_html_e('Action', 'fluent-support'); ?></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -97,7 +97,11 @@ class AdminBarHandler
                     <tr>
                         <td><?php echo esc_html($stat['title']); ?></td>
                         <td><?php echo esc_html($stat['number']); ?></td>
-                        <td>  <a href="<?php echo esc_url($stat['url']); ?>"> <?php echo __('View', 'fluent-support') ?> </a> </td>
+                        <td>
+                            <a href="<?php echo esc_url($stat['url']); ?>">
+                                <?php esc_html_e('View', 'fluent-support'); ?>
+                            </a>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

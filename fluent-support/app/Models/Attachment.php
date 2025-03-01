@@ -35,7 +35,7 @@ class Attachment extends Model
         
         static::creating(function ($model) {
             $uid = wp_generate_uuid4();
-            $model->file_hash = md5($uid . mt_rand(0, 1000));
+            $model->file_hash = md5($uid . wp_rand(0, 1000));
         });
     }
 

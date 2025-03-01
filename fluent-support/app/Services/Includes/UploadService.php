@@ -19,6 +19,20 @@ class UploadService
 
     public static function handleTempFileUpload($file)
     {
+
+        $uploadDir = wp_upload_dir();
+        $fluentSupportFolder = $uploadDir['basedir'] . DIRECTORY_SEPARATOR . FLUENT_SUPPORT_UPLOAD_DIR;
+        if (!file_exists($fluentSupportFolder . DIRECTORY_SEPARATOR . 'index.html')) {
+            if (!is_dir($fluentSupportFolder)) {
+                // create the folder
+                @mkdir($fluentSupportFolder, 0755);
+            }
+
+            @file_put_contents($fluentSupportFolder . DIRECTORY_SEPARATOR . 'index.html', '');
+            @file_put_contents($fluentSupportFolder . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all');
+        }
+
+
         $uploadInfo = FileSystem::setSubDir('temp_files')->put($file);
 
         if (!empty($uploadInfo) && is_array($uploadInfo)) {
@@ -110,7 +124,7 @@ class UploadService
         $response = wp_remote_request($contentUrl, [
             'sslverify' => false,
             'method'    => 'GET',
-            'timeout' => 30
+            'timeout'   => 30
         ]);
 
         if (is_wp_error($response)) {

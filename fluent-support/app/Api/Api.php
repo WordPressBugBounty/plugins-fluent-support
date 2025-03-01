@@ -39,7 +39,7 @@ final class Api
         try {
             return $this->app[$this->key($key)];
         } catch(\Exception $e) {
-            throw new \Exception("The '$key' doesn't exist in FluentSupportApi.");
+            throw new \Exception(sprintf('The %s doesn\'t exist in FluentSupportApi.', esc_html($key)));
         }
     }
 }

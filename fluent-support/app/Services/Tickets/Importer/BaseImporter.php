@@ -239,6 +239,8 @@ abstract class BaseImporter
 
         static $cachedPerson = [];
 
+        $personData = (array) $personData;
+
         if (!empty($personData['user_id'])) {
             if (isset($personData[$personData['user_id'] . '_' . $type])) {
                 return $personData[$personData['user_id'] . '_' . $type];
