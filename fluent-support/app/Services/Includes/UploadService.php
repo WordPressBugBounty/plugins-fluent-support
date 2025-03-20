@@ -34,7 +34,6 @@ class UploadService
 
 
         $uploadInfo = FileSystem::setSubDir('temp_files')->put($file);
-
         if (!empty($uploadInfo) && is_array($uploadInfo)) {
             return $uploadInfo;
         }

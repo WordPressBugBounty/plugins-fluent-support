@@ -30,7 +30,7 @@ class UploaderController extends Controller
         $mimeHeadings = Helper::getAcceptedMimeHeadings();
         $maxSizeBytes = $maxFileSize * 1024;
         $imageType = $request->type ? $request->type : null;
-        
+
         $this->validateUploadedFiles($request->files(), $maxSizeBytes, $mimeHeadings, $maxFileSize);
         $ticketId = $this->resolveTicketId($request);
         $person = $this->resolvePerson($ticketId, $request);
@@ -143,7 +143,7 @@ class UploaderController extends Controller
             if($imageType == 'direct_paste'){
                 $full_path = esc_url($file['url']);
             }
-            
+
             try {
                 $attachment = Attachment::create($fileData);
                 $attachments[] = $attachment->file_hash;

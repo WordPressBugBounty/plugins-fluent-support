@@ -6,7 +6,7 @@ use FluentSupport\Framework\Request\Request;
 use FluentSupport\App\Services\Tickets\Importer\BaseImporter;
 
 
-class TicketImportController
+class TicketImportController extends Controller
 {
     public function getStats ( MigratorService $importService )
     {
@@ -17,9 +17,13 @@ class TicketImportController
         return $stats;
     }
 
-    public function importTickets ( MigratorService $importService, Request $request )
+    public function importTickets(MigratorService $importService, Request $request)
     {
-        return $importService->handleImport( $request->getSafe('page', 'intval'), $request->getSafe('handler'), $request->getSafe('query', []) );
+        try {
+            return $importService->handleImport( $request->getSafe('page', 'intval'), $request->getSafe('handler'), $request->getSafe('query', []) );
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 
     public function deleteTickets (MigratorService $importService, Request $request)

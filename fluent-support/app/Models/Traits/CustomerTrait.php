@@ -272,6 +272,7 @@ trait CustomerTrait
     public function updateCustomer($customerId, $data)
     {
         $customFieldsKeys = apply_filters('fluent_support/custom_registration_form_fields_key', Helper::getBusinessSettings('custom_registration_form_field'));
+        $customFieldsKeys = is_array($customFieldsKeys) ? $customFieldsKeys : [];
         $customFormValue = Arr::only($data, $customFieldsKeys);
 
         $data = $this->takeValidKeysForUpdate($data);
@@ -285,7 +286,7 @@ trait CustomerTrait
 
         $user = get_user_by('email', $data['email']);
 
-        if ($user) {
+        if ($user && !empty($customFieldsKeys)) {
             $data['user_id'] = $user->ID;
 
             //Update Custom field data for user

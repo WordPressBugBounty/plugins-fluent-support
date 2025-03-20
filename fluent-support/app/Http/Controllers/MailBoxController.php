@@ -119,9 +119,7 @@ class MailBoxController extends Controller
             $data = $request->only(['ticket_ids', 'new_box_id', 'move_type']);
             return $mailBoxService->moveTickets( $data, $id );
         } catch (\Exception $e) {
-            return [
-                'message' => __( $e->getMessage(), 'fluent-support' ),
-            ];
+            return $this->sendError($e->getMessage());
         }
     }
 

@@ -3,6 +3,7 @@
 namespace FluentSupport\App\Services\MailerInbox;
 
 use FluentSupport\App\App;
+use FluentSupport\App\Models\Agent;
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Models\Ticket;
@@ -238,7 +239,29 @@ class MailBoxService
         if ( $data['move_type'] == 'Custom' && empty($data['ticket_ids']) ) {
             throw new \Exception('Invalid request submitted, Select ticket first');
         }
+        $ticketIDs = $data['ticket_ids'];
+        $newMailBoxId = (int)$data['new_box_id'];
 
+        foreach ($ticketIDs as $ticketID) {
+            $ticket = Ticket::findOrFail($ticketID);
+            if (!$ticket->agent_id) {
+                continue;
+            }
+
+            $agent = Agent::find($ticket->agent_id);
+            if (!$agent) {
+                continue;
+            }
+
+            $restrictions = $agent->getMeta('agent_restrictions', []);
+            if (!empty($restrictions['restrictedBusinessBoxes'])) {
+                $restrictedBoxes = array_map('intval', $restrictions['restrictedBusinessBoxes']);
+
+                if (in_array($newMailBoxId, $restrictedBoxes)) {
+                    throw new \Exception('Agent is restricted for this mailbox ticket');
+                }
+            }
+        }
         return true;
     }
 

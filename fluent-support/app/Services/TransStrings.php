@@ -343,7 +343,7 @@ class TransStrings
             'Close'    => __('Close', 'fluent-support'),
             'Click to Edit Subject'    => __('Click to Edit Subject', 'fluent-support'),
             'Press enter to save'    => __('Press enter to save', 'fluent-support'),
-            'ticket_closed'    => __('This ticket has been closed at', 'fluent-support'),
+            'ticket_closed'    => __('This ticket was closed on', 'fluent-support'),
             'Reopen This ticket'    => __('Reopen This ticket', 'fluent-support'),
             'You created a draft'    => __('You created a draft', 'fluent-support'),
             'Saved Draft'   => __('Saved Draft', 'fluent-support'),
@@ -705,6 +705,8 @@ class TransStrings
             'Agent Time Sheet Report' => __('Customer Time Sheet Report', 'fluent-support'),
             'Time Sheet Report By Tickets' => __('Time Sheet Report By Tickets', 'fluent-support'),
             'Saved Filters' => __('Saved Filters', 'fluent-support'),
+            'Back to All Tickets' => __('Back to All Tickets', 'fluent-support'),
+            'Refresh' => __('Refresh', 'fluent-support'),
         ];
     }
 }

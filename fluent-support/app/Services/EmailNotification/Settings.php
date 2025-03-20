@@ -135,7 +135,7 @@ class Settings
             'login_message'         => [
                 'type'        => 'wp-editor',
                 'label'       => __('Message for non logged in users', 'fluent-support'),
-                'inline_help' => __('Please provide message for not logged in users. You can place login shortcode too Use shortcode <code>[fluent_support_login]</code> to show built-in login form. For the user registration use this shortcode <code>[fluent_support_signup]</code> and for both form please use <code>[fluent_support_auth]</code>', 'fluent-support')
+                'inline_help' => __('Please provide message for not logged in users. You can place login shortcode too. Use shortcode <code>[fluent_support_login]</code> to show built-in login form. For the user registration use this shortcode <code>[fluent_support_signup]</code> and for both form please use <code>[fluent_support_auth]</code>', 'fluent-support')
             ],
             'disable_public_ticket' => [
                 'type'           => 'inline-checkbox',

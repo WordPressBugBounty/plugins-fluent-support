@@ -98,10 +98,10 @@ abstract class BaseImporter
             $data['content'] = '';
         }
 
-        $data['customer_id'] = $ticketData['customer']->id;
+        $data['customer_id'] = $ticketData['customer']['id'];
 
         if (!empty($ticketData['agent'])) {
-            $data['agent_id'] = $ticketData['agent']->id;
+            $data['agent_id'] = $ticketData['agent']['id'];
         }
 
         if (empty($ticketData['mailbox_id'])) {
@@ -148,12 +148,17 @@ abstract class BaseImporter
         $defualtAgentId = false;
 
         foreach ($ticketData['replies'] as $reply) {
+
             $replyData = Arr::only($reply, [
                 'content',
                 'conversation_type',
                 'created_at',
                 'updated_at'
             ]);
+
+            if (!isset($replyData['content']) || empty($replyData['content'])) {
+                continue;
+            }
 
             $replyData['ticket_id'] = $createdTicket->id;
             $replyData['source'] = $this->handler;
@@ -287,18 +292,14 @@ abstract class BaseImporter
             $user = get_user_by('email', $personData['email']);
         }
 
-//        if (!$user) {
-//            return false;
-//        }
-
         if (!$user && 'agent' == $type) {
             $person = Agent::updateOrCreate(
                 [
                     'email' => $personData['email']
                 ],
                 [
-                    'first_name' => $personData['first_name'],
-                    'last_name'  => $personData['last_name'],
+                    'first_name' => $personData['first_name'] ?? '',
+                    'last_name'  => $personData['last_name'] ?? '',
                     'email'      => $personData['email'],
                     'type'       => $type
                 ]

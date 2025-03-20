@@ -1378,8 +1378,13 @@ class Ticket extends Model
 
             $agent = Agent::findOrFail($propValue);
             $restrictions = $agent->getMeta('agent_restrictions', []);
-            if (!empty($restrictions) && in_array($ticket->mailbox_id, $restrictions)) {
-                throw new \Exception('Agent is restricted for this mailbox ticket', 400);
+
+            if (!empty($restrictions['restrictedBusinessBoxes'])) {
+                $mailboxId = (int)$ticket->mailbox_id;
+
+                if (in_array($mailboxId, $restrictions['restrictedBusinessBoxes'], true)) {
+                    throw new \Exception('Agent is restricted for this mailbox ticket', 403);
+                }
             }
         }
 
