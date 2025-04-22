@@ -780,12 +780,21 @@ class Ticket extends Model
         $validData = Arr::only($data, $keys);
 
         foreach ($validData as $dataKey => $validDatum) {
+            if (empty($validDatum)) {
+                Meta::where('object_type', 'ticket_meta')
+                    ->where('object_id', $this->id)
+                    ->where('key', $dataKey)
+                    ->delete();
+                continue;
+            }
+
             if ($fields[$dataKey]['type'] == 'checkbox' || is_array($validDatum)) {
                 $validDatum = implode('|', $validDatum);
                 $validDatum = '|' . $validDatum . '|';
             }
 
-            $exist = Meta::where('object_type', 'ticket_meta')->where('object_id', $this->id)
+            $exist = Meta::where('object_type', 'ticket_meta')
+                ->where('object_id', $this->id)
                 ->where('key', $dataKey)
                 ->first();
 
@@ -800,15 +809,6 @@ class Ticket extends Model
                     'value'       => $validDatum
                 ]);
             }
-        }
-
-        // maybe delete data
-        $deletedSlugs = array_diff($keys, array_keys($validData));
-
-        if ($deletedSlugs) {
-            Meta::where('object_type', 'ticket_meta')->where('object_id', $this->id)
-                ->whereIn('key', $deletedSlugs)
-                ->delete();
         }
 
         return true;

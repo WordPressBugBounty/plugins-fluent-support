@@ -193,7 +193,7 @@ class FeedIntegration extends IntegrationManagerController
                     'key'                => 'customer_other_fields',
                     'require_list'       => false,
                     'label'              => __('Customer Other Fields', 'fluent-support'),
-                    'tips'               => 'Select which Fluent Forms fields pair with their<br /> respective Fluent Support fields.',
+                    'tips'               => __('Select which Fluent Forms fields pair with their<br /> respective Fluent Support fields.'),
                     'field_label_remote' => __('Fluent Support Field', 'fluent-support'),
                     'field_label_local'  => __('Form Field', 'fluent-support'),
                     'component'          => 'dropdown_many_fields',
@@ -339,7 +339,7 @@ class FeedIntegration extends IntegrationManagerController
         }
 
         if(empty($customerData['email'])) {
-            do_action('ff_log_data', [
+            do_action('fluentform/log_data', [
                 'title'            => $feed['settings']['name'],
                 'status'           => 'failed',
                 'description'      => __('Support ticket creation failed, because no valid customer email found', 'fluent-support'),
@@ -357,7 +357,7 @@ class FeedIntegration extends IntegrationManagerController
 
         // Don't create a ticket if customer is blocked
         if($this->isBlockedCustomer($customerData['email'])) {
-            do_action('ff_log_data', [
+            do_action('fluentform/log_data', [
                 'title'            => $feed['settings']['name'],
                 'status'           => 'failed',
                 'description'      => __('Support ticket creation failed, because customer email is blocked', 'fluent-support'),
@@ -388,7 +388,7 @@ class FeedIntegration extends IntegrationManagerController
 
         do_action('fluent_support/ticket_created', $ticket, $customer);
 
-        do_action('ff_log_data', [
+        do_action('fluentform/log_data', [
             'title'            => $feed['settings']['name'],
             'status'           => 'success',
             'description'      => __('Support ticket has been created at Fluent Support. Ticket ID: '.$ticket->id, 'fluent-support'),

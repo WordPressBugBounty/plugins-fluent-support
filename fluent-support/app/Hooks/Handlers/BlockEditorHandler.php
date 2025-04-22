@@ -14,7 +14,7 @@ class BlockEditorHandler
 
         $assets = $app['url.assets'];
 
-        wp_enqueue_script(
+        wp_register_script(
             'fluent-support/customer-portal',
             $assets . 'block-editor/js/fs_block.js',
             array('wp-blocks', 'wp-components', 'wp-block-editor', 'wp-element'),

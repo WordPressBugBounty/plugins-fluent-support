@@ -19,7 +19,9 @@ $app->addAction('wp_dashboard_setup', 'AdminBarHandler@initAdminWidget');
 $app->addShortcode('fluent_support_portal', 'ShortcodeHandler@fluentSupportPortal');
 
 // init integrations
-(new \FluentSupport\App\Services\Integrations\IntegrationInit())->init();
+add_action('init', function () {
+    (new \FluentSupport\App\Services\Integrations\IntegrationInit())->init();
+});
 
 // Activities
 (new \FluentSupport\App\Hooks\Handlers\ActivityLogger())->init();

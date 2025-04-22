@@ -26,6 +26,7 @@ class PortalPolicy extends Policy
         if (!$hasAccess) {
             return false;
         }
+
         /*
          * Filter portal access settings
          *

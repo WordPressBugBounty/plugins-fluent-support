@@ -68,6 +68,11 @@ class FluentCRMWidgets
 
         $email = $customer->email;
 
+        if (!class_exists('\FluentCrm\App\Models\Subscriber')) {
+            error_log('FluentCRM: Subscriber class not found.');
+            return false;
+        }
+
         $subscriber = Subscriber::where('email', $email)->first();
 
         $customerData = array_filter([

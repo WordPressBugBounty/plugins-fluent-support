@@ -29,15 +29,17 @@ class CustomerPortalController extends Controller
      */
     public function getTickets(Request $request, CustomerPortalService $customerPortalService)
     {
+
         $onBehalf = $request->getSafe('on_behalf', 'sanitize_text_field');
         $userIP = $request->getIp();
+
         $requestedStatus = $request->getSafe('filter_type', 'sanitize_text_field');
 
         $ticketOptions = $request->getSafe([
-            'search' => 'sanitize_text_field',
+            'search'             => 'sanitize_text_field',
             'filters.product_id' => 'intval',
-            'sorting.sort_type' => 'sanitize_sql_orderby',
-            'sorting.sort_by' => 'sanitize_sql_orderby'
+            'sorting.sort_type'  => 'sanitize_sql_orderby',
+            'sorting.sort_by'    => 'sanitize_sql_orderby'
         ]);
 
         try {
@@ -61,7 +63,7 @@ class CustomerPortalController extends Controller
      */
     public function createTicket(Request $request, CustomerPortalService $customerPortalService)
     {
-        $dataRules =  $this->app->applyCustomFilters('custom_field_required_before_ticket_create', [
+        $dataRules = $this->app->applyCustomFilters('custom_field_required_before_ticket_create', [
             'required_fields' => [
                 'title'   => 'required',
                 'content' => 'required'
@@ -83,7 +85,7 @@ class CustomerPortalController extends Controller
         }
 
         $defaultData = [
-            'ticket_title' => $request->get('title'),
+            'ticket_title'   => $request->get('title'),
             'ticket_content' => $request->get('content')
         ];
 
@@ -91,14 +93,14 @@ class CustomerPortalController extends Controller
             $defaultData['ticket_product_id'] = $request->get('product_id');
         }
 
-        $dataRules = $this->app->applyCustomFilters('custom_field_required_by_conditions_before_ticket_create',[
+        $dataRules = $this->app->applyCustomFilters('custom_field_required_by_conditions_before_ticket_create', [
             'required_fields' => $dataRules['required_fields'],
             'error_messages'  => $dataRules['error_messages'],
-            'custom_data' => $request->get('custom_data', []),
-            'default_data' => $defaultData
+            'custom_data'     => $request->get('custom_data', []),
+            'default_data'    => $defaultData
         ]);
 
-        if(!isset($dataRules['required_fields']) && !isset($dataRules['error_messages'])){
+        if (!isset($dataRules['required_fields']) && !isset($dataRules['error_messages'])) {
             return $this->sendError([
                 'message'    => __('Invalid form data submitted', 'fluent-support'),
                 'error_type' => '400'
@@ -140,7 +142,6 @@ class CustomerPortalController extends Controller
                 'ticket'  => $ticket
             ];
         } catch (\Exception $e) {
-
             return $this->sendError([
                 'message'    => $e->getMessage(),
                 'error_type' => $e->getCode()
@@ -156,11 +157,7 @@ class CustomerPortalController extends Controller
      */
     public function getTicket(Request $request, CustomerPortalService $customerPortalService, $ticket_id)
     {
-        $customerAdditionalData = [
-            'intended_ticket_hash' => $request->getSafe('intended_ticket_hash'),
-            'on_behalf'            => $request->getSafe('on_behalf', 'sanitize_text_field'),
-            'user_ip'              => $request->getIp()
-        ];
+        $customerAdditionalData = $this->getCustomerAdditionalData($request);
 
         try {
             return $customerPortalService->getTicket($customerAdditionalData, $ticket_id);
@@ -176,19 +173,16 @@ class CustomerPortalController extends Controller
      * createResponse method will create response by customer in a ticket by ticket id
      * @param Request $request
      * @param $ticket_id
-     * @return array
+     * @return array|\WP_REST_Response
      * @throws \FluentSupport\Framework\Validator\ValidationException
      */
     public function createResponse(TicketResponseRequest $request, CustomerPortalService $customerPortalService, $ticket_id)
     {
 
-        $customerAdditionalData = [
-            'intended_ticket_hash' => $request->getSafe('intended_ticket_hash', 'sanitize_text_field'),
-            'on_behalf'            => $request->getSafe('on_behalf', 'sanitize_text_field'),
-            'user_ip'              => $request->getIp()
-        ];
+        $customerAdditionalData = $this->getCustomerAdditionalData($request);
 
         $ticket = Ticket::findOrFail($ticket_id);
+
         $data = $request->sanitize();
 
         $canCreateResponse = apply_filters('fluent_support/can_customer_create_response', true, $ticket->customer, $ticket, $data);
@@ -218,11 +212,8 @@ class CustomerPortalController extends Controller
      */
     public function closeTicket(Request $request, CustomerPortalService $customerPortalService, $ticket_id)
     {
-        $customerAdditionalData = [
-            'intended_ticket_hash' => $request->getSafe('intended_ticket_hash', 'sanitize_text_field'),
-            'on_behalf'            => $request->getSafe('on_behalf', 'sanitize_text_field'),
-            'user_ip'              => $request->getIp()
-        ];
+        $customerAdditionalData = $this->getCustomerAdditionalData($request);
+
         try {
             return $customerPortalService->closeTicket($customerAdditionalData, $ticket_id);
         } catch (Exception $e) {
@@ -241,11 +232,8 @@ class CustomerPortalController extends Controller
      */
     public function reOpenTicket(Request $request, CustomerPortalService $customerPortalService, $ticket_id)
     {
-        $customerAdditionalData = [
-            'intended_ticket_hash' => $request->getSafe('intended_ticket_hash', 'sanitize_text_field'),
-            'on_behalf'            => $request->getSafe('on_behalf', 'sanitize_text_field'),
-            'user_ip'              => $request->getIp()
-        ];
+        $customerAdditionalData = $this->getCustomerAdditionalData($request);
+
         try {
             return $customerPortalService->reOpenTicket($customerAdditionalData, $ticket_id);
         } catch (Exception $e) {
@@ -256,9 +244,16 @@ class CustomerPortalController extends Controller
         }
     }
 
-    public function agentFeedbackRating(Request $request, CustomerPortalService $customerPortalService, $conversationID)
+    public function agentFeedbackRating(Request $request, CustomerPortalService $customerPortalService, $ticketId)
     {
-        $approvalStatus = $request->getSafe('approvalStatus', 'sanitize_text_field');
+        // just for validation
+        $ticket = Ticket::with(['customer'])->findOrFail($ticketId);
+        $customerAdditionalData = $this->getCustomerAdditionalData($request);
+        $customer = $customerPortalService->getCustomer($customerAdditionalData, $ticket);
+        $customerPortalService->checkCustomerTicketAccess($customer, $ticket, 'feedback');
+
+        $conversationID = $request->getSafe('conversation_id', 'intval');
+        $approvalStatus = $request->getSafe('approval_status', 'sanitize_text_field');
 
         try {
             return $customerPortalService->addUserFeedback($approvalStatus, $conversationID);
@@ -313,5 +308,16 @@ class CustomerPortalController extends Controller
         return $this->sendSuccess([
             'message' => __('You have been logged out', 'fluent-support')
         ]);
+    }
+
+    private function getCustomerAdditionalData($request)
+    {
+        $customerAdditionalData = [
+            'intended_ticket_hash' => $request->getSafe('intended_ticket_hash', 'sanitize_text_field'),
+            'on_behalf'            => $request->getSafe('on_behalf', 'sanitize_text_field'),
+            'user_ip'              => $request->getIp()
+        ];
+
+        return $customerAdditionalData;
     }
 }

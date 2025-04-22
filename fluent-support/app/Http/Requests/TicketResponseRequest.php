@@ -7,7 +7,7 @@ use FluentSupport\Framework\Foundation\RequestGuard;
 class TicketResponseRequest extends RequestGuard
 {
     /**
-     * @return Array
+     * @return array
      */
     public function rules()
     {
@@ -17,7 +17,7 @@ class TicketResponseRequest extends RequestGuard
     }
 
     /**
-     * @return Array
+     * @return array
      */
     public function messages()
     {

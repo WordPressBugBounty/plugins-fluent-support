@@ -449,7 +449,7 @@ class AuthHandler
                 'required'    => true,
                 'type'        => 'text',
                 'label'       => __('Email Address', 'fluent-support'),
-                'id'          => 'fst_email',
+                'id'          => 'fst_reset_email',
                 'placeholder' => __('Your Email Address', 'fluent-support')
             ]
         ]);

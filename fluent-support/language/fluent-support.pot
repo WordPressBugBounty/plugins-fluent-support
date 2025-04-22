@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Fluent Support\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 06:31+0000\n"
+"POT-Creation-Date: 2025-04-22 07:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco https://localise.biz/\n"
-"X-Loco-Version: 2.6.11; wp-6.6.2\n"
+"X-Loco-Version: 2.6.11; wp-6.8\n"
 "X-Domain: fluent-support"
 
 #: app/Services/TransStrings.php:30
@@ -259,9 +259,9 @@ msgid "Active"
 msgstr ""
 
 #: app/Services/TransStrings.php:282
-#: app/Hooks/Handlers/CustomerPortalHandler.php:185
+#: app/Hooks/Handlers/CustomerPortalHandler.php:187
 #: builds/fluent-support/app/Services/TransStrings.php:282
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:185
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:187
 msgid "active"
 msgstr ""
 
@@ -321,6 +321,11 @@ msgstr ""
 #: app/Services/TransStrings.php:478
 #: builds/fluent-support/app/Services/TransStrings.php:478
 msgid "Add Another Action"
+msgstr ""
+
+#: app/Hooks/Handlers/CustomerPortalHandler.php:214
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:214
+msgid "Add Attachment"
 msgstr ""
 
 #: app/Services/TransStrings.php:632
@@ -449,9 +454,9 @@ msgid "Additional Data "
 msgstr ""
 
 #: app/Services/TransStrings.php:640
-#: app/Hooks/Handlers/CustomerPortalHandler.php:203
+#: app/Hooks/Handlers/CustomerPortalHandler.php:205
 #: builds/fluent-support/app/Services/TransStrings.php:640
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:203
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:205
 msgid "Additional info"
 msgstr ""
 
@@ -587,9 +592,9 @@ msgid "AI Activity settings has been updated"
 msgstr ""
 
 #: app/Services/TransStrings.php:285
-#: app/Hooks/Handlers/CustomerPortalHandler.php:179
+#: app/Hooks/Handlers/CustomerPortalHandler.php:180
 #: builds/fluent-support/app/Services/TransStrings.php:285
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:179
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:180
 msgid "All"
 msgstr ""
 
@@ -621,9 +626,9 @@ msgid "All or Custom"
 msgstr ""
 
 #: app/Services/TransStrings.php:287
-#: app/Hooks/Handlers/CustomerPortalHandler.php:225
+#: app/Hooks/Handlers/CustomerPortalHandler.php:233
 #: builds/fluent-support/app/Services/TransStrings.php:287
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:225
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:230
 msgid "All Products"
 msgstr ""
 
@@ -651,7 +656,9 @@ msgid "All ticket moves to the selected Business"
 msgstr ""
 
 #: app/Services/TransStrings.php:340
+#: app/Hooks/Handlers/CustomerPortalHandler.php:181
 #: builds/fluent-support/app/Services/TransStrings.php:340
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:181
 msgid "All Tickets"
 msgstr ""
 
@@ -748,8 +755,8 @@ msgstr ""
 msgid "App Secret"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:239
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:239
+#: app/Hooks/Handlers/CustomerPortalHandler.php:249
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:246
 msgid "Apply"
 msgstr ""
 
@@ -880,8 +887,8 @@ msgstr ""
 msgid "Are You Sure? You can not undo this action."
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:237
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:237
+#: app/Hooks/Handlers/CustomerPortalHandler.php:247
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:244
 msgid "Ascending"
 msgstr ""
 
@@ -983,7 +990,9 @@ msgid "Awesome! Your support portal is ready to go!"
 msgstr ""
 
 #: app/Services/TransStrings.php:708
+#: app/Hooks/Handlers/CustomerPortalHandler.php:178
 #: builds/fluent-support/app/Services/TransStrings.php:708
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:178
 msgid "Back to All Tickets"
 msgstr ""
 
@@ -1021,6 +1030,11 @@ msgstr ""
 #: app/Services/TransStrings.php:350
 #: builds/fluent-support/app/Services/TransStrings.php:350
 msgid "bottom"
+msgstr ""
+
+#: app/Hooks/Handlers/CustomerPortalHandler.php:213
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:213
+msgid "Browse Files"
 msgstr ""
 
 #: app/Services/Helper.php:833
@@ -1090,9 +1104,9 @@ msgid "button to get the authorization code."
 msgstr ""
 
 #: app/Services/TransStrings.php:385
-#: app/Hooks/Handlers/CustomerPortalHandler.php:229
+#: app/Hooks/Handlers/CustomerPortalHandler.php:239
 #: builds/fluent-support/app/Services/TransStrings.php:385
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:229
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:236
 msgid "by"
 msgstr ""
 
@@ -1170,8 +1184,8 @@ msgstr ""
 msgid "Click Here to Renew your License"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:178
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:178
+#: app/Hooks/Handlers/CustomerPortalHandler.php:179
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:179
 msgid "Click Here to Write a reply"
 msgstr ""
 
@@ -1191,9 +1205,9 @@ msgid "Click to see Available Dynamic Codes"
 msgstr ""
 
 #: app/Services/TransStrings.php:319
-#: app/Hooks/Handlers/CustomerPortalHandler.php:199
+#: app/Hooks/Handlers/CustomerPortalHandler.php:201
 #: builds/fluent-support/app/Services/TransStrings.php:319
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:199
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:201
 msgid "Click to upload"
 msgstr ""
 
@@ -1218,9 +1232,9 @@ msgid "Close Selected Tickets"
 msgstr ""
 
 #: app/Services/TransStrings.php:379
-#: app/Hooks/Handlers/CustomerPortalHandler.php:195
+#: app/Hooks/Handlers/CustomerPortalHandler.php:197
 #: builds/fluent-support/app/Services/TransStrings.php:379
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:195
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:197
 msgid "Close Ticket"
 msgstr ""
 
@@ -1235,18 +1249,18 @@ msgid "Close Tickets"
 msgstr ""
 
 #: app/Services/TransStrings.php:161 app/Services/Helper.php:122
-#: app/Services/Helper.php:689 app/Hooks/Handlers/CustomerPortalHandler.php:182
+#: app/Services/Helper.php:689 app/Hooks/Handlers/CustomerPortalHandler.php:184
 #: builds/fluent-support/app/Services/TransStrings.php:161
 #: builds/fluent-support/app/Services/Helper.php:122
 #: builds/fluent-support/app/Services/Helper.php:689
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:182
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:184
 msgid "Closed"
 msgstr ""
 
 #: app/Services/TransStrings.php:162
-#: app/Hooks/Handlers/CustomerPortalHandler.php:187
+#: app/Hooks/Handlers/CustomerPortalHandler.php:189
 #: builds/fluent-support/app/Services/TransStrings.php:162
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:187
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:189
 msgid "closed"
 msgstr ""
 
@@ -1275,8 +1289,8 @@ msgstr ""
 msgid "Complete Signup"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:246
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:246
+#: app/Hooks/Handlers/CustomerPortalHandler.php:256
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:253
 msgid "Completed"
 msgstr ""
 
@@ -1343,8 +1357,8 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:71
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:71
+#: app/Http/Controllers/CustomerPortalController.php:73
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:73
 msgid "Content is required"
 msgstr ""
 
@@ -1415,11 +1429,6 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:227
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:227
-msgid "Create a New Ticket"
-msgstr ""
-
 #: app/Services/TransStrings.php:35
 #: builds/fluent-support/app/Services/TransStrings.php:35
 msgid "Create a page automatically with the shortcode"
@@ -1436,9 +1445,9 @@ msgid "Create an account"
 msgstr ""
 
 #: app/Services/TransStrings.php:51
-#: app/Hooks/Handlers/CustomerPortalHandler.php:210
+#: app/Hooks/Handlers/CustomerPortalHandler.php:212
 #: builds/fluent-support/app/Services/TransStrings.php:51
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:210
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:212
 msgid "Create Customer"
 msgstr ""
 
@@ -1501,9 +1510,13 @@ msgid "Create Support Ticket From Your Form Submission in FluentSupport"
 msgstr ""
 
 #: app/Services/TransStrings.php:373
-#: app/Hooks/Handlers/CustomerPortalHandler.php:223
+#: app/Hooks/Handlers/CustomerPortalHandler.php:215
+#: app/Hooks/Handlers/CustomerPortalHandler.php:231
+#: app/Hooks/Handlers/CustomerPortalHandler.php:237
 #: builds/fluent-support/app/Services/TransStrings.php:373
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:223
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:215
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:228
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:234
 msgid "Create Ticket"
 msgstr ""
 
@@ -1513,8 +1526,8 @@ msgstr ""
 msgid "Created At"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:242
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:242
+#: app/Hooks/Handlers/CustomerPortalHandler.php:252
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:249
 msgid "Created at"
 msgstr ""
 
@@ -1700,9 +1713,9 @@ msgid "Dashboard"
 msgstr ""
 
 #: app/Services/TransStrings.php:332
-#: app/Hooks/Handlers/CustomerPortalHandler.php:188
+#: app/Hooks/Handlers/CustomerPortalHandler.php:190
 #: builds/fluent-support/app/Services/TransStrings.php:332
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:188
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:190
 msgid "Date"
 msgstr ""
 
@@ -1721,8 +1734,8 @@ msgstr ""
 msgid "Delete all attachments on ticket close"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:208
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:208
+#: app/Hooks/Handlers/CustomerPortalHandler.php:210
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:210
 msgid "Delete Customer"
 msgstr ""
 
@@ -1751,8 +1764,8 @@ msgstr ""
 msgid "Delete Tickets"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:238
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:238
+#: app/Hooks/Handlers/CustomerPortalHandler.php:248
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:245
 msgid "Descending"
 msgstr ""
 
@@ -2044,8 +2057,8 @@ msgstr ""
 msgid "Export Agents Summary"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:248
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:248
+#: app/Hooks/Handlers/CustomerPortalHandler.php:258
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:255
 msgid "Failed"
 msgstr ""
 
@@ -2552,8 +2565,8 @@ msgid ""
 "ticket or any response"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:193
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:193
+#: app/Hooks/Handlers/CustomerPortalHandler.php:195
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:195
 msgid "If you still have related issues. Please reopen this ticket and reply"
 msgstr ""
 
@@ -2711,8 +2724,8 @@ msgstr ""
 msgid "Invalid filter type."
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:103
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:103
+#: app/Http/Controllers/CustomerPortalController.php:105
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:105
 msgid "Invalid form data submitted"
 msgstr ""
 
@@ -2906,8 +2919,8 @@ msgstr ""
 msgid "Log"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:245
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:245
+#: app/Hooks/Handlers/CustomerPortalHandler.php:255
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:252
 msgid "Log Out"
 msgstr ""
 
@@ -2931,18 +2944,18 @@ msgstr ""
 msgid "Login Form"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:184
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:184
+#: app/Hooks/Handlers/CustomerPortalHandler.php:186
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:186
 msgid "Logout"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:214
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:214
+#: app/Hooks/Handlers/CustomerPortalHandler.php:219
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:219
 msgid "Looking for similar articles..."
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:206
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:206
+#: app/Hooks/Handlers/CustomerPortalHandler.php:208
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:208
 msgid "Looks like you did not open any support tickets yet"
 msgstr ""
 
@@ -3166,9 +3179,9 @@ msgid "New"
 msgstr ""
 
 #: app/Services/TransStrings.php:284
-#: app/Hooks/Handlers/CustomerPortalHandler.php:183
+#: app/Hooks/Handlers/CustomerPortalHandler.php:185
 #: builds/fluent-support/app/Services/TransStrings.php:284
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:183
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:185
 msgid "new"
 msgstr ""
 
@@ -3187,9 +3200,9 @@ msgid "New Tickets"
 msgstr ""
 
 #: app/Services/TransStrings.php:656
-#: app/Hooks/Handlers/CustomerPortalHandler.php:190
+#: app/Hooks/Handlers/CustomerPortalHandler.php:192
 #: builds/fluent-support/app/Services/TransStrings.php:656
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:190
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:192
 msgid "Next"
 msgstr ""
 
@@ -3218,9 +3231,14 @@ msgstr ""
 msgid "No Custom Fields Found"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:207
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:207
+#: app/Hooks/Handlers/CustomerPortalHandler.php:209
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:209
 msgid "No support tickets found for this filter"
+msgstr ""
+
+#: app/Hooks/Handlers/CustomerPortalHandler.php:236
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:233
+msgid "No tickets found"
 msgstr ""
 
 #: app/Services/Helper.php:60 app/Services/Helper.php:74
@@ -3272,8 +3290,12 @@ msgstr ""
 msgid "oAuth2 Authorised redirect URI"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:186
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:186
+#: app/Hooks/Handlers/CustomerPortalHandler.php:224
+msgid "of"
+msgstr ""
+
+#: app/Hooks/Handlers/CustomerPortalHandler.php:188
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:188
 msgid "on-hold"
 msgstr ""
 
@@ -3289,23 +3311,23 @@ msgid "Only %s files are allowed."
 msgstr ""
 
 #: app/Services/TransStrings.php:384
-#: app/Hooks/Handlers/CustomerPortalHandler.php:192
+#: app/Hooks/Handlers/CustomerPortalHandler.php:194
 #: builds/fluent-support/app/Services/TransStrings.php:384
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:192
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:194
 msgid "Only you and official support agents can view this conversation"
 msgstr ""
 
 #: app/Services/TransStrings.php:280
-#: app/Hooks/Handlers/CustomerPortalHandler.php:180
+#: app/Hooks/Handlers/CustomerPortalHandler.php:182
 #: builds/fluent-support/app/Services/TransStrings.php:280
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:180
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:182
 msgid "Open"
 msgstr ""
 
 #: app/Services/TransStrings.php:681
-#: app/Hooks/Handlers/CustomerPortalHandler.php:181
+#: app/Hooks/Handlers/CustomerPortalHandler.php:183
 #: builds/fluent-support/app/Services/TransStrings.php:681
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:181
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:183
 msgid "open"
 msgstr ""
 
@@ -3363,6 +3385,14 @@ msgstr ""
 #: app/Services/TransStrings.php:482
 #: builds/fluent-support/app/Services/TransStrings.php:482
 msgid "Overall Activities"
+msgstr ""
+
+#: app/Hooks/Handlers/CustomerPortalHandler.php:222
+msgid "Page"
+msgstr ""
+
+#: app/Hooks/Handlers/CustomerPortalHandler.php:223
+msgid "page"
 msgstr ""
 
 #: app/Services/Helper.php:798
@@ -3476,9 +3506,9 @@ msgid "Please copy and paste this url:"
 msgstr ""
 
 #: app/Services/TransStrings.php:383
-#: app/Hooks/Handlers/CustomerPortalHandler.php:196
+#: app/Hooks/Handlers/CustomerPortalHandler.php:198
 #: builds/fluent-support/app/Services/TransStrings.php:383
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:196
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:198
 msgid "Please do not share any private information."
 msgstr ""
 
@@ -3495,9 +3525,9 @@ msgid ""
 msgstr ""
 
 #: app/Services/TransStrings.php:298
-#: app/Hooks/Handlers/CustomerPortalHandler.php:226
+#: app/Hooks/Handlers/CustomerPortalHandler.php:234
 #: builds/fluent-support/app/Services/TransStrings.php:298
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:226
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:231
 msgid "Please input"
 msgstr ""
 
@@ -3559,9 +3589,9 @@ msgid ""
 msgstr ""
 
 #: app/Services/TransStrings.php:376
-#: app/Hooks/Handlers/CustomerPortalHandler.php:220
+#: app/Hooks/Handlers/CustomerPortalHandler.php:228
 #: builds/fluent-support/app/Services/TransStrings.php:376
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:220
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:225
 msgid "Please provide details about your problem"
 msgstr ""
 
@@ -3659,8 +3689,8 @@ msgstr ""
 msgid "Press enter to save"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:191
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:191
+#: app/Hooks/Handlers/CustomerPortalHandler.php:193
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:193
 msgid "Prev"
 msgstr ""
 
@@ -3670,9 +3700,9 @@ msgid "Previous Conversations"
 msgstr ""
 
 #: app/Services/TransStrings.php:307
-#: app/Hooks/Handlers/CustomerPortalHandler.php:222
+#: app/Hooks/Handlers/CustomerPortalHandler.php:230
 #: builds/fluent-support/app/Services/TransStrings.php:307
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:222
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:227
 msgid "Priority"
 msgstr ""
 
@@ -3687,14 +3717,14 @@ msgid "Priority (Customer)"
 msgstr ""
 
 #: app/Services/TransStrings.php:381
-#: app/Hooks/Handlers/CustomerPortalHandler.php:201
+#: app/Hooks/Handlers/CustomerPortalHandler.php:203
 #: builds/fluent-support/app/Services/TransStrings.php:381
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:201
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:203
 msgid "Private"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:247
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:247
+#: app/Hooks/Handlers/CustomerPortalHandler.php:257
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:254
 msgid "Processing"
 msgstr ""
 
@@ -3727,8 +3757,8 @@ msgstr ""
 msgid "Product ID"
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:81
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:81
+#: app/Http/Controllers/CustomerPortalController.php:83
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:83
 msgid "Product is required"
 msgstr ""
 
@@ -3818,23 +3848,23 @@ msgid "Refresh"
 msgstr ""
 
 #: app/Services/TransStrings.php:371
-#: app/Hooks/Handlers/CustomerPortalHandler.php:221
+#: app/Hooks/Handlers/CustomerPortalHandler.php:229
 #: builds/fluent-support/app/Services/TransStrings.php:371
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:221
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:226
 msgid "Related Product/Service"
 msgstr ""
 
 #: app/Services/TransStrings.php:347
-#: app/Hooks/Handlers/CustomerPortalHandler.php:228
+#: app/Hooks/Handlers/CustomerPortalHandler.php:238
 #: builds/fluent-support/app/Services/TransStrings.php:347
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:228
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:235
 msgid "Reopen This ticket"
 msgstr ""
 
 #: app/Services/TransStrings.php:354
-#: app/Hooks/Handlers/CustomerPortalHandler.php:197
+#: app/Hooks/Handlers/CustomerPortalHandler.php:199
 #: builds/fluent-support/app/Services/TransStrings.php:354
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:197
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:199
 msgid "replied"
 msgstr ""
 
@@ -3869,9 +3899,9 @@ msgid "replies and"
 msgstr ""
 
 #: app/Services/TransStrings.php:380
-#: app/Hooks/Handlers/CustomerPortalHandler.php:204
+#: app/Hooks/Handlers/CustomerPortalHandler.php:206
 #: builds/fluent-support/app/Services/TransStrings.php:380
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:204
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:206
 msgid "Reply"
 msgstr ""
 
@@ -4057,7 +4087,9 @@ msgid "Saved Replies"
 msgstr ""
 
 #: app/Services/TransStrings.php:296
+#: app/Hooks/Handlers/CustomerPortalHandler.php:235
 #: builds/fluent-support/app/Services/TransStrings.php:296
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:232
 msgid "Search"
 msgstr ""
 
@@ -4208,9 +4240,9 @@ msgid "Select Portal Page"
 msgstr ""
 
 #: app/Services/TransStrings.php:372
-#: app/Hooks/Handlers/CustomerPortalHandler.php:216
+#: app/Hooks/Handlers/CustomerPortalHandler.php:221
 #: builds/fluent-support/app/Services/TransStrings.php:372
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:216
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:221
 msgid "Select Priority"
 msgstr ""
 
@@ -4220,9 +4252,9 @@ msgid "Select Product"
 msgstr ""
 
 #: app/Services/TransStrings.php:136
-#: app/Hooks/Handlers/CustomerPortalHandler.php:213
+#: app/Hooks/Handlers/CustomerPortalHandler.php:218
 #: builds/fluent-support/app/Services/TransStrings.php:136
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:213
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:218
 msgid "Select related Product/Service"
 msgstr ""
 
@@ -4455,13 +4487,13 @@ msgid ""
 "in the login form"
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:199
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:199
+#: app/Http/Controllers/CustomerPortalController.php:193
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:193
 msgid "Sorry you can not create response"
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:124
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:124
+#: app/Http/Controllers/CustomerPortalController.php:126
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:126
 msgid "Sorry you can not create ticket"
 msgstr ""
 
@@ -4514,8 +4546,8 @@ msgid ""
 "new signed url"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:236
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:236
+#: app/Hooks/Handlers/CustomerPortalHandler.php:246
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:243
 msgid "Sort By"
 msgstr ""
 
@@ -4531,9 +4563,9 @@ msgid "Start"
 msgstr ""
 
 #: app/Services/TransStrings.php:386
-#: app/Hooks/Handlers/CustomerPortalHandler.php:198
+#: app/Hooks/Handlers/CustomerPortalHandler.php:200
 #: builds/fluent-support/app/Services/TransStrings.php:386
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:198
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:200
 msgid "started the conversation"
 msgstr ""
 
@@ -4559,28 +4591,28 @@ msgid "Stats"
 msgstr ""
 
 #: app/Services/TransStrings.php:76 app/Models/Traits/CustomerTrait.php:87
-#: app/Hooks/Handlers/CustomerPortalHandler.php:189
+#: app/Hooks/Handlers/CustomerPortalHandler.php:191
 #: app/Hooks/Handlers/PrivacyHandler.php:220
 #: builds/fluent-support/app/Services/TransStrings.php:76
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:87
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:189
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:191
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:220
 msgid "Status"
 msgstr ""
 
 #: app/Services/TransStrings.php:364
-#: app/Hooks/Handlers/CustomerPortalHandler.php:218
-#: app/Hooks/Handlers/CustomerPortalHandler.php:243
+#: app/Hooks/Handlers/CustomerPortalHandler.php:226
+#: app/Hooks/Handlers/CustomerPortalHandler.php:253
 #: builds/fluent-support/app/Services/TransStrings.php:364
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:218
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:243
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:223
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:250
 msgid "Subject"
 msgstr ""
 
 #: app/Services/TransStrings.php:374
-#: app/Hooks/Handlers/CustomerPortalHandler.php:224
+#: app/Hooks/Handlers/CustomerPortalHandler.php:232
 #: builds/fluent-support/app/Services/TransStrings.php:374
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:224
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:229
 msgid "Submit a Support Ticket"
 msgstr ""
 
@@ -4594,13 +4626,13 @@ msgstr ""
 msgid "Successfully registered to the site."
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:244
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:244
+#: app/Hooks/Handlers/CustomerPortalHandler.php:254
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:251
 msgid "Suggested Articles"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:215
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:215
+#: app/Hooks/Handlers/CustomerPortalHandler.php:220
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:220
 msgid "Suggested articles"
 msgstr ""
 
@@ -4640,9 +4672,9 @@ msgid "Support Portal Page (For Customers)"
 msgstr ""
 
 #: app/Services/TransStrings.php:247
-#: app/Hooks/Handlers/CustomerPortalHandler.php:233
+#: app/Hooks/Handlers/CustomerPortalHandler.php:243
 #: builds/fluent-support/app/Services/TransStrings.php:247
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:233
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:240
 msgid "Support Staff"
 msgstr ""
 
@@ -4889,18 +4921,15 @@ msgstr ""
 msgid "This migrator will migrate total"
 msgstr ""
 
-#: builds/fluent-support/app/Services/TransStrings.php:346
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:194
-msgid "This ticket has been closed at"
-msgstr ""
-
-#: app/Hooks/Handlers/CustomerPortalHandler.php:200
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:200
+#: app/Hooks/Handlers/CustomerPortalHandler.php:202
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:202
 msgid "This ticket is"
 msgstr ""
 
 #: app/Services/TransStrings.php:346
-#: app/Hooks/Handlers/CustomerPortalHandler.php:194
+#: app/Hooks/Handlers/CustomerPortalHandler.php:196
+#: builds/fluent-support/app/Services/TransStrings.php:346
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:196
 msgid "This ticket was closed on"
 msgstr ""
 
@@ -4910,16 +4939,16 @@ msgid "This will permanently delete response. Continue?"
 msgstr ""
 
 #: app/Services/TransStrings.php:686
-#: app/Hooks/Handlers/CustomerPortalHandler.php:235
+#: app/Hooks/Handlers/CustomerPortalHandler.php:245
 #: builds/fluent-support/app/Services/TransStrings.php:686
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:235
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:242
 msgid "Thread Follower"
 msgstr ""
 
 #: app/Services/TransStrings.php:685
-#: app/Hooks/Handlers/CustomerPortalHandler.php:234
+#: app/Hooks/Handlers/CustomerPortalHandler.php:244
 #: builds/fluent-support/app/Services/TransStrings.php:685
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:234
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:241
 msgid "Thread Starter"
 msgstr ""
 
@@ -5008,9 +5037,9 @@ msgid "Ticket Description (you can use any smart code)"
 msgstr ""
 
 #: app/Services/TransStrings.php:368
-#: app/Hooks/Handlers/CustomerPortalHandler.php:219
+#: app/Hooks/Handlers/CustomerPortalHandler.php:227
 #: builds/fluent-support/app/Services/TransStrings.php:368
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:219
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:224
 msgid "Ticket Details"
 msgstr ""
 
@@ -5046,8 +5075,8 @@ msgstr ""
 msgid "Ticket has been closed"
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:139
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:139
+#: app/Http/Controllers/CustomerPortalController.php:141
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:141
 msgid "Ticket has been created successfully"
 msgstr ""
 
@@ -5068,11 +5097,11 @@ msgid "Ticket has been reopened"
 msgstr ""
 
 #: app/Services/TransStrings.php:109
-#: app/Hooks/Handlers/CustomerPortalHandler.php:240
+#: app/Hooks/Handlers/CustomerPortalHandler.php:250
 #: app/Hooks/Handlers/PrivacyHandler.php:71
 #: app/Hooks/Handlers/PrivacyHandler.php:153
 #: builds/fluent-support/app/Services/TransStrings.php:109
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:240
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:247
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:71
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:153
 msgid "Ticket ID"
@@ -5238,15 +5267,15 @@ msgid "Time Tracking"
 msgstr ""
 
 #: app/Services/TransStrings.php:75 app/Hooks/Handlers/AdminBarHandler.php:90
-#: app/Hooks/Handlers/CustomerPortalHandler.php:241
+#: app/Hooks/Handlers/CustomerPortalHandler.php:251
 #: builds/fluent-support/app/Services/TransStrings.php:75
 #: builds/fluent-support/app/Hooks/Handlers/AdminBarHandler.php:90
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:241
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:248
 msgid "Title"
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:70
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:70
+#: app/Http/Controllers/CustomerPortalController.php:72
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:72
 msgid "Title is required"
 msgstr ""
 
@@ -5368,9 +5397,9 @@ msgid "Uncheck all"
 msgstr ""
 
 #: app/Services/TransStrings.php:388
-#: app/Hooks/Handlers/CustomerPortalHandler.php:230
+#: app/Hooks/Handlers/CustomerPortalHandler.php:240
 #: builds/fluent-support/app/Services/TransStrings.php:388
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:230
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:237
 msgid "Unknown error. Please reload this page"
 msgstr ""
 
@@ -5391,9 +5420,9 @@ msgid "Update Custom Field"
 msgstr ""
 
 #: app/Services/TransStrings.php:50
-#: app/Hooks/Handlers/CustomerPortalHandler.php:209
+#: app/Hooks/Handlers/CustomerPortalHandler.php:211
 #: builds/fluent-support/app/Services/TransStrings.php:50
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:209
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:211
 msgid "Update Customer"
 msgstr ""
 
@@ -5549,9 +5578,9 @@ msgid "View Agent Today Performance"
 msgstr ""
 
 #: app/Services/TransStrings.php:375
-#: app/Hooks/Handlers/CustomerPortalHandler.php:232
+#: app/Hooks/Handlers/CustomerPortalHandler.php:242
 #: builds/fluent-support/app/Services/TransStrings.php:375
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:232
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:239
 msgid "View All"
 msgstr ""
 
@@ -5576,9 +5605,9 @@ msgid "View Ticket"
 msgstr ""
 
 #: app/Services/TransStrings.php:387
-#: app/Hooks/Handlers/CustomerPortalHandler.php:231
+#: app/Hooks/Handlers/CustomerPortalHandler.php:241
 #: builds/fluent-support/app/Services/TransStrings.php:387
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:231
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:238
 msgid "View Your Tickets"
 msgstr ""
 
@@ -5644,9 +5673,9 @@ msgid "Web Based"
 msgstr ""
 
 #: app/Services/TransStrings.php:365
-#: app/Hooks/Handlers/CustomerPortalHandler.php:212
+#: app/Hooks/Handlers/CustomerPortalHandler.php:217
 #: builds/fluent-support/app/Services/TransStrings.php:365
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:212
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:217
 msgid "What's this support ticket about?"
 msgstr ""
 
@@ -5735,9 +5764,9 @@ msgid "WPManageNinja LLC"
 msgstr ""
 
 #: app/Services/TransStrings.php:378
-#: app/Hooks/Handlers/CustomerPortalHandler.php:202
+#: app/Hooks/Handlers/CustomerPortalHandler.php:204
 #: builds/fluent-support/app/Services/TransStrings.php:378
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:202
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:204
 msgid "Write a reply"
 msgstr ""
 
@@ -5772,9 +5801,9 @@ msgid "Yesterday"
 msgstr ""
 
 #: app/Services/TransStrings.php:389
-#: app/Hooks/Handlers/CustomerPortalHandler.php:205
+#: app/Hooks/Handlers/CustomerPortalHandler.php:207
 #: builds/fluent-support/app/Services/TransStrings.php:389
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:205
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:207
 msgid "You"
 msgstr ""
 
@@ -5839,8 +5868,8 @@ msgstr ""
 msgid "You created a draft"
 msgstr ""
 
-#: app/Http/Policies/PortalPolicy.php:37
-#: builds/fluent-support/app/Http/Policies/PortalPolicy.php:37
+#: app/Http/Policies/PortalPolicy.php:38
+#: builds/fluent-support/app/Http/Policies/PortalPolicy.php:38
 msgid "You do not have permission"
 msgstr ""
 
@@ -5861,8 +5890,8 @@ msgstr ""
 msgid "You don't have permission to access customer support portal"
 msgstr ""
 
-#: app/Http/Controllers/CustomerPortalController.php:314
-#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:314
+#: app/Http/Controllers/CustomerPortalController.php:309
+#: builds/fluent-support/app/Http/Controllers/CustomerPortalController.php:309
 msgid "You have been logged out"
 msgstr ""
 
@@ -5871,8 +5900,8 @@ msgstr ""
 msgid "You're Almost Done"
 msgstr ""
 
-#: app/Hooks/Handlers/CustomerPortalHandler.php:249
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:249
+#: app/Hooks/Handlers/CustomerPortalHandler.php:259
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:256
 msgid ""
 "Your account is currently inactive. You cannot create new tickets or reply "
 "to existing ones. Please contact the site administrator for assistance."

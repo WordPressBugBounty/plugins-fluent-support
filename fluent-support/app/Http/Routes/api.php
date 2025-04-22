@@ -199,7 +199,7 @@ $router->prefix('customer-portal')->withPolicy('PortalPolicy')->group(function (
 
     $router->get('me', 'TicketController@me');
 
-    $router->post('/tickets/{conversationID}/agent-feedback', 'CustomerPortalController@agentFeedbackRating')->int('conversationID');
+    $router->post('/tickets/{ticket_id}/agent-feedback', 'CustomerPortalController@agentFeedbackRating')->int('ticket_id');
 
     $router->post('logout', 'CustomerPortalController@logout');
 });
