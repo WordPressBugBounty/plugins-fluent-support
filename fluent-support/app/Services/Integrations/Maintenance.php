@@ -33,7 +33,7 @@ class Maintenance
     {
         global $wp_version;
         return [
-            'plugin_version' => FLUENTCRM_PLUGIN_VERSION,
+            'plugin_version' => FLUENT_SUPPORT_VERSION,
             'php_version'    => (defined('PHP_VERSION')) ? PHP_VERSION : phpversion(),
             'wp_version'     => $wp_version,
             'plugins'        => (array)get_option('active_plugins'),

@@ -476,7 +476,7 @@ class Ticket extends Model
             list($method, $subMethod) = static::parseRelationalFilterQueryMethods($filter);
             $query = static::buildRelationFilterQuery($filter['property'], $query, $method, $subMethod, $subField, $filter);
         } elseif ($filter['property'] == 'waiting_for_reply') {
-            if (($filter['value'] == 'yes' && $filter['operator'] == '=') || ($filter['value'] == 'no' && $filter['operator'] == '!=')) {
+            if (($filter['value'] == 'yes' && $filter['operator'] == 'in') || ($filter['value'] == 'no' && $filter['operator'] == 'not_in')) {
                 $query = $query->where(function ($q) {
                     $q->whereColumn('last_agent_response', '<', 'last_customer_response')
                         ->orWhereNull('last_agent_response')

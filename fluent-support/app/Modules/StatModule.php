@@ -143,7 +143,11 @@ class StatModule
 
         $closedTickets = Ticket::where('status', 'closed')->whereBetween('resolved_at', [$start, $end]);
 
-        $responses = Conversation::where('conversation_type', 'response')->whereBetween('created_at', [$start, $end]);
+        $responses = Conversation::where('conversation_type', 'response')
+            ->whereHas('person', function ($q) {
+                $q->where('person_type', 'agent');
+            })
+            ->whereBetween('created_at', [$start, $end]);
 
         if ($agentId) {
             $newTickets->where('agent_id', $agentId);

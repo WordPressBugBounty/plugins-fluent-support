@@ -28,6 +28,15 @@ class SavedReply extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'product_id' => 'integer'
+    ];
+
+    /**
      * Local scope to filter subscribers by search/query string
      * @param ModelQueryBuilder $query
      * @param string $search

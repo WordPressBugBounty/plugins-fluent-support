@@ -822,6 +822,13 @@ class Helper
                 'description'    => __('Self-hosted email and marketing automation for WordPress', 'fluent-support'),
                 'doc_url'       => 'https://fluentsupport.com/docs/fluentcrm-integration/',
             ],
+            'fluent-community'  => [
+                'title'          => __('Fluent Community', 'fluent-support'),
+                'logo'           => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/integrations/fluent-community.png',
+                'is_integrated'   => defined('FLUENT_COMMUNITY_PLUGIN_VERSION'),
+                'description'    => __('Build and manage vibrant online communities with integrated LMS features directly within WordPress.', 'fluent-support'),
+                'doc_url'       => 'https://fluentsupport.com/docs/fluentcommunity-integration/',
+            ],
             'fluent-forms'  => [
                 'title'          => __('Fluent FORMS', 'fluent-support'),
                 'logo'           => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/integrations/fluent-forms.png',
@@ -1226,7 +1233,7 @@ class Helper
                                     ->where('box_type', 'email')
                                     ->get();
         return $businessEmailBoxes;
-    } 
+    }
 
     public static function tempImageMoveUploadDir($ticketId, $contentType, $replyId = null)
     {
@@ -1276,7 +1283,7 @@ class Helper
     {
         // Get the current site's upload directory
         $uploadDirInfo = wp_upload_dir();
-        $uploadsDir = $uploadDirInfo['basedir']; 
+        $uploadsDir = $uploadDirInfo['basedir'];
         $tempDir = $uploadsDir . '/fluent-support/temp_files/';
 
         foreach ($imageUrls as $imageUrl) {

@@ -207,6 +207,7 @@ $router->prefix('customer-portal')->withPolicy('PortalPolicy')->group(function (
 $router->prefix('public')->withPolicy('PublicPolicy')->group(function ($router) {
     $router->post('telegram_bot_response/{token}', 'ChatMessageParserController@handleTelegramWebhook')->alphaNumDash('token');
     $router->post('slack_response/{token}', 'ChatMessageParserController@handleSlackEvent')->alphaNumDash('token');
+    $router->get('/authorize', 'AuthorizeController@handleHelpScoutAuthorization');
 });
 
 $router->prefix('activity-logger')->withPolicy('ActivityLoggerPolicy')->group(function ($router) {

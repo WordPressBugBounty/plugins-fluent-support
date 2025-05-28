@@ -267,7 +267,7 @@ class PermissionManager
                     'fst_manage_unassigned_tickets' => __('Manage Unassigned Tickets', 'fluent-support'),
                     'fst_manage_other_tickets'      => __('Manage Others Tickets', 'fluent-support'),
                     'fst_assign_agents'             => __('Assign Agents', 'fluent-support'),
-                    'fst_delete_tickets'            => __('Delete Tickets', 'fluent-support'),
+                    'fst_delete_tickets'            => __('Delete Tickets & Individual Responses', 'fluent-support'),
                     'fst_merge_tickets'             => __('Merge Tickets', 'fluent-support'),
                     'fst_split_ticket'              => __('Split Ticket', 'fluent-support'),
                     'fst_draft_reply'               => __('Draft Reply', 'fluent-support'),

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Fluent Support\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-22 07:52+0000\n"
+"POT-Creation-Date: 2025-05-28 08:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -89,8 +89,8 @@ msgstr ""
 msgid ". Please copy this code and paste it in the"
 msgstr ""
 
-#: app/Services/TransStrings.php:612
-#: builds/fluent-support/app/Services/TransStrings.php:612
+#: app/Services/TransStrings.php:614
+#: builds/fluent-support/app/Services/TransStrings.php:614
 msgid ""
 ". You can set your actions and run the workflow actions from ticket page."
 msgstr ""
@@ -164,38 +164,38 @@ msgid ""
 "address."
 msgstr ""
 
-#: app/Services/TransStrings.php:466
-#: builds/fluent-support/app/Services/TransStrings.php:466
+#: app/Services/TransStrings.php:468
+#: builds/fluent-support/app/Services/TransStrings.php:468
 msgid "A"
-msgstr ""
-
-#: app/Services/Helper.php:906
-#: builds/fluent-support/app/Services/Helper.php:906
-msgid ""
-"A cloud storage service by Google for storing, syncing, and sharing files."
 msgstr ""
 
 #: app/Services/Helper.php:913
 #: builds/fluent-support/app/Services/Helper.php:913
 msgid ""
+"A cloud storage service by Google for storing, syncing, and sharing files."
+msgstr ""
+
+#: app/Services/Helper.php:920
+#: builds/fluent-support/app/Services/Helper.php:920
+msgid ""
 "A cloud-based file storage and sharing service that allows users to store "
 "files online and sync them across devices."
 msgstr ""
 
-#: app/Services/Helper.php:934
-#: builds/fluent-support/app/Services/Helper.php:934
+#: app/Services/Helper.php:941
+#: builds/fluent-support/app/Services/Helper.php:941
 msgid ""
 "A project management tool designed to streamline workflows and collaboration "
 "through customizable, kanban-style boards."
 msgstr ""
 
-#: app/Services/Helper.php:829
-#: builds/fluent-support/app/Services/Helper.php:829
+#: app/Services/Helper.php:836
+#: builds/fluent-support/app/Services/Helper.php:836
 msgid "A robust form plugin suitable for any business"
 msgstr ""
 
-#: app/Services/Helper.php:927
-#: builds/fluent-support/app/Services/Helper.php:927
+#: app/Services/Helper.php:934
+#: builds/fluent-support/app/Services/Helper.php:934
 msgid ""
 "A security service by Google designed to protect websites from bots and "
 "abuse by using challenges to distinguish between human and automated access."
@@ -207,8 +207,8 @@ msgstr ""
 msgid "A verification code has been sent to %s. Please provide the code below:"
 msgstr ""
 
-#: app/Services/Helper.php:920
-#: builds/fluent-support/app/Services/Helper.php:920
+#: app/Services/Helper.php:927
+#: builds/fluent-support/app/Services/Helper.php:927
 msgid ""
 "A WordPress plugin that enables the creation and management of membership "
 "sites, including content access control and subscription billing."
@@ -235,13 +235,13 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: app/Services/TransStrings.php:592
-#: builds/fluent-support/app/Services/TransStrings.php:592
+#: app/Services/TransStrings.php:594
+#: builds/fluent-support/app/Services/TransStrings.php:594
 msgid "Action Title"
 msgstr ""
 
-#: app/Services/TransStrings.php:424
-#: builds/fluent-support/app/Services/TransStrings.php:424
+#: app/Services/TransStrings.php:426
+#: builds/fluent-support/app/Services/TransStrings.php:426
 msgid "Actions"
 msgstr ""
 
@@ -281,13 +281,13 @@ msgstr ""
 msgid "Activities"
 msgstr ""
 
-#: app/Services/TransStrings.php:484
-#: builds/fluent-support/app/Services/TransStrings.php:484
+#: app/Services/TransStrings.php:486
+#: builds/fluent-support/app/Services/TransStrings.php:486
 msgid "Activity Log Settings"
 msgstr ""
 
-#: app/Services/TransStrings.php:483
-#: builds/fluent-support/app/Services/TransStrings.php:483
+#: app/Services/TransStrings.php:485
+#: builds/fluent-support/app/Services/TransStrings.php:485
 msgid "Activity Logs are currently disabled"
 msgstr ""
 
@@ -296,8 +296,8 @@ msgstr ""
 msgid "Activity settings has been updated"
 msgstr ""
 
-#: app/Services/TransStrings.php:543
-#: builds/fluent-support/app/Services/TransStrings.php:543
+#: app/Services/TransStrings.php:545
+#: builds/fluent-support/app/Services/TransStrings.php:545
 msgid "Add"
 msgstr ""
 
@@ -306,8 +306,8 @@ msgstr ""
 msgid "Add a New Business Inbox"
 msgstr ""
 
-#: app/Services/TransStrings.php:457
-#: builds/fluent-support/app/Services/TransStrings.php:457
+#: app/Services/TransStrings.php:459
+#: builds/fluent-support/app/Services/TransStrings.php:459
 msgid "Add a New Workflow"
 msgstr ""
 
@@ -318,8 +318,8 @@ msgstr ""
 msgid "Add a support ticket for contact"
 msgstr ""
 
-#: app/Services/TransStrings.php:478
-#: builds/fluent-support/app/Services/TransStrings.php:478
+#: app/Services/TransStrings.php:480
+#: builds/fluent-support/app/Services/TransStrings.php:480
 msgid "Add Another Action"
 msgstr ""
 
@@ -328,8 +328,8 @@ msgstr ""
 msgid "Add Attachment"
 msgstr ""
 
-#: app/Services/TransStrings.php:632
-#: builds/fluent-support/app/Services/TransStrings.php:632
+#: app/Services/TransStrings.php:634
+#: builds/fluent-support/app/Services/TransStrings.php:634
 msgid "Add Bookmark"
 msgstr ""
 
@@ -338,8 +338,8 @@ msgstr ""
 msgid "Add Business Inbox"
 msgstr ""
 
-#: app/Services/TransStrings.php:413
-#: builds/fluent-support/app/Services/TransStrings.php:413
+#: app/Services/TransStrings.php:415
+#: builds/fluent-support/app/Services/TransStrings.php:415
 msgid ""
 "Add custom fields to your tickets and collect extra data from ticket open "
 "form."
@@ -350,8 +350,8 @@ msgstr ""
 msgid "Add Customer"
 msgstr ""
 
-#: app/Services/TransStrings.php:636
-#: builds/fluent-support/app/Services/TransStrings.php:636
+#: app/Services/TransStrings.php:638
+#: builds/fluent-support/app/Services/TransStrings.php:638
 msgid "Add Customer From FluentCRM"
 msgstr ""
 
@@ -360,8 +360,8 @@ msgstr ""
 msgid "Add Internal Note"
 msgstr ""
 
-#: app/Services/TransStrings.php:617
-#: builds/fluent-support/app/Services/TransStrings.php:617
+#: app/Services/TransStrings.php:619
+#: builds/fluent-support/app/Services/TransStrings.php:619
 msgid "Add More"
 msgstr ""
 
@@ -375,8 +375,8 @@ msgstr ""
 msgid "Add New Business Inbox"
 msgstr ""
 
-#: app/Services/TransStrings.php:417
-#: builds/fluent-support/app/Services/TransStrings.php:417
+#: app/Services/TransStrings.php:419
+#: builds/fluent-support/app/Services/TransStrings.php:419
 msgid "Add New Custom Field"
 msgstr ""
 
@@ -385,13 +385,13 @@ msgstr ""
 msgid "Add new customer"
 msgstr ""
 
-#: app/Services/TransStrings.php:419
-#: builds/fluent-support/app/Services/TransStrings.php:419
+#: app/Services/TransStrings.php:421
+#: builds/fluent-support/app/Services/TransStrings.php:421
 msgid "Add New Field"
 msgstr ""
 
-#: app/Services/TransStrings.php:621
-#: builds/fluent-support/app/Services/TransStrings.php:621
+#: app/Services/TransStrings.php:623
+#: builds/fluent-support/app/Services/TransStrings.php:623
 msgid ""
 "Add new filter to narrow down your contacts based on different properties"
 msgstr ""
@@ -401,8 +401,8 @@ msgstr ""
 msgid "Add New Support Staff"
 msgstr ""
 
-#: app/Services/TransStrings.php:427
-#: builds/fluent-support/app/Services/TransStrings.php:427
+#: app/Services/TransStrings.php:429
+#: builds/fluent-support/app/Services/TransStrings.php:429
 msgid "Add New WorkFlow"
 msgstr ""
 
@@ -448,30 +448,30 @@ msgstr ""
 msgid "Added By Email"
 msgstr ""
 
-#: app/Services/TransStrings.php:446
-#: builds/fluent-support/app/Services/TransStrings.php:446
+#: app/Services/TransStrings.php:448
+#: builds/fluent-support/app/Services/TransStrings.php:448
 msgid "Additional Data "
 msgstr ""
 
-#: app/Services/TransStrings.php:640
+#: app/Services/TransStrings.php:642
 #: app/Hooks/Handlers/CustomerPortalHandler.php:205
-#: builds/fluent-support/app/Services/TransStrings.php:640
+#: builds/fluent-support/app/Services/TransStrings.php:642
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:205
 msgid "Additional info"
 msgstr ""
 
-#: app/Services/TransStrings.php:486
-#: builds/fluent-support/app/Services/TransStrings.php:486
+#: app/Services/TransStrings.php:488
+#: builds/fluent-support/app/Services/TransStrings.php:488
 msgid "Address Info"
 msgstr ""
 
-#: app/Models/Customer.php:52 app/Services/TransStrings.php:436
+#: app/Services/TransStrings.php:438 app/Models/Customer.php:52
 #: app/Models/Traits/CustomerTrait.php:110
 #: app/Models/Traits/CustomerTrait.php:112
 #: app/Hooks/Handlers/AuthHandler.php:395
 #: app/Hooks/Handlers/AuthHandler.php:397
+#: builds/fluent-support/app/Services/TransStrings.php:438
 #: builds/fluent-support/app/Models/Customer.php:52
-#: builds/fluent-support/app/Services/TransStrings.php:436
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:110
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:112
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:395
@@ -479,13 +479,13 @@ msgstr ""
 msgid "Address Line 1"
 msgstr ""
 
-#: app/Models/Customer.php:53 app/Services/TransStrings.php:437
+#: app/Services/TransStrings.php:439 app/Models/Customer.php:53
 #: app/Models/Traits/CustomerTrait.php:117
 #: app/Models/Traits/CustomerTrait.php:119
 #: app/Hooks/Handlers/AuthHandler.php:402
 #: app/Hooks/Handlers/AuthHandler.php:404
+#: builds/fluent-support/app/Services/TransStrings.php:439
 #: builds/fluent-support/app/Models/Customer.php:53
-#: builds/fluent-support/app/Services/TransStrings.php:437
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:117
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:119
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:402
@@ -513,18 +513,18 @@ msgstr ""
 msgid "Admin Label (Optional)"
 msgstr ""
 
-#: app/Services/TransStrings.php:390
-#: builds/fluent-support/app/Services/TransStrings.php:390
+#: app/Services/TransStrings.php:392
+#: builds/fluent-support/app/Services/TransStrings.php:392
 msgid "Admin Priority"
 msgstr ""
 
-#: app/Services/TransStrings.php:448
-#: builds/fluent-support/app/Services/TransStrings.php:448
+#: app/Services/TransStrings.php:450
+#: builds/fluent-support/app/Services/TransStrings.php:450
 msgid "Admin Priority:"
 msgstr ""
 
-#: app/Services/TransStrings.php:677
-#: builds/fluent-support/app/Services/TransStrings.php:677
+#: app/Services/TransStrings.php:679
+#: builds/fluent-support/app/Services/TransStrings.php:679
 msgid "Advanced Filter"
 msgstr ""
 
@@ -571,8 +571,8 @@ msgstr ""
 msgid "Agent Last Name"
 msgstr ""
 
-#: app/Services/TransStrings.php:684
-#: builds/fluent-support/app/Services/TransStrings.php:684
+#: app/Services/TransStrings.php:686
+#: builds/fluent-support/app/Services/TransStrings.php:686
 msgid "Agent Performance (Today)"
 msgstr ""
 
@@ -586,8 +586,8 @@ msgstr ""
 msgid "Agents Reports"
 msgstr ""
 
-#: app/Services/Helper.php:1049
-#: builds/fluent-support/app/Services/Helper.php:1049
+#: app/Services/Helper.php:1056
+#: builds/fluent-support/app/Services/Helper.php:1056
 msgid "AI Activity settings has been updated"
 msgstr ""
 
@@ -608,8 +608,8 @@ msgstr ""
 msgid "All Customers"
 msgstr ""
 
-#: app/Services/TransStrings.php:444
-#: builds/fluent-support/app/Services/TransStrings.php:444
+#: app/Services/TransStrings.php:446
+#: builds/fluent-support/app/Services/TransStrings.php:446
 msgid "All Inbox"
 msgstr ""
 
@@ -628,7 +628,7 @@ msgstr ""
 #: app/Services/TransStrings.php:287
 #: app/Hooks/Handlers/CustomerPortalHandler.php:233
 #: builds/fluent-support/app/Services/TransStrings.php:287
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:230
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:233
 msgid "All Products"
 msgstr ""
 
@@ -644,8 +644,8 @@ msgstr ""
 msgid "All Support Staff"
 msgstr ""
 
-#: app/Services/TransStrings.php:514
-#: builds/fluent-support/app/Services/TransStrings.php:514
+#: app/Services/TransStrings.php:516
+#: builds/fluent-support/app/Services/TransStrings.php:516
 msgid ""
 "All the forwarded emails to this address will be synced with your tickets"
 msgstr ""
@@ -667,27 +667,39 @@ msgstr ""
 msgid "All tickets has been deleted successfully"
 msgstr ""
 
-#: app/Services/Tickets/Importer/SupportCandyTickets.php:69
-#: app/Services/Tickets/Importer/JSHelpdeskTickets.php:55
+#: app/Services/Tickets/Importer/ZendeskTickets.php:58
+#: builds/fluent-support/app/Services/Tickets/Importer/ZendeskTickets.php:58
+msgid "All tickets has been imported successfully"
+msgstr ""
+
 #: app/Services/Tickets/Importer/AwesomeSupportTickets.php:71
-#: builds/fluent-support/app/Services/Tickets/Importer/SupportCandyTickets.php:69
-#: builds/fluent-support/app/Services/Tickets/Importer/JSHelpdeskTickets.php:55
+#: app/Services/Tickets/Importer/JSHelpdeskTickets.php:55
+#: app/Services/Tickets/Importer/SupportCandyTickets.php:69
 #: builds/fluent-support/app/Services/Tickets/Importer/AwesomeSupportTickets.php:71
+#: builds/fluent-support/app/Services/Tickets/Importer/JSHelpdeskTickets.php:55
+#: builds/fluent-support/app/Services/Tickets/Importer/SupportCandyTickets.php:69
 msgid "All tickets has been importer successfully"
 msgstr ""
 
-#: app/Services/TransStrings.php:426
-#: builds/fluent-support/app/Services/TransStrings.php:426
+#: app/Services/Tickets/Importer/FreshDeskTickets.php:80
+#: app/Services/Tickets/Importer/HelpScoutTickets.php:79
+#: builds/fluent-support/app/Services/Tickets/Importer/FreshDeskTickets.php:80
+#: builds/fluent-support/app/Services/Tickets/Importer/HelpScoutTickets.php:79
+msgid "All tickets have been imported successfully"
+msgstr ""
+
+#: app/Services/TransStrings.php:428
+#: builds/fluent-support/app/Services/TransStrings.php:428
 msgid "All Workflows"
 msgstr ""
 
-#: app/Services/Helper.php:885
-#: builds/fluent-support/app/Services/Helper.php:885
+#: app/Services/Helper.php:892
+#: builds/fluent-support/app/Services/Helper.php:892
 msgid "All-in-one payment gateway designed for WordPress"
 msgstr ""
 
-#: app/Services/TransStrings.php:602
-#: builds/fluent-support/app/Services/TransStrings.php:602
+#: app/Services/TransStrings.php:604
+#: builds/fluent-support/app/Services/TransStrings.php:604
 msgid "Almost Done"
 msgstr ""
 
@@ -703,35 +715,35 @@ msgstr ""
 msgid "An error occurred while saving the settings: %s"
 msgstr ""
 
-#: app/Services/TransStrings.php:408
-#: builds/fluent-support/app/Services/TransStrings.php:408
+#: app/Services/TransStrings.php:410
+#: builds/fluent-support/app/Services/TransStrings.php:410
 msgid ""
 "An incomplete migration exists. Would you like to resume from the previous "
 "one?"
 msgstr ""
 
-#: app/Services/TransStrings.php:591
-#: builds/fluent-support/app/Services/TransStrings.php:591
+#: app/Services/TransStrings.php:593
+#: builds/fluent-support/app/Services/TransStrings.php:593
 msgid "AND"
 msgstr ""
 
-#: app/Services/TransStrings.php:600
-#: builds/fluent-support/app/Services/TransStrings.php:600
+#: app/Services/TransStrings.php:602
+#: builds/fluent-support/app/Services/TransStrings.php:602
 msgid "And"
 msgstr ""
 
-#: app/Services/TransStrings.php:576
-#: builds/fluent-support/app/Services/TransStrings.php:576
+#: app/Services/TransStrings.php:578
+#: builds/fluent-support/app/Services/TransStrings.php:578
 msgid "and"
 msgstr ""
 
-#: app/Services/TransStrings.php:544
-#: builds/fluent-support/app/Services/TransStrings.php:544
+#: app/Services/TransStrings.php:546
+#: builds/fluent-support/app/Services/TransStrings.php:546
 msgid "any"
 msgstr ""
 
-#: app/Services/TransStrings.php:670
-#: builds/fluent-support/app/Services/TransStrings.php:670
+#: app/Services/TransStrings.php:672
+#: builds/fluent-support/app/Services/TransStrings.php:672
 msgid "API Key"
 msgstr ""
 
@@ -756,17 +768,17 @@ msgid "App Secret"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:249
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:246
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:249
 msgid "Apply"
 msgstr ""
 
-#: app/Services/TransStrings.php:639
-#: builds/fluent-support/app/Services/TransStrings.php:639
+#: app/Services/TransStrings.php:641
+#: builds/fluent-support/app/Services/TransStrings.php:641
 msgid "Apply / Remove Lists on FluentCRM Profile"
 msgstr ""
 
-#: app/Services/TransStrings.php:451
-#: builds/fluent-support/app/Services/TransStrings.php:451
+#: app/Services/TransStrings.php:453
+#: builds/fluent-support/app/Services/TransStrings.php:453
 msgid "Apply / Remove Tags on FluentCRM Profile"
 msgstr ""
 
@@ -775,8 +787,8 @@ msgstr ""
 msgid "Approve Draft Reply"
 msgstr ""
 
-#: app/Services/TransStrings.php:468
-#: builds/fluent-support/app/Services/TransStrings.php:468
+#: app/Services/TransStrings.php:470
+#: builds/fluent-support/app/Services/TransStrings.php:470
 msgid ""
 "are always on, running on selected ticket events. Based on what's\n"
 "            happening to your tickets and conversations, It will run the "
@@ -798,35 +810,35 @@ msgstr ""
 msgid "Are you sure to delete the selected Tickets?"
 msgstr ""
 
-#: app/Services/TransStrings.php:588
-#: builds/fluent-support/app/Services/TransStrings.php:588
+#: app/Services/TransStrings.php:590
+#: builds/fluent-support/app/Services/TransStrings.php:590
 msgid "Are you sure to delete this Action?"
 msgstr ""
 
-#: app/Services/TransStrings.php:489
-#: builds/fluent-support/app/Services/TransStrings.php:489
+#: app/Services/TransStrings.php:491
+#: builds/fluent-support/app/Services/TransStrings.php:491
 msgid ""
 "Are you sure to delete this customer? It will delete all associated data "
 "with this customer"
 msgstr ""
 
-#: app/Services/TransStrings.php:542
-#: builds/fluent-support/app/Services/TransStrings.php:542
+#: app/Services/TransStrings.php:544
+#: builds/fluent-support/app/Services/TransStrings.php:544
 msgid "Are you sure to delete this field?"
 msgstr ""
 
-#: app/Services/TransStrings.php:569
-#: builds/fluent-support/app/Services/TransStrings.php:569
+#: app/Services/TransStrings.php:571
+#: builds/fluent-support/app/Services/TransStrings.php:571
 msgid "Are you sure to delete this product?"
 msgstr ""
 
-#: app/Services/TransStrings.php:572
-#: builds/fluent-support/app/Services/TransStrings.php:572
+#: app/Services/TransStrings.php:574
+#: builds/fluent-support/app/Services/TransStrings.php:574
 msgid "Are you sure to delete this tag?"
 msgstr ""
 
-#: app/Services/TransStrings.php:522
-#: builds/fluent-support/app/Services/TransStrings.php:522
+#: app/Services/TransStrings.php:524
+#: builds/fluent-support/app/Services/TransStrings.php:524
 msgid "Are you sure to delete this template?"
 msgstr ""
 
@@ -835,45 +847,45 @@ msgstr ""
 msgid "Are you sure to delete this Ticket?"
 msgstr ""
 
-#: app/Services/TransStrings.php:619
-#: builds/fluent-support/app/Services/TransStrings.php:619
+#: app/Services/TransStrings.php:621
+#: builds/fluent-support/app/Services/TransStrings.php:621
 msgid "Are you sure to delete this?"
 msgstr ""
 
-#: app/Services/TransStrings.php:463
-#: builds/fluent-support/app/Services/TransStrings.php:463
+#: app/Services/TransStrings.php:465
+#: builds/fluent-support/app/Services/TransStrings.php:465
 msgid "Are you sure to delete this? All associate data will be deleted"
 msgstr ""
 
-#: app/Services/TransStrings.php:553
-#: builds/fluent-support/app/Services/TransStrings.php:553
+#: app/Services/TransStrings.php:555
+#: builds/fluent-support/app/Services/TransStrings.php:555
 msgid ""
 "Are you sure to regenerate the webhook url? If you regenerate the url you "
 "have to change all your used webhook"
 msgstr ""
 
-#: app/Services/TransStrings.php:635
-#: builds/fluent-support/app/Services/TransStrings.php:635
+#: app/Services/TransStrings.php:637
+#: builds/fluent-support/app/Services/TransStrings.php:637
 msgid "Are you sure to remove this bookmark?"
+msgstr ""
+
+#: app/Services/TransStrings.php:677
+#: builds/fluent-support/app/Services/TransStrings.php:677
+msgid "Are you sure want to set this business box for webhook?"
 msgstr ""
 
 #: app/Services/TransStrings.php:675
 #: builds/fluent-support/app/Services/TransStrings.php:675
-msgid "Are you sure want to set this business box for webhook?"
-msgstr ""
-
-#: app/Services/TransStrings.php:673
-#: builds/fluent-support/app/Services/TransStrings.php:673
 msgid "Are you sure you want to set this as default?"
 msgstr ""
 
-#: app/Services/TransStrings.php:583
-#: builds/fluent-support/app/Services/TransStrings.php:583
+#: app/Services/TransStrings.php:585
+#: builds/fluent-support/app/Services/TransStrings.php:585
 msgid "Are you sure, you want to close selected tickets?"
 msgstr ""
 
-#: app/Services/TransStrings.php:584
-#: builds/fluent-support/app/Services/TransStrings.php:584
+#: app/Services/TransStrings.php:586
+#: builds/fluent-support/app/Services/TransStrings.php:586
 msgid "Are you sure, you want to delete selected tickets?"
 msgstr ""
 
@@ -888,12 +900,12 @@ msgid "Are You Sure? You can not undo this action."
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:247
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:244
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:247
 msgid "Ascending"
 msgstr ""
 
-#: app/Services/TransStrings.php:582
-#: builds/fluent-support/app/Services/TransStrings.php:582
+#: app/Services/TransStrings.php:584
+#: builds/fluent-support/app/Services/TransStrings.php:584
 msgid "Assign Agent"
 msgstr ""
 
@@ -907,8 +919,8 @@ msgstr ""
 msgid "Assigned Agent "
 msgstr ""
 
-#: app/Services/TransStrings.php:479
-#: builds/fluent-support/app/Services/TransStrings.php:479
+#: app/Services/TransStrings.php:481
+#: builds/fluent-support/app/Services/TransStrings.php:481
 msgid "Assigned Permissions"
 msgstr ""
 
@@ -933,23 +945,23 @@ msgid ""
 "Auto Close tickets based on active days or based on tags or waiting time."
 msgstr ""
 
-#: app/Services/TransStrings.php:456
-#: builds/fluent-support/app/Services/TransStrings.php:456
+#: app/Services/TransStrings.php:458
+#: builds/fluent-support/app/Services/TransStrings.php:458
 msgid "Automate your tickets by applying manual or automated tasks"
 msgstr ""
 
-#: app/Services/TransStrings.php:476
-#: builds/fluent-support/app/Services/TransStrings.php:476
+#: app/Services/TransStrings.php:478
+#: builds/fluent-support/app/Services/TransStrings.php:478
 msgid "Automatic"
 msgstr ""
 
-#: app/Services/TransStrings.php:475
-#: builds/fluent-support/app/Services/TransStrings.php:475
+#: app/Services/TransStrings.php:477
+#: builds/fluent-support/app/Services/TransStrings.php:477
 msgid "automatic"
 msgstr ""
 
-#: app/Services/TransStrings.php:462
-#: builds/fluent-support/app/Services/TransStrings.php:462
+#: app/Services/TransStrings.php:464
+#: builds/fluent-support/app/Services/TransStrings.php:464
 msgid "Automatic workflows"
 msgstr ""
 
@@ -989,20 +1001,20 @@ msgstr ""
 msgid "Awesome! Your support portal is ready to go!"
 msgstr ""
 
-#: app/Services/TransStrings.php:708
+#: app/Services/TransStrings.php:710
 #: app/Hooks/Handlers/CustomerPortalHandler.php:178
-#: builds/fluent-support/app/Services/TransStrings.php:708
+#: builds/fluent-support/app/Services/TransStrings.php:710
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:178
 msgid "Back to All Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:485
-#: builds/fluent-support/app/Services/TransStrings.php:485
+#: app/Services/TransStrings.php:487
+#: builds/fluent-support/app/Services/TransStrings.php:487
 msgid "Basic Info"
 msgstr ""
 
-#: app/Services/Helper.php:868
-#: builds/fluent-support/app/Services/Helper.php:868
+#: app/Services/Helper.php:875
+#: builds/fluent-support/app/Services/Helper.php:875
 msgid "BetterDocs"
 msgstr ""
 
@@ -1016,14 +1028,14 @@ msgstr ""
 msgid "block_instruction"
 msgstr ""
 
-#: app/Services/TransStrings.php:453 app/Models/Traits/CustomerTrait.php:92
-#: builds/fluent-support/app/Services/TransStrings.php:453
+#: app/Services/TransStrings.php:455 app/Models/Traits/CustomerTrait.php:92
+#: builds/fluent-support/app/Services/TransStrings.php:455
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:92
 msgid "Blocked"
 msgstr ""
 
-#: app/Services/TransStrings.php:631
-#: builds/fluent-support/app/Services/TransStrings.php:631
+#: app/Services/TransStrings.php:633
+#: builds/fluent-support/app/Services/TransStrings.php:633
 msgid "Bookmarks"
 msgstr ""
 
@@ -1037,14 +1049,21 @@ msgstr ""
 msgid "Browse Files"
 msgstr ""
 
-#: app/Services/Helper.php:833
-#: builds/fluent-support/app/Services/Helper.php:833
+#: app/Services/Helper.php:840
+#: builds/fluent-support/app/Services/Helper.php:840
 msgid "BuddyBoss"
 msgstr ""
 
 #: app/Services/Tickets/CustomFieldsService.php:17
 #: builds/fluent-support/app/Services/Tickets/CustomFieldsService.php:17
 msgid "Bug Report"
+msgstr ""
+
+#: app/Services/Helper.php:829
+#: builds/fluent-support/app/Services/Helper.php:829
+msgid ""
+"Build and manage vibrant online communities with integrated LMS features "
+"directly within WordPress."
 msgstr ""
 
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:107
@@ -1057,8 +1076,8 @@ msgstr ""
 msgid "Business Boxes Reports"
 msgstr ""
 
-#: app/Services/Helper.php:878
-#: builds/fluent-support/app/Services/Helper.php:878
+#: app/Services/Helper.php:885
+#: builds/fluent-support/app/Services/Helper.php:885
 msgid "Business communication platform designed for privacy"
 msgstr ""
 
@@ -1067,8 +1086,8 @@ msgstr ""
 msgid "Business communication platform designed for security"
 msgstr ""
 
-#: app/Services/Helper.php:843
-#: builds/fluent-support/app/Services/Helper.php:843
+#: app/Services/Helper.php:850
+#: builds/fluent-support/app/Services/Helper.php:850
 msgid "Business communication platform designed for tech"
 msgstr ""
 
@@ -1082,8 +1101,8 @@ msgstr ""
 msgid "Business Email"
 msgstr ""
 
-#: app/Services/TransStrings.php:406
-#: builds/fluent-support/app/Services/TransStrings.php:406
+#: app/Services/TransStrings.php:408
+#: builds/fluent-support/app/Services/TransStrings.php:408
 msgid "Business Inbox Access Restriction"
 msgstr ""
 
@@ -1103,25 +1122,25 @@ msgstr ""
 msgid "button to get the authorization code."
 msgstr ""
 
-#: app/Services/TransStrings.php:385
+#: app/Services/TransStrings.php:387
 #: app/Hooks/Handlers/CustomerPortalHandler.php:239
-#: builds/fluent-support/app/Services/TransStrings.php:385
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:236
+#: builds/fluent-support/app/Services/TransStrings.php:387
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:239
 msgid "by"
 msgstr ""
 
-#: app/Services/TransStrings.php:702
-#: builds/fluent-support/app/Services/TransStrings.php:702
+#: app/Services/TransStrings.php:704
+#: builds/fluent-support/app/Services/TransStrings.php:704
 msgid "By Agents"
+msgstr ""
+
+#: app/Services/TransStrings.php:705
+#: builds/fluent-support/app/Services/TransStrings.php:705
+msgid "By Customers"
 msgstr ""
 
 #: app/Services/TransStrings.php:703
 #: builds/fluent-support/app/Services/TransStrings.php:703
-msgid "By Customers"
-msgstr ""
-
-#: app/Services/TransStrings.php:701
-#: builds/fluent-support/app/Services/TransStrings.php:701
 msgid "By Tickets"
 msgstr ""
 
@@ -1130,18 +1149,18 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: app/Services/TransStrings.php:410
-#: builds/fluent-support/app/Services/TransStrings.php:410
+#: app/Services/TransStrings.php:412
+#: builds/fluent-support/app/Services/TransStrings.php:412
 msgid "Change Customer"
 msgstr ""
 
-#: app/Services/TransStrings.php:507
-#: builds/fluent-support/app/Services/TransStrings.php:507
+#: app/Services/TransStrings.php:509
+#: builds/fluent-support/app/Services/TransStrings.php:509
 msgid "Check all"
 msgstr ""
 
-#: app/Services/TransStrings.php:412
-#: builds/fluent-support/app/Services/TransStrings.php:412
+#: app/Services/TransStrings.php:414
+#: builds/fluent-support/app/Services/TransStrings.php:414
 msgid "Check overall activities"
 msgstr ""
 
@@ -1169,18 +1188,18 @@ msgstr ""
 msgid "Clear Filters"
 msgstr ""
 
-#: app/Services/TransStrings.php:667
-#: builds/fluent-support/app/Services/TransStrings.php:667
+#: app/Services/TransStrings.php:669
+#: builds/fluent-support/app/Services/TransStrings.php:669
 msgid "Clear Settings"
 msgstr ""
 
-#: app/Services/TransStrings.php:560
-#: builds/fluent-support/app/Services/TransStrings.php:560
+#: app/Services/TransStrings.php:562
+#: builds/fluent-support/app/Services/TransStrings.php:562
 msgid "Click here"
 msgstr ""
 
-#: app/Services/TransStrings.php:559
-#: builds/fluent-support/app/Services/TransStrings.php:559
+#: app/Services/TransStrings.php:561
+#: builds/fluent-support/app/Services/TransStrings.php:561
 msgid "Click Here to Renew your License"
 msgstr ""
 
@@ -1216,8 +1235,8 @@ msgstr ""
 msgid "Client Priority"
 msgstr ""
 
-#: app/Services/TransStrings.php:445
-#: builds/fluent-support/app/Services/TransStrings.php:445
+#: app/Services/TransStrings.php:447
+#: builds/fluent-support/app/Services/TransStrings.php:447
 msgid "Client Priority: "
 msgstr ""
 
@@ -1231,15 +1250,15 @@ msgstr ""
 msgid "Close Selected Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:379
+#: app/Services/TransStrings.php:381
 #: app/Hooks/Handlers/CustomerPortalHandler.php:197
-#: builds/fluent-support/app/Services/TransStrings.php:379
+#: builds/fluent-support/app/Services/TransStrings.php:381
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:197
 msgid "Close Ticket"
 msgstr ""
 
-#: app/Services/TransStrings.php:648
-#: builds/fluent-support/app/Services/TransStrings.php:648
+#: app/Services/TransStrings.php:650
+#: builds/fluent-support/app/Services/TransStrings.php:650
 msgid "Close Ticket Silently"
 msgstr ""
 
@@ -1271,10 +1290,10 @@ msgid "Closed by Customer"
 msgstr ""
 
 #: app/Modules/StatModule.php:77 app/Modules/StatModule.php:120
-#: app/Modules/StatModule.php:160 app/Services/Tickets/TicketStats.php:43
+#: app/Modules/StatModule.php:164 app/Services/Tickets/TicketStats.php:43
 #: builds/fluent-support/app/Modules/StatModule.php:77
 #: builds/fluent-support/app/Modules/StatModule.php:120
-#: builds/fluent-support/app/Modules/StatModule.php:160
+#: builds/fluent-support/app/Modules/StatModule.php:164
 #: builds/fluent-support/app/Services/Tickets/TicketStats.php:43
 msgid "Closed Tickets"
 msgstr ""
@@ -1290,7 +1309,7 @@ msgid "Complete Signup"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:256
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:253
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:256
 msgid "Completed"
 msgstr ""
 
@@ -1299,8 +1318,8 @@ msgstr ""
 msgid "completed"
 msgstr ""
 
-#: app/Services/TransStrings.php:539
-#: builds/fluent-support/app/Services/TransStrings.php:539
+#: app/Services/TransStrings.php:541
+#: builds/fluent-support/app/Services/TransStrings.php:541
 msgid "Condition Match Type"
 msgstr ""
 
@@ -1309,8 +1328,8 @@ msgstr ""
 msgid "Condition Value"
 msgstr ""
 
-#: app/Services/TransStrings.php:590
-#: builds/fluent-support/app/Services/TransStrings.php:590
+#: app/Services/TransStrings.php:592
+#: builds/fluent-support/app/Services/TransStrings.php:592
 msgid "Conditions"
 msgstr ""
 
@@ -1319,8 +1338,8 @@ msgstr ""
 msgid "Configuration required!"
 msgstr ""
 
-#: app/Services/TransStrings.php:618
-#: builds/fluent-support/app/Services/TransStrings.php:618
+#: app/Services/TransStrings.php:620
+#: builds/fluent-support/app/Services/TransStrings.php:620
 msgid "confirm"
 msgstr ""
 
@@ -1334,21 +1353,21 @@ msgstr ""
 msgid "Confirm Delete This Business"
 msgstr ""
 
-#: app/Services/TransStrings.php:689
-#: builds/fluent-support/app/Services/TransStrings.php:689
+#: app/Services/TransStrings.php:691
+#: builds/fluent-support/app/Services/TransStrings.php:691
 msgid "Connect"
 msgstr ""
 
-#: app/Services/TransStrings.php:517
-#: builds/fluent-support/app/Services/TransStrings.php:517
+#: app/Services/TransStrings.php:519
+#: builds/fluent-support/app/Services/TransStrings.php:519
 msgid ""
 "Connect your email address with Fluent Support Email parser, so when your "
 "customers send an email or reply from email it will be synced with your "
 "support portal"
 msgstr ""
 
-#: app/Services/TransStrings.php:536
-#: builds/fluent-support/app/Services/TransStrings.php:536
+#: app/Services/TransStrings.php:538
+#: builds/fluent-support/app/Services/TransStrings.php:538
 msgid "Contains"
 msgstr ""
 
@@ -1362,8 +1381,8 @@ msgstr ""
 msgid "Content is required"
 msgstr ""
 
-#: app/Services/TransStrings.php:601
-#: builds/fluent-support/app/Services/TransStrings.php:601
+#: app/Services/TransStrings.php:603
+#: builds/fluent-support/app/Services/TransStrings.php:603
 msgid "Continue"
 msgstr ""
 
@@ -1402,13 +1421,13 @@ msgstr ""
 msgid "Count"
 msgstr ""
 
-#: app/Models/Customer.php:57 app/Services/TransStrings.php:440
+#: app/Services/TransStrings.php:442 app/Models/Customer.php:57
 #: app/Models/Traits/CustomerTrait.php:145
 #: app/Models/Traits/CustomerTrait.php:146
 #: app/Hooks/Handlers/AuthHandler.php:430
 #: app/Hooks/Handlers/PrivacyHandler.php:252
+#: builds/fluent-support/app/Services/TransStrings.php:442
 #: builds/fluent-support/app/Models/Customer.php:57
-#: builds/fluent-support/app/Services/TransStrings.php:440
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:145
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:146
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:430
@@ -1417,15 +1436,15 @@ msgid "Country"
 msgstr ""
 
 #: app/Services/Helper.php:787 app/Services/Helper.php:808
-#: app/Services/Helper.php:899
+#: app/Services/Helper.php:906
 #: builds/fluent-support/app/Services/Helper.php:787
 #: builds/fluent-support/app/Services/Helper.php:808
-#: builds/fluent-support/app/Services/Helper.php:899
+#: builds/fluent-support/app/Services/Helper.php:906
 msgid "Course and e-learning platform built for WordPress"
 msgstr ""
 
-#: app/Services/TransStrings.php:606
-#: builds/fluent-support/app/Services/TransStrings.php:606
+#: app/Services/TransStrings.php:608
+#: builds/fluent-support/app/Services/TransStrings.php:608
 msgid "Create"
 msgstr ""
 
@@ -1462,8 +1481,8 @@ msgstr ""
 msgid "Create New"
 msgstr ""
 
-#: app/Services/TransStrings.php:578
-#: builds/fluent-support/app/Services/TransStrings.php:578
+#: app/Services/TransStrings.php:580
+#: builds/fluent-support/app/Services/TransStrings.php:580
 msgid "Create New Customer"
 msgstr ""
 
@@ -1487,8 +1506,8 @@ msgstr ""
 msgid "Create New Ticket Type"
 msgstr ""
 
-#: app/Services/TransStrings.php:581
-#: builds/fluent-support/app/Services/TransStrings.php:581
+#: app/Services/TransStrings.php:583
+#: builds/fluent-support/app/Services/TransStrings.php:583
 msgid "Create New User in WordPress"
 msgstr ""
 
@@ -1509,14 +1528,14 @@ msgstr ""
 msgid "Create Support Ticket From Your Form Submission in FluentSupport"
 msgstr ""
 
-#: app/Services/TransStrings.php:373
+#: app/Services/TransStrings.php:375
 #: app/Hooks/Handlers/CustomerPortalHandler.php:215
 #: app/Hooks/Handlers/CustomerPortalHandler.php:231
 #: app/Hooks/Handlers/CustomerPortalHandler.php:237
-#: builds/fluent-support/app/Services/TransStrings.php:373
+#: builds/fluent-support/app/Services/TransStrings.php:375
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:215
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:228
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:234
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:231
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:237
 msgid "Create Ticket"
 msgstr ""
 
@@ -1527,7 +1546,7 @@ msgid "Created At"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:252
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:249
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:252
 msgid "Created at"
 msgstr ""
 
@@ -1547,8 +1566,8 @@ msgstr ""
 msgid "Critical"
 msgstr ""
 
-#: app/Services/TransStrings.php:680
-#: builds/fluent-support/app/Services/TransStrings.php:680
+#: app/Services/TransStrings.php:682
+#: builds/fluent-support/app/Services/TransStrings.php:682
 msgid "critical"
 msgstr ""
 
@@ -1562,8 +1581,8 @@ msgstr ""
 msgid "Current Overall"
 msgstr ""
 
-#: app/Services/TransStrings.php:511
-#: builds/fluent-support/app/Services/TransStrings.php:511
+#: app/Services/TransStrings.php:513
+#: builds/fluent-support/app/Services/TransStrings.php:513
 msgid "Currently no migration is available for this site"
 msgstr ""
 
@@ -1587,8 +1606,8 @@ msgstr ""
 msgid "Custom Field Slug"
 msgstr ""
 
-#: app/Services/TransStrings.php:415
-#: builds/fluent-support/app/Services/TransStrings.php:415
+#: app/Services/TransStrings.php:417
+#: builds/fluent-support/app/Services/TransStrings.php:417
 msgid "Custom Fields"
 msgstr ""
 
@@ -1597,8 +1616,8 @@ msgstr ""
 msgid "Custom Registration Form Field"
 msgstr ""
 
-#: app/Services/TransStrings.php:414
-#: builds/fluent-support/app/Services/TransStrings.php:414
+#: app/Services/TransStrings.php:416
+#: builds/fluent-support/app/Services/TransStrings.php:416
 msgid "Custom Ticket Fields"
 msgstr ""
 
@@ -1627,8 +1646,8 @@ msgstr ""
 msgid "Customer First Name"
 msgstr ""
 
-#: app/Services/TransStrings.php:428
-#: builds/fluent-support/app/Services/TransStrings.php:428
+#: app/Services/TransStrings.php:430
+#: builds/fluent-support/app/Services/TransStrings.php:430
 msgid "Customer First name"
 msgstr ""
 
@@ -1659,13 +1678,13 @@ msgstr ""
 msgid "Customer Last Name"
 msgstr ""
 
-#: app/Services/TransStrings.php:429
-#: builds/fluent-support/app/Services/TransStrings.php:429
+#: app/Services/TransStrings.php:431
+#: builds/fluent-support/app/Services/TransStrings.php:431
 msgid "Customer Last name"
 msgstr ""
 
-#: app/Services/TransStrings.php:409
-#: builds/fluent-support/app/Services/TransStrings.php:409
+#: app/Services/TransStrings.php:411
+#: builds/fluent-support/app/Services/TransStrings.php:411
 msgid "Customer Management"
 msgstr ""
 
@@ -1681,9 +1700,9 @@ msgid ""
 "support staff"
 msgstr ""
 
-#: app/Services/TransStrings.php:704 app/Services/TransStrings.php:705
-#: builds/fluent-support/app/Services/TransStrings.php:704
-#: builds/fluent-support/app/Services/TransStrings.php:705
+#: app/Services/TransStrings.php:706 app/Services/TransStrings.php:707
+#: builds/fluent-support/app/Services/TransStrings.php:706
+#: builds/fluent-support/app/Services/TransStrings.php:707
 msgid "Customer Time Sheet Report"
 msgstr ""
 
@@ -1691,8 +1710,8 @@ msgstr ""
 msgid "Customer Title"
 msgstr ""
 
-#: app/Services/TransStrings.php:487 app/Hooks/Handlers/Menu.php:141
-#: builds/fluent-support/app/Services/TransStrings.php:487
+#: app/Services/TransStrings.php:489 app/Hooks/Handlers/Menu.php:141
+#: builds/fluent-support/app/Services/TransStrings.php:489
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:141
 msgid "Customers"
 msgstr ""
@@ -1749,8 +1768,8 @@ msgstr ""
 msgid "Delete Selected Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:687
-#: builds/fluent-support/app/Services/TransStrings.php:687
+#: app/Services/TransStrings.php:689
+#: builds/fluent-support/app/Services/TransStrings.php:689
 msgid "Delete Settings"
 msgstr ""
 
@@ -1759,13 +1778,16 @@ msgstr ""
 msgid "Delete Ticket"
 msgstr ""
 
-#: app/Modules/PermissionManager.php:270
 #: builds/fluent-support/app/Modules/PermissionManager.php:270
 msgid "Delete Tickets"
 msgstr ""
 
+#: app/Modules/PermissionManager.php:270
+msgid "Delete Tickets & Individual Responses"
+msgstr ""
+
 #: app/Hooks/Handlers/CustomerPortalHandler.php:248
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:245
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:248
 msgid "Descending"
 msgstr ""
 
@@ -1781,8 +1803,8 @@ msgstr ""
 msgid "Details about the issue"
 msgstr ""
 
-#: app/Services/TransStrings.php:481
-#: builds/fluent-support/app/Services/TransStrings.php:481
+#: app/Services/TransStrings.php:483
+#: builds/fluent-support/app/Services/TransStrings.php:483
 msgid "Disable Activity Logs"
 msgstr ""
 
@@ -1791,8 +1813,8 @@ msgstr ""
 msgid "Disable Public Ticket interaction"
 msgstr ""
 
-#: app/Services/TransStrings.php:593
-#: builds/fluent-support/app/Services/TransStrings.php:593
+#: app/Services/TransStrings.php:595
+#: builds/fluent-support/app/Services/TransStrings.php:595
 msgid "Discard"
 msgstr ""
 
@@ -1800,13 +1822,13 @@ msgstr ""
 msgid "Discard draft successfully"
 msgstr ""
 
-#: app/Services/TransStrings.php:396
-#: builds/fluent-support/app/Services/TransStrings.php:396
+#: app/Services/TransStrings.php:398
+#: builds/fluent-support/app/Services/TransStrings.php:398
 msgid "Disconnect"
 msgstr ""
 
-#: app/Services/Helper.php:840
-#: builds/fluent-support/app/Services/Helper.php:840
+#: app/Services/Helper.php:847
+#: builds/fluent-support/app/Services/Helper.php:847
 msgid "Discord"
 msgstr ""
 
@@ -1820,15 +1842,15 @@ msgstr ""
 msgid "Do you want to delete all imported tickets and its data?"
 msgstr ""
 
-#: app/Services/TransStrings.php:473
-#: builds/fluent-support/app/Services/TransStrings.php:473
+#: app/Services/TransStrings.php:475
+#: builds/fluent-support/app/Services/TransStrings.php:475
 msgid ""
 "doesn't do anything until you tell it to. When you apply a manual\n"
 "            workflow from a ticket, Fluent Support performs all the actions."
 msgstr ""
 
-#: app/Services/TransStrings.php:566
-#: builds/fluent-support/app/Services/TransStrings.php:566
+#: app/Services/TransStrings.php:568
+#: builds/fluent-support/app/Services/TransStrings.php:568
 msgid "Don't have a license key?"
 msgstr ""
 
@@ -1855,18 +1877,18 @@ msgstr ""
 msgid "Draft response has been successfully approved."
 msgstr ""
 
-#: app/Services/Helper.php:910
-#: builds/fluent-support/app/Services/Helper.php:910
+#: app/Services/Helper.php:917
+#: builds/fluent-support/app/Services/Helper.php:917
 msgid "Dropbox"
 msgstr ""
 
-#: app/Services/Helper.php:854
-#: builds/fluent-support/app/Services/Helper.php:854
+#: app/Services/Helper.php:861
+#: builds/fluent-support/app/Services/Helper.php:861
 msgid "Easy Digital Downloads"
 msgstr ""
 
-#: app/Services/TransStrings.php:586
-#: builds/fluent-support/app/Services/TransStrings.php:586
+#: app/Services/TransStrings.php:588
+#: builds/fluent-support/app/Services/TransStrings.php:588
 msgid "Edit"
 msgstr ""
 
@@ -1910,10 +1932,10 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: app/Services/TransStrings.php:672 app/Hooks/Handlers/AuthHandler.php:364
+#: app/Services/TransStrings.php:674 app/Hooks/Handlers/AuthHandler.php:364
 #: app/Hooks/Handlers/AuthHandler.php:451
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:178
-#: builds/fluent-support/app/Services/TransStrings.php:672
+#: builds/fluent-support/app/Services/TransStrings.php:674
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:364
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:451
 #: builds/fluent-support/app/Services/Integrations/FluentForm/FeedIntegration.php:178
@@ -1940,8 +1962,8 @@ msgstr ""
 msgid "Email Footer For Customers"
 msgstr ""
 
-#: app/Services/TransStrings.php:547
-#: builds/fluent-support/app/Services/TransStrings.php:547
+#: app/Services/TransStrings.php:549
+#: builds/fluent-support/app/Services/TransStrings.php:549
 msgid "Email Marketing Automation, Newsletter and CRM Plugin for WordPress"
 msgstr ""
 
@@ -1952,8 +1974,8 @@ msgstr ""
 msgid "Email or Password is not valid. Please try again"
 msgstr ""
 
-#: app/Services/TransStrings.php:504
-#: builds/fluent-support/app/Services/TransStrings.php:504
+#: app/Services/TransStrings.php:506
+#: builds/fluent-support/app/Services/TransStrings.php:506
 msgid "Email Piping"
 msgstr ""
 
@@ -1967,18 +1989,18 @@ msgstr ""
 msgid "Email Subject"
 msgstr ""
 
-#: app/Services/TransStrings.php:580
-#: builds/fluent-support/app/Services/TransStrings.php:580
+#: app/Services/TransStrings.php:582
+#: builds/fluent-support/app/Services/TransStrings.php:582
 msgid "Email:"
 msgstr ""
 
-#: app/Services/TransStrings.php:657
-#: builds/fluent-support/app/Services/TransStrings.php:657
+#: app/Services/TransStrings.php:659
+#: builds/fluent-support/app/Services/TransStrings.php:659
 msgid "Enable Auto Closing Inactive Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:527
-#: builds/fluent-support/app/Services/TransStrings.php:527
+#: app/Services/TransStrings.php:529
+#: builds/fluent-support/app/Services/TransStrings.php:529
 msgid "Enable Conditional Logics"
 msgstr ""
 
@@ -2027,8 +2049,8 @@ msgstr ""
 msgid "Enhance Responses with AI"
 msgstr ""
 
-#: app/Services/TransStrings.php:532
-#: builds/fluent-support/app/Services/TransStrings.php:532
+#: app/Services/TransStrings.php:534
+#: builds/fluent-support/app/Services/TransStrings.php:534
 msgid "Equal"
 msgstr ""
 
@@ -2037,28 +2059,28 @@ msgstr ""
 msgid "evening"
 msgstr ""
 
-#: app/Services/TransStrings.php:404
-#: builds/fluent-support/app/Services/TransStrings.php:404
+#: app/Services/TransStrings.php:406
+#: builds/fluent-support/app/Services/TransStrings.php:406
 msgid "Ex: +123456789"
 msgstr ""
 
-#: app/Services/TransStrings.php:477
-#: builds/fluent-support/app/Services/TransStrings.php:477
+#: app/Services/TransStrings.php:479
+#: builds/fluent-support/app/Services/TransStrings.php:479
 msgid "Example"
 msgstr ""
 
-#: app/Services/TransStrings.php:646
-#: builds/fluent-support/app/Services/TransStrings.php:646
+#: app/Services/TransStrings.php:648
+#: builds/fluent-support/app/Services/TransStrings.php:648
 msgid "Exclude"
 msgstr ""
 
-#: app/Services/TransStrings.php:651
-#: builds/fluent-support/app/Services/TransStrings.php:651
+#: app/Services/TransStrings.php:653
+#: builds/fluent-support/app/Services/TransStrings.php:653
 msgid "Export Agents Summary"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:258
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:255
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:258
 msgid "Failed"
 msgstr ""
 
@@ -2094,18 +2116,18 @@ msgstr ""
 msgid "Feed Name"
 msgstr ""
 
-#: app/Services/TransStrings.php:568
-#: builds/fluent-support/app/Services/TransStrings.php:568
+#: app/Services/TransStrings.php:570
+#: builds/fluent-support/app/Services/TransStrings.php:570
 msgid "Fetching License Information Please wait"
 msgstr ""
 
-#: app/Services/TransStrings.php:528
-#: builds/fluent-support/app/Services/TransStrings.php:528
+#: app/Services/TransStrings.php:530
+#: builds/fluent-support/app/Services/TransStrings.php:530
 msgid "Field"
 msgstr ""
 
-#: app/Services/TransStrings.php:367
-#: builds/fluent-support/app/Services/TransStrings.php:367
+#: app/Services/TransStrings.php:369
+#: builds/fluent-support/app/Services/TransStrings.php:369
 msgid "Field Placeholder"
 msgstr ""
 
@@ -2114,8 +2136,8 @@ msgstr ""
 msgid "Field Type"
 msgstr ""
 
-#: app/Services/TransStrings.php:369
-#: builds/fluent-support/app/Services/TransStrings.php:369
+#: app/Services/TransStrings.php:371
+#: builds/fluent-support/app/Services/TransStrings.php:371
 msgid "Field Value Options"
 msgstr ""
 
@@ -2145,8 +2167,8 @@ msgid ""
 "Files with a size less than 2MB. Supported Types: images, text, pdf, zip"
 msgstr ""
 
-#: app/Services/TransStrings.php:556
-#: builds/fluent-support/app/Services/TransStrings.php:556
+#: app/Services/TransStrings.php:558
+#: builds/fluent-support/app/Services/TransStrings.php:558
 msgid "Fillable Fields"
 msgstr ""
 
@@ -2155,8 +2177,8 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-#: app/Services/TransStrings.php:625
-#: builds/fluent-support/app/Services/TransStrings.php:625
+#: app/Services/TransStrings.php:627
+#: builds/fluent-support/app/Services/TransStrings.php:627
 msgid ""
 "Filter and select specific ticket and move these to another mailbox easily"
 msgstr ""
@@ -2166,8 +2188,8 @@ msgstr ""
 msgid "Filter By Tags"
 msgstr ""
 
-#: app/Services/TransStrings.php:432
-#: builds/fluent-support/app/Services/TransStrings.php:432
+#: app/Services/TransStrings.php:434
+#: builds/fluent-support/app/Services/TransStrings.php:434
 msgid "Filter by ticket title"
 msgstr ""
 
@@ -2197,6 +2219,11 @@ msgstr ""
 
 #: app/Services/Helper.php:826
 #: builds/fluent-support/app/Services/Helper.php:826
+msgid "Fluent Community"
+msgstr ""
+
+#: app/Services/Helper.php:833
+#: builds/fluent-support/app/Services/Helper.php:833
 msgid "Fluent FORMS"
 msgstr ""
 
@@ -2221,12 +2248,12 @@ msgstr ""
 
 #. Name of the plugin
 #: app/Hooks/Handlers/Menu.php:45 app/Hooks/Handlers/Menu.php:46
-#: app/Services/Integrations/FluentCrm/CreateTicketAction.php:49
 #: app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:25
+#: app/Services/Integrations/FluentCrm/CreateTicketAction.php:49
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:45
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:46
-#: builds/fluent-support/app/Services/Integrations/FluentCrm/CreateTicketAction.php:49
 #: builds/fluent-support/app/Services/Integrations/FluentCrm/FluentCRMWidgets.php:25
+#: builds/fluent-support/app/Services/Integrations/FluentCrm/CreateTicketAction.php:49
 msgid "Fluent Support"
 msgstr ""
 
@@ -2280,8 +2307,8 @@ msgstr ""
 msgid "Fluent Support Tickets Exporter"
 msgstr ""
 
-#: app/Services/Helper.php:931
-#: builds/fluent-support/app/Services/Helper.php:931
+#: app/Services/Helper.php:938
+#: builds/fluent-support/app/Services/Helper.php:938
 msgid "FluentBoards"
 msgstr ""
 
@@ -2300,8 +2327,8 @@ msgstr ""
 msgid "FluentCRM contact tags has been updated"
 msgstr ""
 
-#: app/Services/TransStrings.php:546
-#: builds/fluent-support/app/Services/TransStrings.php:546
+#: app/Services/TransStrings.php:548
+#: builds/fluent-support/app/Services/TransStrings.php:548
 msgid "FluentCRM Integration Settings"
 msgstr ""
 
@@ -2319,8 +2346,8 @@ msgid ""
 "first"
 msgstr ""
 
-#: app/Services/TransStrings.php:502
-#: builds/fluent-support/app/Services/TransStrings.php:502
+#: app/Services/TransStrings.php:504
+#: builds/fluent-support/app/Services/TransStrings.php:504
 msgid ""
 "For the confirmation email from your email service provider, please check "
 "the latest ticket. A new ticket should be created with confirmation code."
@@ -2340,8 +2367,8 @@ msgstr ""
 msgid "Form Field"
 msgstr ""
 
-#: app/Services/TransStrings.php:598
-#: builds/fluent-support/app/Services/TransStrings.php:598
+#: app/Services/TransStrings.php:600
+#: builds/fluent-support/app/Services/TransStrings.php:600
 msgid "From"
 msgstr ""
 
@@ -2374,18 +2401,18 @@ msgstr ""
 msgid "Get Authorized"
 msgstr ""
 
-#: app/Services/TransStrings.php:393
-#: builds/fluent-support/app/Services/TransStrings.php:393
+#: app/Services/TransStrings.php:395
+#: builds/fluent-support/app/Services/TransStrings.php:395
 msgid "Get OpenAI ChatGPT API Keys"
 msgstr ""
 
-#: app/Services/TransStrings.php:521
-#: builds/fluent-support/app/Services/TransStrings.php:521
+#: app/Services/TransStrings.php:523
+#: builds/fluent-support/app/Services/TransStrings.php:523
 msgid "Get Overall reports of all the support agents and their performance"
 msgstr ""
 
-#: app/Services/TransStrings.php:492
-#: builds/fluent-support/app/Services/TransStrings.php:492
+#: app/Services/TransStrings.php:494
+#: builds/fluent-support/app/Services/TransStrings.php:494
 msgid "Get Piping Email Details"
 msgstr ""
 
@@ -2420,23 +2447,23 @@ msgstr ""
 msgid "Good Job"
 msgstr ""
 
-#: app/Services/Helper.php:903
-#: builds/fluent-support/app/Services/Helper.php:903
+#: app/Services/Helper.php:910
+#: builds/fluent-support/app/Services/Helper.php:910
 msgid "Google Drive"
 msgstr ""
 
-#: app/Services/Helper.php:924
-#: builds/fluent-support/app/Services/Helper.php:924
+#: app/Services/Helper.php:931
+#: builds/fluent-support/app/Services/Helper.php:931
 msgid "Google reCAPTCHA"
 msgstr ""
 
-#: app/Services/TransStrings.php:659
-#: builds/fluent-support/app/Services/TransStrings.php:659
+#: app/Services/TransStrings.php:661
+#: builds/fluent-support/app/Services/TransStrings.php:661
 msgid "Google reCAPTCHA Settings"
 msgstr ""
 
-#: app/Services/TransStrings.php:535
-#: builds/fluent-support/app/Services/TransStrings.php:535
+#: app/Services/TransStrings.php:537
+#: builds/fluent-support/app/Services/TransStrings.php:537
 msgid "Greater Than"
 msgstr ""
 
@@ -2445,8 +2472,8 @@ msgstr ""
 msgid "Greeting Message"
 msgstr ""
 
-#: app/Services/TransStrings.php:561
-#: builds/fluent-support/app/Services/TransStrings.php:561
+#: app/Services/TransStrings.php:563
+#: builds/fluent-support/app/Services/TransStrings.php:563
 msgid "Have a new license Key?"
 msgstr ""
 
@@ -2471,13 +2498,13 @@ msgstr ""
 msgid "https://wpmanageninja.com"
 msgstr ""
 
-#: app/Services/TransStrings.php:494
-#: builds/fluent-support/app/Services/TransStrings.php:494
+#: app/Services/TransStrings.php:496
+#: builds/fluent-support/app/Services/TransStrings.php:496
 msgid "I agree with the Fluent Support email parsing"
 msgstr ""
 
-#: app/Services/TransStrings.php:499
-#: builds/fluent-support/app/Services/TransStrings.php:499
+#: app/Services/TransStrings.php:501
+#: builds/fluent-support/app/Services/TransStrings.php:501
 msgid "I have done it"
 msgstr ""
 
@@ -2486,15 +2513,15 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: app/Services/TransStrings.php:644
-#: builds/fluent-support/app/Services/TransStrings.php:644
+#: app/Services/TransStrings.php:646
+#: builds/fluent-support/app/Services/TransStrings.php:646
 msgid ""
 "If you don't select any agents then all the agents report will be displayed "
 "here otherwise it will show only selected agents report."
 msgstr ""
 
-#: app/Services/TransStrings.php:509
-#: builds/fluent-support/app/Services/TransStrings.php:509
+#: app/Services/TransStrings.php:511
+#: builds/fluent-support/app/Services/TransStrings.php:511
 msgid "If you don't select any column, by default system will take all."
 msgstr ""
 
@@ -2553,13 +2580,13 @@ msgid ""
 "bar."
 msgstr ""
 
-#: app/Services/TransStrings.php:692
-#: builds/fluent-support/app/Services/TransStrings.php:692
+#: app/Services/TransStrings.php:694
+#: builds/fluent-support/app/Services/TransStrings.php:694
 msgid "If you need help or support with Google Drive integration"
 msgstr ""
 
-#: app/Services/TransStrings.php:452
-#: builds/fluent-support/app/Services/TransStrings.php:452
+#: app/Services/TransStrings.php:454
+#: builds/fluent-support/app/Services/TransStrings.php:454
 msgid ""
 "If you select <b>Blocked</b> status then this customer can not submit a "
 "ticket or any response"
@@ -2570,8 +2597,8 @@ msgstr ""
 msgid "If you still have related issues. Please reopen this ticket and reply"
 msgstr ""
 
-#: app/Services/TransStrings.php:495
-#: builds/fluent-support/app/Services/TransStrings.php:495
+#: app/Services/TransStrings.php:497
+#: builds/fluent-support/app/Services/TransStrings.php:497
 msgid ""
 "If you want to connect with your own email parser please use this following "
 "URL to send payload data"
@@ -2582,8 +2609,8 @@ msgstr ""
 msgid "If you want to migrate tickets from other ticketing system like"
 msgstr ""
 
-#: app/Services/TransStrings.php:671
-#: builds/fluent-support/app/Services/TransStrings.php:671
+#: app/Services/TransStrings.php:673
+#: builds/fluent-support/app/Services/TransStrings.php:673
 msgid "Import"
 msgstr ""
 
@@ -2592,13 +2619,13 @@ msgstr ""
 msgid "Import from other Support Tickets Plugins"
 msgstr ""
 
-#: app/Services/TransStrings.php:649
-#: builds/fluent-support/app/Services/TransStrings.php:649
+#: app/Services/TransStrings.php:651
+#: builds/fluent-support/app/Services/TransStrings.php:651
 msgid "Import Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:652
-#: builds/fluent-support/app/Services/TransStrings.php:652
+#: app/Services/TransStrings.php:654
+#: builds/fluent-support/app/Services/TransStrings.php:654
 msgid "Import Tickets from Help Scout"
 msgstr ""
 
@@ -2619,13 +2646,13 @@ msgid ""
 "your app before start importing."
 msgstr ""
 
-#: app/Services/TransStrings.php:443
-#: builds/fluent-support/app/Services/TransStrings.php:443
+#: app/Services/TransStrings.php:445
+#: builds/fluent-support/app/Services/TransStrings.php:445
 msgid "Inbox"
 msgstr ""
 
-#: app/Services/TransStrings.php:637
-#: builds/fluent-support/app/Services/TransStrings.php:637
+#: app/Services/TransStrings.php:639
+#: builds/fluent-support/app/Services/TransStrings.php:639
 msgid "Inbox Color"
 msgstr ""
 
@@ -2639,28 +2666,28 @@ msgstr ""
 msgid "Inbox Settings"
 msgstr ""
 
-#: app/Services/TransStrings.php:645
-#: builds/fluent-support/app/Services/TransStrings.php:645
+#: app/Services/TransStrings.php:647
+#: builds/fluent-support/app/Services/TransStrings.php:647
 msgid "Include"
 msgstr ""
 
-#: app/Services/TransStrings.php:643
-#: builds/fluent-support/app/Services/TransStrings.php:643
+#: app/Services/TransStrings.php:645
+#: builds/fluent-support/app/Services/TransStrings.php:645
 msgid "Include Agents in Summary"
 msgstr ""
 
-#: app/Services/TransStrings.php:628
-#: builds/fluent-support/app/Services/TransStrings.php:628
+#: app/Services/TransStrings.php:630
+#: builds/fluent-support/app/Services/TransStrings.php:630
 msgid "Includes In"
 msgstr ""
 
-#: app/Services/TransStrings.php:551
-#: builds/fluent-support/app/Services/TransStrings.php:551
+#: app/Services/TransStrings.php:553
+#: builds/fluent-support/app/Services/TransStrings.php:553
 msgid "Incoming Webhook"
 msgstr ""
 
-#: app/Services/TransStrings.php:552
-#: builds/fluent-support/app/Services/TransStrings.php:552
+#: app/Services/TransStrings.php:554
+#: builds/fluent-support/app/Services/TransStrings.php:554
 msgid "Incoming Webhook URL"
 msgstr ""
 
@@ -2674,8 +2701,8 @@ msgstr ""
 msgid "Insert Content"
 msgstr ""
 
-#: app/Services/TransStrings.php:550
-#: builds/fluent-support/app/Services/TransStrings.php:550
+#: app/Services/TransStrings.php:552
+#: builds/fluent-support/app/Services/TransStrings.php:552
 msgid "Install & Activate FluentCRM (it's free)"
 msgstr ""
 
@@ -2684,8 +2711,8 @@ msgstr ""
 msgid "Installation has been completed"
 msgstr ""
 
-#: app/Services/TransStrings.php:549
-#: builds/fluent-support/app/Services/TransStrings.php:549
+#: app/Services/TransStrings.php:551
+#: builds/fluent-support/app/Services/TransStrings.php:551
 msgid ""
 "Integrate your support customers with FluentCRM to segment, automate your "
 "email marketing."
@@ -2706,11 +2733,11 @@ msgstr ""
 msgid "Integration Statuses"
 msgstr ""
 
-#: app/Modules/StatModule.php:85 app/Services/TransStrings.php:159
-#: app/Services/Helper.php:687
-#: builds/fluent-support/app/Modules/StatModule.php:85
+#: app/Services/TransStrings.php:159 app/Services/Helper.php:687
+#: app/Modules/StatModule.php:85
 #: builds/fluent-support/app/Services/TransStrings.php:159
 #: builds/fluent-support/app/Services/Helper.php:687
+#: builds/fluent-support/app/Modules/StatModule.php:85
 msgid "Interactions"
 msgstr ""
 
@@ -2756,8 +2783,8 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
-#: app/Services/TransStrings.php:548
-#: builds/fluent-support/app/Services/TransStrings.php:548
+#: app/Services/TransStrings.php:550
+#: builds/fluent-support/app/Services/TransStrings.php:550
 msgid ""
 "is a Self Hosted Email Marketing Automation Plugin for WordPress. Manage "
 "your leads and customers, email campaigns, automated email sequencing, "
@@ -2765,18 +2792,18 @@ msgid ""
 "in one place; without ever having to leave your WordPress dashboard!"
 msgstr ""
 
-#: app/Services/TransStrings.php:595
-#: builds/fluent-support/app/Services/TransStrings.php:595
+#: app/Services/TransStrings.php:597
+#: builds/fluent-support/app/Services/TransStrings.php:597
 msgid "Is after"
-msgstr ""
-
-#: app/Services/TransStrings.php:594
-#: builds/fluent-support/app/Services/TransStrings.php:594
-msgid "Is before"
 msgstr ""
 
 #: app/Services/TransStrings.php:596
 #: builds/fluent-support/app/Services/TransStrings.php:596
+msgid "Is before"
+msgstr ""
+
+#: app/Services/TransStrings.php:598
+#: builds/fluent-support/app/Services/TransStrings.php:598
 msgid "Is between"
 msgstr ""
 
@@ -2787,9 +2814,9 @@ msgid ""
 "suggestion, bug report etc"
 msgstr ""
 
-#: app/Services/TransStrings.php:434 app/Models/Traits/CustomerTrait.php:73
+#: app/Services/TransStrings.php:436 app/Models/Traits/CustomerTrait.php:73
 #: app/Models/Traits/CustomerTrait.php:75
-#: builds/fluent-support/app/Services/TransStrings.php:434
+#: builds/fluent-support/app/Services/TransStrings.php:436
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:73
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:75
 msgid "Job Title"
@@ -2800,8 +2827,8 @@ msgstr ""
 msgid "JSON"
 msgstr ""
 
-#: app/Services/TransStrings.php:421
-#: builds/fluent-support/app/Services/TransStrings.php:421
+#: app/Services/TransStrings.php:423
+#: builds/fluent-support/app/Services/TransStrings.php:423
 msgid "Label"
 msgstr ""
 
@@ -2874,18 +2901,18 @@ msgstr ""
 msgid "Last Week"
 msgstr ""
 
-#: app/Services/Helper.php:889
-#: builds/fluent-support/app/Services/Helper.php:889
+#: app/Services/Helper.php:896
+#: builds/fluent-support/app/Services/Helper.php:896
 msgid "LearnDash"
 msgstr ""
 
-#: app/Services/Helper.php:896
-#: builds/fluent-support/app/Services/Helper.php:896
+#: app/Services/Helper.php:903
+#: builds/fluent-support/app/Services/Helper.php:903
 msgid "LearnPress"
 msgstr ""
 
-#: app/Services/TransStrings.php:534
-#: builds/fluent-support/app/Services/TransStrings.php:534
+#: app/Services/TransStrings.php:536
+#: builds/fluent-support/app/Services/TransStrings.php:536
 msgid "Less than"
 msgstr ""
 
@@ -2894,8 +2921,8 @@ msgstr ""
 msgid "Let ChatGPT generate ticket responses to enhance support efficiency."
 msgstr ""
 
-#: app/Services/TransStrings.php:420
-#: builds/fluent-support/app/Services/TransStrings.php:420
+#: app/Services/TransStrings.php:422
+#: builds/fluent-support/app/Services/TransStrings.php:422
 msgid "License Management"
 msgstr ""
 
@@ -2914,18 +2941,18 @@ msgstr ""
 msgid "Loading Customer Portal. Please wait..."
 msgstr ""
 
-#: app/Services/TransStrings.php:694
-#: builds/fluent-support/app/Services/TransStrings.php:694
+#: app/Services/TransStrings.php:696
+#: builds/fluent-support/app/Services/TransStrings.php:696
 msgid "Log"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:255
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:252
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:255
 msgid "Log Out"
 msgstr ""
 
-#: app/Services/TransStrings.php:696
-#: builds/fluent-support/app/Services/TransStrings.php:696
+#: app/Services/TransStrings.php:698
+#: builds/fluent-support/app/Services/TransStrings.php:698
 msgid "Logged at:"
 msgstr ""
 
@@ -2939,8 +2966,8 @@ msgstr ""
 msgid "Login Code"
 msgstr ""
 
-#: app/Services/TransStrings.php:664
-#: builds/fluent-support/app/Services/TransStrings.php:664
+#: app/Services/TransStrings.php:666
+#: builds/fluent-support/app/Services/TransStrings.php:666
 msgid "Login Form"
 msgstr ""
 
@@ -2964,8 +2991,8 @@ msgstr ""
 msgid "Looks like you have caught up everything for now."
 msgstr ""
 
-#: app/Services/TransStrings.php:558
-#: builds/fluent-support/app/Services/TransStrings.php:558
+#: app/Services/TransStrings.php:560
+#: builds/fluent-support/app/Services/TransStrings.php:560
 msgid "Looks like your license has been expired"
 msgstr ""
 
@@ -3029,28 +3056,28 @@ msgstr ""
 msgid "Manager"
 msgstr ""
 
-#: app/Services/TransStrings.php:464
-#: builds/fluent-support/app/Services/TransStrings.php:464
+#: app/Services/TransStrings.php:466
+#: builds/fluent-support/app/Services/TransStrings.php:466
 msgid "Manual"
 msgstr ""
 
-#: app/Services/TransStrings.php:465
-#: builds/fluent-support/app/Services/TransStrings.php:465
+#: app/Services/TransStrings.php:467
+#: builds/fluent-support/app/Services/TransStrings.php:467
 msgid "manual"
-msgstr ""
-
-#: app/Services/TransStrings.php:609
-#: builds/fluent-support/app/Services/TransStrings.php:609
-msgid "Manual Trigger"
-msgstr ""
-
-#: app/Services/TransStrings.php:471
-#: builds/fluent-support/app/Services/TransStrings.php:471
-msgid "Manual workflow"
 msgstr ""
 
 #: app/Services/TransStrings.php:611
 #: builds/fluent-support/app/Services/TransStrings.php:611
+msgid "Manual Trigger"
+msgstr ""
+
+#: app/Services/TransStrings.php:473
+#: builds/fluent-support/app/Services/TransStrings.php:473
+msgid "Manual workflow"
+msgstr ""
+
+#: app/Services/TransStrings.php:613
+#: builds/fluent-support/app/Services/TransStrings.php:613
 msgid "manual workflow"
 msgstr ""
 
@@ -3059,18 +3086,18 @@ msgstr ""
 msgid "Mapped Email"
 msgstr ""
 
-#: app/Services/TransStrings.php:540
-#: builds/fluent-support/app/Services/TransStrings.php:540
+#: app/Services/TransStrings.php:542
+#: builds/fluent-support/app/Services/TransStrings.php:542
 msgid "Match all conditions"
 msgstr ""
 
-#: app/Services/TransStrings.php:541
-#: builds/fluent-support/app/Services/TransStrings.php:541
+#: app/Services/TransStrings.php:543
+#: builds/fluent-support/app/Services/TransStrings.php:543
 msgid "Match any conditions"
 msgstr ""
 
-#: app/Services/TransStrings.php:530
-#: builds/fluent-support/app/Services/TransStrings.php:530
+#: app/Services/TransStrings.php:532
+#: builds/fluent-support/app/Services/TransStrings.php:532
 msgid "Match Value"
 msgstr ""
 
@@ -3101,18 +3128,18 @@ msgstr ""
 msgid "Medium"
 msgstr ""
 
-#: app/Services/TransStrings.php:678
-#: builds/fluent-support/app/Services/TransStrings.php:678
+#: app/Services/TransStrings.php:680
+#: builds/fluent-support/app/Services/TransStrings.php:680
 msgid "medium"
 msgstr ""
 
-#: app/Services/Helper.php:917
-#: builds/fluent-support/app/Services/Helper.php:917
+#: app/Services/Helper.php:924
+#: builds/fluent-support/app/Services/Helper.php:924
 msgid "MemberPress"
 msgstr ""
 
-#: app/Services/TransStrings.php:630
-#: builds/fluent-support/app/Services/TransStrings.php:630
+#: app/Services/TransStrings.php:632
+#: builds/fluent-support/app/Services/TransStrings.php:632
 msgid "Mentioned"
 msgstr ""
 
@@ -3121,14 +3148,14 @@ msgstr ""
 msgid "Mentioned Ticket"
 msgstr ""
 
-#: app/Services/TransStrings.php:626
-#: builds/fluent-support/app/Services/TransStrings.php:626
+#: app/Services/TransStrings.php:628
+#: builds/fluent-support/app/Services/TransStrings.php:628
 msgid "Merge"
 msgstr ""
 
-#: app/Modules/PermissionManager.php:271 app/Services/TransStrings.php:627
+#: app/Services/TransStrings.php:629 app/Modules/PermissionManager.php:271
+#: builds/fluent-support/app/Services/TransStrings.php:629
 #: builds/fluent-support/app/Modules/PermissionManager.php:271
-#: builds/fluent-support/app/Services/TransStrings.php:627
 msgid "Merge Tickets"
 msgstr ""
 
@@ -3147,8 +3174,8 @@ msgstr ""
 msgid "morning"
 msgstr ""
 
-#: app/Services/TransStrings.php:641
-#: builds/fluent-support/app/Services/TransStrings.php:641
+#: app/Services/TransStrings.php:643
+#: builds/fluent-support/app/Services/TransStrings.php:643
 msgid "Move"
 msgstr ""
 
@@ -3157,8 +3184,8 @@ msgstr ""
 msgid "My Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:695
-#: builds/fluent-support/app/Services/TransStrings.php:695
+#: app/Services/TransStrings.php:697
+#: builds/fluent-support/app/Services/TransStrings.php:697
 msgid "n/a"
 msgstr ""
 
@@ -3167,8 +3194,8 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: app/Services/TransStrings.php:579
-#: builds/fluent-support/app/Services/TransStrings.php:579
+#: app/Services/TransStrings.php:581
+#: builds/fluent-support/app/Services/TransStrings.php:581
 msgid "Name:"
 msgstr ""
 
@@ -3185,23 +3212,23 @@ msgstr ""
 msgid "new"
 msgstr ""
 
-#: app/Services/TransStrings.php:525
-#: builds/fluent-support/app/Services/TransStrings.php:525
+#: app/Services/TransStrings.php:527
+#: builds/fluent-support/app/Services/TransStrings.php:527
 msgid "New Option"
 msgstr ""
 
 #: app/Modules/StatModule.php:69 app/Modules/StatModule.php:112
-#: app/Modules/StatModule.php:156 app/Services/Tickets/TicketStats.php:31
+#: app/Modules/StatModule.php:160 app/Services/Tickets/TicketStats.php:31
 #: builds/fluent-support/app/Modules/StatModule.php:69
 #: builds/fluent-support/app/Modules/StatModule.php:112
-#: builds/fluent-support/app/Modules/StatModule.php:156
+#: builds/fluent-support/app/Modules/StatModule.php:160
 #: builds/fluent-support/app/Services/Tickets/TicketStats.php:31
 msgid "New Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:656
+#: app/Services/TransStrings.php:658
 #: app/Hooks/Handlers/CustomerPortalHandler.php:192
-#: builds/fluent-support/app/Services/TransStrings.php:656
+#: builds/fluent-support/app/Services/TransStrings.php:658
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:192
 msgid "Next"
 msgstr ""
@@ -3211,13 +3238,13 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: app/Services/TransStrings.php:633
-#: builds/fluent-support/app/Services/TransStrings.php:633
+#: app/Services/TransStrings.php:635
+#: builds/fluent-support/app/Services/TransStrings.php:635
 msgid "No activities found at this moment"
 msgstr ""
 
-#: app/Services/TransStrings.php:447
-#: builds/fluent-support/app/Services/TransStrings.php:447
+#: app/Services/TransStrings.php:449
+#: builds/fluent-support/app/Services/TransStrings.php:449
 msgid "No additional data found"
 msgstr ""
 
@@ -3226,8 +3253,8 @@ msgstr ""
 msgid "No available tags found"
 msgstr ""
 
-#: app/Services/TransStrings.php:416
-#: builds/fluent-support/app/Services/TransStrings.php:416
+#: app/Services/TransStrings.php:418
+#: builds/fluent-support/app/Services/TransStrings.php:418
 msgid "No Custom Fields Found"
 msgstr ""
 
@@ -3237,7 +3264,7 @@ msgid "No support tickets found for this filter"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:236
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:233
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:236
 msgid "No tickets found"
 msgstr ""
 
@@ -3247,23 +3274,23 @@ msgstr ""
 msgid "Normal"
 msgstr ""
 
-#: app/Services/TransStrings.php:679
-#: builds/fluent-support/app/Services/TransStrings.php:679
+#: app/Services/TransStrings.php:681
+#: builds/fluent-support/app/Services/TransStrings.php:681
 msgid "normal"
 msgstr ""
 
-#: app/Services/TransStrings.php:537
-#: builds/fluent-support/app/Services/TransStrings.php:537
+#: app/Services/TransStrings.php:539
+#: builds/fluent-support/app/Services/TransStrings.php:539
 msgid "Not Contains"
 msgstr ""
 
-#: app/Services/TransStrings.php:533
-#: builds/fluent-support/app/Services/TransStrings.php:533
+#: app/Services/TransStrings.php:535
+#: builds/fluent-support/app/Services/TransStrings.php:535
 msgid "Not Equal"
 msgstr ""
 
-#: app/Services/TransStrings.php:629
-#: builds/fluent-support/app/Services/TransStrings.php:629
+#: app/Services/TransStrings.php:631
+#: builds/fluent-support/app/Services/TransStrings.php:631
 msgid "Not Includes In"
 msgstr ""
 
@@ -3272,9 +3299,9 @@ msgstr ""
 msgid "Not registered?"
 msgstr ""
 
-#: app/Services/TransStrings.php:435 app/Models/Traits/CustomerTrait.php:80
+#: app/Services/TransStrings.php:437 app/Models/Traits/CustomerTrait.php:80
 #: app/Models/Traits/CustomerTrait.php:82
-#: builds/fluent-support/app/Services/TransStrings.php:435
+#: builds/fluent-support/app/Services/TransStrings.php:437
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:80
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:82
 msgid "Note"
@@ -3285,12 +3312,13 @@ msgstr ""
 msgid "Notification Integrations"
 msgstr ""
 
-#: app/Services/TransStrings.php:690
-#: builds/fluent-support/app/Services/TransStrings.php:690
+#: app/Services/TransStrings.php:692
+#: builds/fluent-support/app/Services/TransStrings.php:692
 msgid "oAuth2 Authorised redirect URI"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:224
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:224
 msgid "of"
 msgstr ""
 
@@ -3299,8 +3327,8 @@ msgstr ""
 msgid "on-hold"
 msgstr ""
 
-#: app/Services/TransStrings.php:500
-#: builds/fluent-support/app/Services/TransStrings.php:500
+#: app/Services/TransStrings.php:502
+#: builds/fluent-support/app/Services/TransStrings.php:502
 msgid "Once you activate the auto-forward for"
 msgstr ""
 
@@ -3310,9 +3338,9 @@ msgstr ""
 msgid "Only %s files are allowed."
 msgstr ""
 
-#: app/Services/TransStrings.php:384
+#: app/Services/TransStrings.php:386
 #: app/Hooks/Handlers/CustomerPortalHandler.php:194
-#: builds/fluent-support/app/Services/TransStrings.php:384
+#: builds/fluent-support/app/Services/TransStrings.php:386
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:194
 msgid "Only you and official support agents can view this conversation"
 msgstr ""
@@ -3324,15 +3352,15 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: app/Services/TransStrings.php:681
+#: app/Services/TransStrings.php:683
 #: app/Hooks/Handlers/CustomerPortalHandler.php:183
-#: builds/fluent-support/app/Services/TransStrings.php:681
+#: builds/fluent-support/app/Services/TransStrings.php:683
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:183
 msgid "open"
 msgstr ""
 
-#: app/Services/TransStrings.php:676
-#: builds/fluent-support/app/Services/TransStrings.php:676
+#: app/Services/TransStrings.php:678
+#: builds/fluent-support/app/Services/TransStrings.php:678
 msgid "Open Ticket in New Tab"
 msgstr ""
 
@@ -3342,8 +3370,8 @@ msgstr ""
 msgid "Open Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:391
-#: builds/fluent-support/app/Services/TransStrings.php:391
+#: app/Services/TransStrings.php:393
+#: builds/fluent-support/app/Services/TransStrings.php:393
 msgid "OpenAI ChatGPT Integration"
 msgstr ""
 
@@ -3357,23 +3385,23 @@ msgstr ""
 msgid "OpenAI settings have been successfully saved."
 msgstr ""
 
-#: app/Services/TransStrings.php:529
-#: builds/fluent-support/app/Services/TransStrings.php:529
+#: app/Services/TransStrings.php:531
+#: builds/fluent-support/app/Services/TransStrings.php:531
 msgid "Operator"
 msgstr ""
 
-#: app/Services/TransStrings.php:370
-#: builds/fluent-support/app/Services/TransStrings.php:370
+#: app/Services/TransStrings.php:372
+#: builds/fluent-support/app/Services/TransStrings.php:372
 msgid "Option Value"
 msgstr ""
 
-#: app/Services/TransStrings.php:599
-#: builds/fluent-support/app/Services/TransStrings.php:599
+#: app/Services/TransStrings.php:601
+#: builds/fluent-support/app/Services/TransStrings.php:601
 msgid "OR"
 msgstr ""
 
-#: app/Services/TransStrings.php:506
-#: builds/fluent-support/app/Services/TransStrings.php:506
+#: app/Services/TransStrings.php:508
+#: builds/fluent-support/app/Services/TransStrings.php:508
 msgid "or"
 msgstr ""
 
@@ -3382,16 +3410,18 @@ msgstr ""
 msgid "Order"
 msgstr ""
 
-#: app/Services/TransStrings.php:482
-#: builds/fluent-support/app/Services/TransStrings.php:482
+#: app/Services/TransStrings.php:484
+#: builds/fluent-support/app/Services/TransStrings.php:484
 msgid "Overall Activities"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:222
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:222
 msgid "Page"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:223
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:223
 msgid "page"
 msgstr ""
 
@@ -3423,8 +3453,8 @@ msgstr ""
 msgid "Paste the authorization code here once you get it."
 msgstr ""
 
-#: app/Services/Helper.php:882
-#: builds/fluent-support/app/Services/Helper.php:882
+#: app/Services/Helper.php:889
+#: builds/fluent-support/app/Services/Helper.php:889
 msgid "Paymattic"
 msgstr ""
 
@@ -3463,13 +3493,13 @@ msgstr ""
 msgid "Photos"
 msgstr ""
 
-#: app/Services/TransStrings.php:597
-#: builds/fluent-support/app/Services/TransStrings.php:597
+#: app/Services/TransStrings.php:599
+#: builds/fluent-support/app/Services/TransStrings.php:599
 msgid "Pick a day"
 msgstr ""
 
-#: app/Services/TransStrings.php:366
-#: builds/fluent-support/app/Services/TransStrings.php:366
+#: app/Services/TransStrings.php:368
+#: builds/fluent-support/app/Services/TransStrings.php:368
 msgid "Placeholder"
 msgstr ""
 
@@ -3485,18 +3515,18 @@ msgid ""
 "below:"
 msgstr ""
 
-#: app/Services/TransStrings.php:394
-#: builds/fluent-support/app/Services/TransStrings.php:394
+#: app/Services/TransStrings.php:396
+#: builds/fluent-support/app/Services/TransStrings.php:396
 msgid "Please click on this link to get API keys from OpenAI ChatGPT."
 msgstr ""
 
-#: app/Services/TransStrings.php:519
-#: builds/fluent-support/app/Services/TransStrings.php:519
+#: app/Services/TransStrings.php:521
+#: builds/fluent-support/app/Services/TransStrings.php:521
 msgid "Please configure"
 msgstr ""
 
-#: app/Services/TransStrings.php:515
-#: builds/fluent-support/app/Services/TransStrings.php:515
+#: app/Services/TransStrings.php:517
+#: builds/fluent-support/app/Services/TransStrings.php:517
 msgid "Please contact with"
 msgstr ""
 
@@ -3505,15 +3535,15 @@ msgstr ""
 msgid "Please copy and paste this url:"
 msgstr ""
 
-#: app/Services/TransStrings.php:383
+#: app/Services/TransStrings.php:385
 #: app/Hooks/Handlers/CustomerPortalHandler.php:198
-#: builds/fluent-support/app/Services/TransStrings.php:383
+#: builds/fluent-support/app/Services/TransStrings.php:385
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:198
 msgid "Please do not share any private information."
 msgstr ""
 
-#: app/Services/TransStrings.php:497
-#: builds/fluent-support/app/Services/TransStrings.php:497
+#: app/Services/TransStrings.php:499
+#: builds/fluent-support/app/Services/TransStrings.php:499
 msgid "Please enable auto-forwarding your emails from"
 msgstr ""
 
@@ -3527,7 +3557,7 @@ msgstr ""
 #: app/Services/TransStrings.php:298
 #: app/Hooks/Handlers/CustomerPortalHandler.php:234
 #: builds/fluent-support/app/Services/TransStrings.php:298
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:231
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:234
 msgid "Please input"
 msgstr ""
 
@@ -3568,8 +3598,8 @@ msgstr ""
 msgid "Please Map Your Ticket Custom Field Data for this form."
 msgstr ""
 
-#: app/Services/TransStrings.php:565
-#: builds/fluent-support/app/Services/TransStrings.php:565
+#: app/Services/TransStrings.php:567
+#: builds/fluent-support/app/Services/TransStrings.php:567
 msgid ""
 "Please Provide a license key of FluentSupport - Customer Support Plugin for "
 "WordPress"
@@ -3588,10 +3618,10 @@ msgid ""
 "Please provide a valid verification code that sent to your email address"
 msgstr ""
 
-#: app/Services/TransStrings.php:376
+#: app/Services/TransStrings.php:378
 #: app/Hooks/Handlers/CustomerPortalHandler.php:228
-#: builds/fluent-support/app/Services/TransStrings.php:376
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:225
+#: builds/fluent-support/app/Services/TransStrings.php:378
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:228
 msgid "Please provide details about your problem"
 msgstr ""
 
@@ -3629,8 +3659,8 @@ msgid ""
 "customers. Use shortcode <code>[fluent_support_portal]</code> in that page"
 msgstr ""
 
-#: app/Services/TransStrings.php:691
-#: builds/fluent-support/app/Services/TransStrings.php:691
+#: app/Services/TransStrings.php:693
+#: builds/fluent-support/app/Services/TransStrings.php:693
 msgid "Please read the documentation first to get ClientID and Client Secret"
 msgstr ""
 
@@ -3671,11 +3701,11 @@ msgstr ""
 msgid "Portal Page"
 msgstr ""
 
-#: app/Services/Helper.php:836 app/Services/Helper.php:850
-#: app/Services/Helper.php:864
-#: builds/fluent-support/app/Services/Helper.php:836
-#: builds/fluent-support/app/Services/Helper.php:850
-#: builds/fluent-support/app/Services/Helper.php:864
+#: app/Services/Helper.php:843 app/Services/Helper.php:857
+#: app/Services/Helper.php:871
+#: builds/fluent-support/app/Services/Helper.php:843
+#: builds/fluent-support/app/Services/Helper.php:857
+#: builds/fluent-support/app/Services/Helper.php:871
 msgid "Powerful platform for any member-focused business"
 msgstr ""
 
@@ -3702,7 +3732,7 @@ msgstr ""
 #: app/Services/TransStrings.php:307
 #: app/Hooks/Handlers/CustomerPortalHandler.php:230
 #: builds/fluent-support/app/Services/TransStrings.php:307
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:227
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:230
 msgid "Priority"
 msgstr ""
 
@@ -3716,15 +3746,15 @@ msgstr ""
 msgid "Priority (Customer)"
 msgstr ""
 
-#: app/Services/TransStrings.php:381
+#: app/Services/TransStrings.php:383
 #: app/Hooks/Handlers/CustomerPortalHandler.php:203
-#: builds/fluent-support/app/Services/TransStrings.php:381
+#: builds/fluent-support/app/Services/TransStrings.php:383
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:203
 msgid "Private"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:257
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:254
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:257
 msgid "Processing"
 msgstr ""
 
@@ -3782,13 +3812,13 @@ msgstr ""
 msgid "Profile picture has been updated successfully"
 msgstr ""
 
-#: app/Services/TransStrings.php:382
-#: builds/fluent-support/app/Services/TransStrings.php:382
+#: app/Services/TransStrings.php:384
+#: builds/fluent-support/app/Services/TransStrings.php:384
 msgid "Public"
 msgstr ""
 
-#: app/Services/TransStrings.php:668
-#: builds/fluent-support/app/Services/TransStrings.php:668
+#: app/Services/TransStrings.php:670
+#: builds/fluent-support/app/Services/TransStrings.php:670
 msgid "Public Label"
 msgstr ""
 
@@ -3797,8 +3827,8 @@ msgstr ""
 msgid "Purchase Date"
 msgstr ""
 
-#: app/Services/TransStrings.php:567
-#: builds/fluent-support/app/Services/TransStrings.php:567
+#: app/Services/TransStrings.php:569
+#: builds/fluent-support/app/Services/TransStrings.php:569
 msgid "Purchase one here"
 msgstr ""
 
@@ -3817,8 +3847,8 @@ msgstr ""
 msgid "Quick Summary"
 msgstr ""
 
-#: app/Services/TransStrings.php:503
-#: builds/fluent-support/app/Services/TransStrings.php:503
+#: app/Services/TransStrings.php:505
+#: builds/fluent-support/app/Services/TransStrings.php:505
 msgid "Read the email piping documentation"
 msgstr ""
 
@@ -3827,13 +3857,13 @@ msgstr ""
 msgid "Recaptcha"
 msgstr ""
 
-#: app/Services/TransStrings.php:660
-#: builds/fluent-support/app/Services/TransStrings.php:660
+#: app/Services/TransStrings.php:662
+#: builds/fluent-support/app/Services/TransStrings.php:662
 msgid "Recaptcha Version"
 msgstr ""
 
-#: app/Services/TransStrings.php:688
-#: builds/fluent-support/app/Services/TransStrings.php:688
+#: app/Services/TransStrings.php:690
+#: builds/fluent-support/app/Services/TransStrings.php:690
 msgid "Reconnect"
 msgstr ""
 
@@ -3842,22 +3872,22 @@ msgstr ""
 msgid "Refine ticket responses with ChatGPT to enhance clarity and precision."
 msgstr ""
 
-#: app/Services/TransStrings.php:709
-#: builds/fluent-support/app/Services/TransStrings.php:709
+#: app/Services/TransStrings.php:711
+#: builds/fluent-support/app/Services/TransStrings.php:711
 msgid "Refresh"
 msgstr ""
 
-#: app/Services/TransStrings.php:371
+#: app/Services/TransStrings.php:373
 #: app/Hooks/Handlers/CustomerPortalHandler.php:229
-#: builds/fluent-support/app/Services/TransStrings.php:371
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:226
+#: builds/fluent-support/app/Services/TransStrings.php:373
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:229
 msgid "Related Product/Service"
 msgstr ""
 
 #: app/Services/TransStrings.php:347
 #: app/Hooks/Handlers/CustomerPortalHandler.php:238
 #: builds/fluent-support/app/Services/TransStrings.php:347
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:235
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:238
 msgid "Reopen This ticket"
 msgstr ""
 
@@ -3898,9 +3928,9 @@ msgstr ""
 msgid "replies and"
 msgstr ""
 
-#: app/Services/TransStrings.php:380
+#: app/Services/TransStrings.php:382
 #: app/Hooks/Handlers/CustomerPortalHandler.php:206
-#: builds/fluent-support/app/Services/TransStrings.php:380
+#: builds/fluent-support/app/Services/TransStrings.php:382
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:206
 msgid "Reply"
 msgstr ""
@@ -3943,8 +3973,8 @@ msgstr ""
 msgid "Request Token"
 msgstr ""
 
-#: app/Services/TransStrings.php:658
-#: builds/fluent-support/app/Services/TransStrings.php:658
+#: app/Services/TransStrings.php:660
+#: builds/fluent-support/app/Services/TransStrings.php:660
 msgid "Required"
 msgstr ""
 
@@ -4014,39 +4044,39 @@ msgstr ""
 msgid "Response Title"
 msgstr ""
 
+#: app/Services/TransStrings.php:158 app/Services/Helper.php:686
 #: app/Modules/StatModule.php:81 app/Modules/StatModule.php:124
-#: app/Modules/StatModule.php:164 app/Services/TransStrings.php:158
-#: app/Services/Helper.php:686
-#: builds/fluent-support/app/Modules/StatModule.php:81
-#: builds/fluent-support/app/Modules/StatModule.php:124
-#: builds/fluent-support/app/Modules/StatModule.php:164
+#: app/Modules/StatModule.php:168
 #: builds/fluent-support/app/Services/TransStrings.php:158
 #: builds/fluent-support/app/Services/Helper.php:686
+#: builds/fluent-support/app/Modules/StatModule.php:81
+#: builds/fluent-support/app/Modules/StatModule.php:124
+#: builds/fluent-support/app/Modules/StatModule.php:168
 msgid "Responses"
 msgstr ""
 
-#: app/Services/Helper.php:861
-#: builds/fluent-support/app/Services/Helper.php:861
+#: app/Services/Helper.php:868
+#: builds/fluent-support/app/Services/Helper.php:868
 msgid "Restrict Content pro"
-msgstr ""
-
-#: app/Services/TransStrings.php:405
-#: builds/fluent-support/app/Services/TransStrings.php:405
-msgid "Restrictions"
 msgstr ""
 
 #: app/Services/TransStrings.php:407
 #: builds/fluent-support/app/Services/TransStrings.php:407
+msgid "Restrictions"
+msgstr ""
+
+#: app/Services/TransStrings.php:409
+#: builds/fluent-support/app/Services/TransStrings.php:409
 msgid "Resume Previous Migration"
 msgstr ""
 
-#: app/Services/TransStrings.php:573
-#: builds/fluent-support/app/Services/TransStrings.php:573
+#: app/Services/TransStrings.php:575
+#: builds/fluent-support/app/Services/TransStrings.php:575
 msgid "Review your Workflow"
 msgstr ""
 
-#: app/Services/TransStrings.php:577
-#: builds/fluent-support/app/Services/TransStrings.php:577
+#: app/Services/TransStrings.php:579
+#: builds/fluent-support/app/Services/TransStrings.php:579
 msgid "Run Workflow"
 msgstr ""
 
@@ -4055,8 +4085,8 @@ msgstr ""
 msgid "Run workflows"
 msgstr ""
 
-#: app/Services/TransStrings.php:574
-#: builds/fluent-support/app/Services/TransStrings.php:574
+#: app/Services/TransStrings.php:576
+#: builds/fluent-support/app/Services/TransStrings.php:576
 msgid "Running the"
 msgstr ""
 
@@ -4075,8 +4105,8 @@ msgstr ""
 msgid "Saved Draft"
 msgstr ""
 
-#: app/Services/TransStrings.php:707
-#: builds/fluent-support/app/Services/TransStrings.php:707
+#: app/Services/TransStrings.php:709
+#: builds/fluent-support/app/Services/TransStrings.php:709
 msgid "Saved Filters"
 msgstr ""
 
@@ -4089,7 +4119,7 @@ msgstr ""
 #: app/Services/TransStrings.php:296
 #: app/Hooks/Handlers/CustomerPortalHandler.php:235
 #: builds/fluent-support/app/Services/TransStrings.php:296
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:232
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:235
 msgid "Search"
 msgstr ""
 
@@ -4098,8 +4128,8 @@ msgstr ""
 msgid "Search Agents"
 msgstr ""
 
-#: app/Services/TransStrings.php:400
-#: builds/fluent-support/app/Services/TransStrings.php:400
+#: app/Services/TransStrings.php:402
+#: builds/fluent-support/app/Services/TransStrings.php:402
 msgid "Search Custom Fields"
 msgstr ""
 
@@ -4113,8 +4143,8 @@ msgstr ""
 msgid "Search deleted successfully."
 msgstr ""
 
-#: app/Services/TransStrings.php:653
-#: builds/fluent-support/app/Services/TransStrings.php:653
+#: app/Services/TransStrings.php:655
+#: builds/fluent-support/app/Services/TransStrings.php:655
 msgid "Search Existing contact or provide email address"
 msgstr ""
 
@@ -4123,13 +4153,13 @@ msgstr ""
 msgid "Search ID not found."
 msgstr ""
 
-#: app/Services/TransStrings.php:654
-#: builds/fluent-support/app/Services/TransStrings.php:654
+#: app/Services/TransStrings.php:656
+#: builds/fluent-support/app/Services/TransStrings.php:656
 msgid "Search or provide email address"
 msgstr ""
 
-#: app/Services/TransStrings.php:399
-#: builds/fluent-support/app/Services/TransStrings.php:399
+#: app/Services/TransStrings.php:401
+#: builds/fluent-support/app/Services/TransStrings.php:401
 msgid "Search Products"
 msgstr ""
 
@@ -4138,8 +4168,8 @@ msgstr ""
 msgid "Search Replies"
 msgstr ""
 
-#: app/Services/TransStrings.php:398
-#: builds/fluent-support/app/Services/TransStrings.php:398
+#: app/Services/TransStrings.php:400
+#: builds/fluent-support/app/Services/TransStrings.php:400
 msgid "Search Tags"
 msgstr ""
 
@@ -4155,8 +4185,8 @@ msgstr ""
 msgid "Security verification failed. Please try again"
 msgstr ""
 
-#: app/Services/TransStrings.php:647
-#: builds/fluent-support/app/Services/TransStrings.php:647
+#: app/Services/TransStrings.php:649
+#: builds/fluent-support/app/Services/TransStrings.php:649
 msgid ""
 "Seems like Awesome Support or Support Candy isn't activated in your site. To "
 "import tickets from any of these please activate it."
@@ -4167,8 +4197,8 @@ msgstr ""
 msgid "Select a Country"
 msgstr ""
 
-#: app/Services/TransStrings.php:480
-#: builds/fluent-support/app/Services/TransStrings.php:480
+#: app/Services/TransStrings.php:482
+#: builds/fluent-support/app/Services/TransStrings.php:482
 msgid "Select Action"
 msgstr ""
 
@@ -4177,9 +4207,9 @@ msgstr ""
 msgid "Select All"
 msgstr ""
 
-#: app/Services/TransStrings.php:363
+#: app/Services/TransStrings.php:364
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:108
-#: builds/fluent-support/app/Services/TransStrings.php:363
+#: builds/fluent-support/app/Services/TransStrings.php:364
 #: builds/fluent-support/app/Services/Integrations/FluentForm/FeedIntegration.php:108
 msgid "Select Business"
 msgstr ""
@@ -4189,23 +4219,23 @@ msgstr ""
 msgid "Select Business Inbox"
 msgstr ""
 
-#: app/Services/TransStrings.php:650
-#: builds/fluent-support/app/Services/TransStrings.php:650
+#: app/Services/TransStrings.php:652
+#: builds/fluent-support/app/Services/TransStrings.php:652
 msgid "Select columns that you want to export"
 msgstr ""
 
-#: app/Services/TransStrings.php:615
-#: builds/fluent-support/app/Services/TransStrings.php:615
+#: app/Services/TransStrings.php:617
+#: builds/fluent-support/app/Services/TransStrings.php:617
 msgid "Select Contact Property"
 msgstr ""
 
-#: app/Services/TransStrings.php:362
-#: builds/fluent-support/app/Services/TransStrings.php:362
+#: app/Services/TransStrings.php:363
+#: builds/fluent-support/app/Services/TransStrings.php:363
 msgid "Select Customer"
 msgstr ""
 
-#: app/Services/TransStrings.php:531
-#: builds/fluent-support/app/Services/TransStrings.php:531
+#: app/Services/TransStrings.php:533
+#: builds/fluent-support/app/Services/TransStrings.php:533
 msgid "Select Field"
 msgstr ""
 
@@ -4214,13 +4244,13 @@ msgstr ""
 msgid "Select Field Type"
 msgstr ""
 
-#: app/Services/TransStrings.php:616
-#: builds/fluent-support/app/Services/TransStrings.php:616
+#: app/Services/TransStrings.php:618
+#: builds/fluent-support/app/Services/TransStrings.php:618
 msgid "Select Form Property"
 msgstr ""
 
-#: app/Services/TransStrings.php:589
-#: builds/fluent-support/app/Services/TransStrings.php:589
+#: app/Services/TransStrings.php:591
+#: builds/fluent-support/app/Services/TransStrings.php:591
 msgid "Select Integration Event"
 msgstr ""
 
@@ -4239,15 +4269,15 @@ msgstr ""
 msgid "Select Portal Page"
 msgstr ""
 
-#: app/Services/TransStrings.php:372
+#: app/Services/TransStrings.php:374
 #: app/Hooks/Handlers/CustomerPortalHandler.php:221
-#: builds/fluent-support/app/Services/TransStrings.php:372
+#: builds/fluent-support/app/Services/TransStrings.php:374
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:221
 msgid "Select Priority"
 msgstr ""
 
-#: app/Services/TransStrings.php:431
-#: builds/fluent-support/app/Services/TransStrings.php:431
+#: app/Services/TransStrings.php:433
+#: builds/fluent-support/app/Services/TransStrings.php:433
 msgid "Select Product"
 msgstr ""
 
@@ -4275,18 +4305,18 @@ msgid ""
 "new contact then a double optin email will be sent"
 msgstr ""
 
-#: app/Services/TransStrings.php:433
-#: builds/fluent-support/app/Services/TransStrings.php:433
+#: app/Services/TransStrings.php:435
+#: builds/fluent-support/app/Services/TransStrings.php:435
 msgid "Select ticket that you want to move"
 msgstr ""
 
-#: app/Services/TransStrings.php:614
-#: builds/fluent-support/app/Services/TransStrings.php:614
+#: app/Services/TransStrings.php:616
+#: builds/fluent-support/app/Services/TransStrings.php:616
 msgid "Select Value"
 msgstr ""
 
-#: app/Services/TransStrings.php:377
-#: builds/fluent-support/app/Services/TransStrings.php:377
+#: app/Services/TransStrings.php:379
+#: builds/fluent-support/app/Services/TransStrings.php:379
 msgid "Select Your Ticket Type"
 msgstr ""
 
@@ -4300,8 +4330,8 @@ msgstr ""
 msgid "Selected Business has been set as default"
 msgstr ""
 
-#: app/Services/TransStrings.php:655
-#: builds/fluent-support/app/Services/TransStrings.php:655
+#: app/Services/TransStrings.php:657
+#: builds/fluent-support/app/Services/TransStrings.php:657
 msgid "Selected Contact Details"
 msgstr ""
 
@@ -4329,8 +4359,13 @@ msgstr ""
 msgid "Self-hosted email and marketing automation for WordPress"
 msgstr ""
 
-#: app/Services/TransStrings.php:622
-#: builds/fluent-support/app/Services/TransStrings.php:622
+#: app/Services/TransStrings.php:362
+#: builds/fluent-support/app/Services/TransStrings.php:362
+msgid "Send as Informational Reply"
+msgstr ""
+
+#: app/Services/TransStrings.php:624
+#: builds/fluent-support/app/Services/TransStrings.php:624
 msgid "Send Attachments(Not Recommended)"
 msgstr ""
 
@@ -4346,18 +4381,18 @@ msgstr ""
 msgid "Send ticket activity notifications to slack"
 msgstr ""
 
-#: app/Services/TransStrings.php:674
-#: builds/fluent-support/app/Services/TransStrings.php:674
+#: app/Services/TransStrings.php:676
+#: builds/fluent-support/app/Services/TransStrings.php:676
 msgid "Set as Default"
+msgstr ""
+
+#: app/Services/TransStrings.php:702
+#: builds/fluent-support/app/Services/TransStrings.php:702
+msgid "Set Estimated Time"
 msgstr ""
 
 #: app/Services/TransStrings.php:700
 #: builds/fluent-support/app/Services/TransStrings.php:700
-msgid "Set Estimated Time"
-msgstr ""
-
-#: app/Services/TransStrings.php:698
-#: builds/fluent-support/app/Services/TransStrings.php:698
 msgid "Set Estimation"
 msgstr ""
 
@@ -4371,15 +4406,15 @@ msgstr ""
 msgid "Set Product"
 msgstr ""
 
-#: app/Services/TransStrings.php:608
-#: builds/fluent-support/app/Services/TransStrings.php:608
+#: app/Services/TransStrings.php:610
+#: builds/fluent-support/app/Services/TransStrings.php:610
 msgid "Set Your Trigger & Conditions"
 msgstr ""
 
-#: app/Modules/PermissionManager.php:286 app/Services/TransStrings.php:141
+#: app/Services/TransStrings.php:141 app/Modules/PermissionManager.php:286
 #: app/Hooks/Handlers/Menu.php:93 app/Hooks/Handlers/Menu.php:94
-#: builds/fluent-support/app/Modules/PermissionManager.php:286
 #: builds/fluent-support/app/Services/TransStrings.php:141
+#: builds/fluent-support/app/Modules/PermissionManager.php:286
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:93
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:94
 msgid "Settings"
@@ -4390,8 +4425,8 @@ msgstr ""
 msgid "Settings could not be found"
 msgstr ""
 
-#: app/Services/TransStrings.php:516
-#: builds/fluent-support/app/Services/TransStrings.php:516
+#: app/Services/TransStrings.php:518
+#: builds/fluent-support/app/Services/TransStrings.php:518
 msgid "Settings could not be loaded"
 msgstr ""
 
@@ -4402,14 +4437,14 @@ msgstr ""
 msgid "Settings failed to save"
 msgstr ""
 
-#: app/Http/Controllers/SlackController.php:47
-#: app/Http/Controllers/SettingsController.php:65
-#: app/Http/Controllers/IntegrationController.php:49
 #: app/Services/MailerInbox/MailBoxService.php:195
-#: builds/fluent-support/app/Http/Controllers/SlackController.php:47
-#: builds/fluent-support/app/Http/Controllers/SettingsController.php:65
-#: builds/fluent-support/app/Http/Controllers/IntegrationController.php:49
+#: app/Http/Controllers/SlackController.php:47
+#: app/Http/Controllers/IntegrationController.php:49
+#: app/Http/Controllers/SettingsController.php:65
 #: builds/fluent-support/app/Services/MailerInbox/MailBoxService.php:195
+#: builds/fluent-support/app/Http/Controllers/SlackController.php:47
+#: builds/fluent-support/app/Http/Controllers/IntegrationController.php:49
+#: builds/fluent-support/app/Http/Controllers/SettingsController.php:65
 msgid "Settings has been updated"
 msgstr ""
 
@@ -4428,13 +4463,13 @@ msgstr ""
 msgid "Shipping method"
 msgstr ""
 
-#: app/Services/TransStrings.php:624
-#: builds/fluent-support/app/Services/TransStrings.php:624
+#: app/Services/TransStrings.php:626
+#: builds/fluent-support/app/Services/TransStrings.php:626
 msgid "Shortcodes"
 msgstr ""
 
-#: app/Services/TransStrings.php:411
-#: builds/fluent-support/app/Services/TransStrings.php:411
+#: app/Services/TransStrings.php:413
+#: builds/fluent-support/app/Services/TransStrings.php:413
 msgid "Show Filters"
 msgstr ""
 
@@ -4443,8 +4478,8 @@ msgstr ""
 msgid "Signup"
 msgstr ""
 
-#: app/Services/TransStrings.php:665
-#: builds/fluent-support/app/Services/TransStrings.php:665
+#: app/Services/TransStrings.php:667
+#: builds/fluent-support/app/Services/TransStrings.php:667
 msgid "Signup Form"
 msgstr ""
 
@@ -4454,18 +4489,18 @@ msgstr ""
 msgid "Slack"
 msgstr ""
 
-#: app/Services/TransStrings.php:401
-#: builds/fluent-support/app/Services/TransStrings.php:401
+#: app/Services/TransStrings.php:403
+#: builds/fluent-support/app/Services/TransStrings.php:403
 msgid "Slack Integration"
 msgstr ""
 
-#: app/Services/TransStrings.php:402
-#: builds/fluent-support/app/Services/TransStrings.php:402
+#: app/Services/TransStrings.php:404
+#: builds/fluent-support/app/Services/TransStrings.php:404
 msgid "Slack User ID"
 msgstr ""
 
-#: app/Services/TransStrings.php:422
-#: builds/fluent-support/app/Services/TransStrings.php:422
+#: app/Services/TransStrings.php:424
+#: builds/fluent-support/app/Services/TransStrings.php:424
 msgid "Slug"
 msgstr ""
 
@@ -4515,23 +4550,28 @@ msgstr ""
 msgid "Sorry! you do not have permission to install plugin"
 msgstr ""
 
-#: app/Services/Tickets/Importer/SupportCandyTickets.php:42
-#: app/Services/Tickets/Importer/JSHelpdeskTickets.php:28
 #: app/Services/Tickets/Importer/AwesomeSupportTickets.php:44
-#: builds/fluent-support/app/Services/Tickets/Importer/SupportCandyTickets.php:42
-#: builds/fluent-support/app/Services/Tickets/Importer/JSHelpdeskTickets.php:28
+#: app/Services/Tickets/Importer/JSHelpdeskTickets.php:28
+#: app/Services/Tickets/Importer/SupportCandyTickets.php:42
 #: builds/fluent-support/app/Services/Tickets/Importer/AwesomeSupportTickets.php:44
+#: builds/fluent-support/app/Services/Tickets/Importer/JSHelpdeskTickets.php:28
+#: builds/fluent-support/app/Services/Tickets/Importer/SupportCandyTickets.php:42
 msgid "Sorry, no tickets available for import."
 msgstr ""
 
-#: app/Services/TransStrings.php:634
-#: builds/fluent-support/app/Services/TransStrings.php:634
+#: app/Services/TransStrings.php:636
+#: builds/fluent-support/app/Services/TransStrings.php:636
 msgid "Sorry, this customer has one ticket only"
 msgstr ""
 
 #: app/Services/CustomerPortalService.php:450
 #: builds/fluent-support/app/Services/CustomerPortalService.php:450
 msgid "Sorry, You cannot access this ticket"
+msgstr ""
+
+#: app/Models/Conversation.php:432
+#, php-format
+msgid "Sorry, you do not have permission to %s this response."
 msgstr ""
 
 #: app/Hooks/Handlers/TwoFaHandler.php:120
@@ -4547,13 +4587,13 @@ msgid ""
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:246
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:243
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:246
 msgid "Sort By"
 msgstr ""
 
-#: app/Modules/PermissionManager.php:272 app/Services/TransStrings.php:638
+#: app/Services/TransStrings.php:640 app/Modules/PermissionManager.php:272
+#: builds/fluent-support/app/Services/TransStrings.php:640
 #: builds/fluent-support/app/Modules/PermissionManager.php:272
-#: builds/fluent-support/app/Services/TransStrings.php:638
 msgid "Split Ticket"
 msgstr ""
 
@@ -4562,21 +4602,21 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
-#: app/Services/TransStrings.php:386
+#: app/Services/TransStrings.php:388
 #: app/Hooks/Handlers/CustomerPortalHandler.php:200
-#: builds/fluent-support/app/Services/TransStrings.php:386
+#: builds/fluent-support/app/Services/TransStrings.php:388
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:200
 msgid "started the conversation"
 msgstr ""
 
-#: app/Models/Customer.php:55 app/Services/TransStrings.php:438
+#: app/Services/TransStrings.php:440 app/Models/Customer.php:55
 #: app/Models/Traits/CustomerTrait.php:131
 #: app/Models/Traits/CustomerTrait.php:133
 #: app/Hooks/Handlers/AuthHandler.php:423
 #: app/Hooks/Handlers/AuthHandler.php:425
 #: app/Hooks/Handlers/PrivacyHandler.php:248
+#: builds/fluent-support/app/Services/TransStrings.php:440
 #: builds/fluent-support/app/Models/Customer.php:55
-#: builds/fluent-support/app/Services/TransStrings.php:438
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:131
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:133
 #: builds/fluent-support/app/Hooks/Handlers/AuthHandler.php:423
@@ -4591,28 +4631,28 @@ msgid "Stats"
 msgstr ""
 
 #: app/Services/TransStrings.php:76 app/Models/Traits/CustomerTrait.php:87
-#: app/Hooks/Handlers/CustomerPortalHandler.php:191
 #: app/Hooks/Handlers/PrivacyHandler.php:220
+#: app/Hooks/Handlers/CustomerPortalHandler.php:191
 #: builds/fluent-support/app/Services/TransStrings.php:76
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:87
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:191
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:220
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:191
 msgid "Status"
 msgstr ""
 
-#: app/Services/TransStrings.php:364
+#: app/Services/TransStrings.php:365
 #: app/Hooks/Handlers/CustomerPortalHandler.php:226
 #: app/Hooks/Handlers/CustomerPortalHandler.php:253
-#: builds/fluent-support/app/Services/TransStrings.php:364
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:223
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:250
+#: builds/fluent-support/app/Services/TransStrings.php:365
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:226
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:253
 msgid "Subject"
 msgstr ""
 
-#: app/Services/TransStrings.php:374
+#: app/Services/TransStrings.php:376
 #: app/Hooks/Handlers/CustomerPortalHandler.php:232
-#: builds/fluent-support/app/Services/TransStrings.php:374
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:229
+#: builds/fluent-support/app/Services/TransStrings.php:376
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:232
 msgid "Submit a Support Ticket"
 msgstr ""
 
@@ -4627,7 +4667,7 @@ msgid "Successfully registered to the site."
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:254
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:251
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:254
 msgid "Suggested Articles"
 msgstr ""
 
@@ -4641,8 +4681,8 @@ msgstr ""
 msgid "Suggested Ticket"
 msgstr ""
 
-#: app/Services/TransStrings.php:510
-#: builds/fluent-support/app/Services/TransStrings.php:510
+#: app/Services/TransStrings.php:512
+#: builds/fluent-support/app/Services/TransStrings.php:512
 msgid "Support Candy"
 msgstr ""
 
@@ -4656,8 +4696,8 @@ msgstr ""
 msgid "Support Customer Field"
 msgstr ""
 
-#: app/Services/TransStrings.php:430
-#: builds/fluent-support/app/Services/TransStrings.php:430
+#: app/Services/TransStrings.php:432
+#: builds/fluent-support/app/Services/TransStrings.php:432
 msgid "Support From Email"
 msgstr ""
 
@@ -4674,7 +4714,7 @@ msgstr ""
 #: app/Services/TransStrings.php:247
 #: app/Hooks/Handlers/CustomerPortalHandler.php:243
 #: builds/fluent-support/app/Services/TransStrings.php:247
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:240
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:243
 msgid "Support Staff"
 msgstr ""
 
@@ -4708,8 +4748,8 @@ msgstr ""
 msgid "Support ticket creation failed, because no valid customer email found"
 msgstr ""
 
-#: app/Services/TransStrings.php:441
-#: builds/fluent-support/app/Services/TransStrings.php:441
+#: app/Services/TransStrings.php:443
+#: builds/fluent-support/app/Services/TransStrings.php:443
 msgid "Support Tickets"
 msgstr ""
 
@@ -4782,13 +4822,13 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
-#: app/Services/TransStrings.php:493
-#: builds/fluent-support/app/Services/TransStrings.php:493
+#: app/Services/TransStrings.php:495
+#: builds/fluent-support/app/Services/TransStrings.php:495
 msgid "terms and conditions"
 msgstr ""
 
-#: app/Services/TransStrings.php:603
-#: builds/fluent-support/app/Services/TransStrings.php:603
+#: app/Services/TransStrings.php:605
+#: builds/fluent-support/app/Services/TransStrings.php:605
 msgid ""
 "Thank you again for configuring your own Support System in WordPress. You "
 "may install companion Form Plugin to create tickets from contact forms."
@@ -4809,8 +4849,8 @@ msgid ""
 "Dropbox/Google Drive and paste the link in the response"
 msgstr ""
 
-#: app/Services/Helper.php:892
-#: builds/fluent-support/app/Services/Helper.php:892
+#: app/Services/Helper.php:899
+#: builds/fluent-support/app/Services/Helper.php:899
 msgid "The leading course platform built for WordPress"
 msgstr ""
 
@@ -4819,18 +4859,18 @@ msgstr ""
 msgid "The most popular e-commerce platform for WordPress"
 msgstr ""
 
-#: app/Services/TransStrings.php:392
-#: builds/fluent-support/app/Services/TransStrings.php:392
+#: app/Services/TransStrings.php:394
+#: builds/fluent-support/app/Services/TransStrings.php:394
 msgid "The OpenAI ChatGPT API can be used to generate and enhance responses."
 msgstr ""
 
-#: app/Services/Helper.php:871
-#: builds/fluent-support/app/Services/Helper.php:871
+#: app/Services/Helper.php:878
+#: builds/fluent-support/app/Services/Helper.php:878
 msgid "The standard plugin for knowledge base and documentation"
 msgstr ""
 
-#: app/Services/TransStrings.php:501
-#: builds/fluent-support/app/Services/TransStrings.php:501
+#: app/Services/TransStrings.php:503
+#: builds/fluent-support/app/Services/TransStrings.php:503
 msgid "the status will be active"
 msgstr ""
 
@@ -4843,8 +4883,8 @@ msgstr ""
 msgid "The Ultimate Support Plugin For Your WordPress."
 msgstr ""
 
-#: app/Services/Helper.php:857
-#: builds/fluent-support/app/Services/Helper.php:857
+#: app/Services/Helper.php:864
+#: builds/fluent-support/app/Services/Helper.php:864
 msgid "The ultimate WordPress platform for digital products"
 msgstr ""
 
@@ -4899,8 +4939,8 @@ msgid ""
 "submitted"
 msgstr ""
 
-#: app/Services/TransStrings.php:610
-#: builds/fluent-support/app/Services/TransStrings.php:610
+#: app/Services/TransStrings.php:612
+#: builds/fluent-support/app/Services/TransStrings.php:612
 msgid "This is a"
 msgstr ""
 
@@ -4911,14 +4951,21 @@ msgid ""
 "feature"
 msgstr ""
 
-#: app/Services/TransStrings.php:526
-#: builds/fluent-support/app/Services/TransStrings.php:526
+#: app/Services/TransStrings.php:528
+#: builds/fluent-support/app/Services/TransStrings.php:528
 msgid "This is an agent only field"
 msgstr ""
 
 #: app/Services/TransStrings.php:218
 #: builds/fluent-support/app/Services/TransStrings.php:218
 msgid "This migrator will migrate total"
+msgstr ""
+
+#: app/Services/TransStrings.php:366
+#: builds/fluent-support/app/Services/TransStrings.php:366
+msgid ""
+"This reply will be visible to the customer but will not update the ticket's "
+"'waiting since' timestamp."
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:202
@@ -4938,17 +4985,17 @@ msgstr ""
 msgid "This will permanently delete response. Continue?"
 msgstr ""
 
-#: app/Services/TransStrings.php:686
+#: app/Services/TransStrings.php:688
 #: app/Hooks/Handlers/CustomerPortalHandler.php:245
-#: builds/fluent-support/app/Services/TransStrings.php:686
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:242
+#: builds/fluent-support/app/Services/TransStrings.php:688
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:245
 msgid "Thread Follower"
 msgstr ""
 
-#: app/Services/TransStrings.php:685
+#: app/Services/TransStrings.php:687
 #: app/Hooks/Handlers/CustomerPortalHandler.php:244
-#: builds/fluent-support/app/Services/TransStrings.php:685
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:241
+#: builds/fluent-support/app/Services/TransStrings.php:687
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:244
 msgid "Thread Starter"
 msgstr ""
 
@@ -5011,8 +5058,8 @@ msgstr ""
 msgid "Ticket created at"
 msgstr ""
 
-#: app/Services/TransStrings.php:449
-#: builds/fluent-support/app/Services/TransStrings.php:449
+#: app/Services/TransStrings.php:451
+#: builds/fluent-support/app/Services/TransStrings.php:451
 msgid "Ticket created at "
 msgstr ""
 
@@ -5036,10 +5083,10 @@ msgstr ""
 msgid "Ticket Description (you can use any smart code)"
 msgstr ""
 
-#: app/Services/TransStrings.php:368
+#: app/Services/TransStrings.php:370
 #: app/Hooks/Handlers/CustomerPortalHandler.php:227
-#: builds/fluent-support/app/Services/TransStrings.php:368
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:224
+#: builds/fluent-support/app/Services/TransStrings.php:370
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:227
 msgid "Ticket Details"
 msgstr ""
 
@@ -5053,24 +5100,24 @@ msgstr ""
 msgid "Ticket Form Config"
 msgstr ""
 
-#: app/Services/TransStrings.php:571
-#: builds/fluent-support/app/Services/TransStrings.php:571
+#: app/Services/TransStrings.php:573
+#: builds/fluent-support/app/Services/TransStrings.php:573
 msgid ""
 "Ticket Form Customization including Knowledge base integration is available "
 "on Pro Version"
 msgstr ""
 
-#: app/Services/TransStrings.php:570
-#: builds/fluent-support/app/Services/TransStrings.php:570
+#: app/Services/TransStrings.php:572
+#: builds/fluent-support/app/Services/TransStrings.php:572
 msgid "Ticket Form Settings"
 msgstr ""
 
-#: app/Models/Ticket.php:1285 app/Services/CustomerPortalService.php:128
-#: app/Services/Tickets/ResponseService.php:118
+#: app/Services/CustomerPortalService.php:128 app/Models/Ticket.php:1285
+#: app/Services/Tickets/ResponseService.php:119
 #: app/Services/Tickets/TicketService.php:40
-#: builds/fluent-support/app/Models/Ticket.php:1285
 #: builds/fluent-support/app/Services/CustomerPortalService.php:128
-#: builds/fluent-support/app/Services/Tickets/ResponseService.php:118
+#: builds/fluent-support/app/Models/Ticket.php:1285
+#: builds/fluent-support/app/Services/Tickets/ResponseService.php:119
 #: builds/fluent-support/app/Services/Tickets/TicketService.php:40
 msgid "Ticket has been closed"
 msgstr ""
@@ -5085,9 +5132,9 @@ msgstr ""
 msgid "Ticket has been deleted successfully"
 msgstr ""
 
-#: app/Models/Ticket.php:1305 app/Services/CustomerPortalService.php:148
-#: builds/fluent-support/app/Models/Ticket.php:1305
+#: app/Services/CustomerPortalService.php:148 app/Models/Ticket.php:1305
 #: builds/fluent-support/app/Services/CustomerPortalService.php:148
+#: builds/fluent-support/app/Models/Ticket.php:1305
 msgid "Ticket has been opened again"
 msgstr ""
 
@@ -5096,24 +5143,23 @@ msgstr ""
 msgid "Ticket has been reopened"
 msgstr ""
 
-#: app/Services/TransStrings.php:109
-#: app/Hooks/Handlers/CustomerPortalHandler.php:250
-#: app/Hooks/Handlers/PrivacyHandler.php:71
+#: app/Services/TransStrings.php:109 app/Hooks/Handlers/PrivacyHandler.php:71
 #: app/Hooks/Handlers/PrivacyHandler.php:153
+#: app/Hooks/Handlers/CustomerPortalHandler.php:250
 #: builds/fluent-support/app/Services/TransStrings.php:109
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:247
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:71
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:153
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:250
 msgid "Ticket ID"
 msgstr ""
 
-#: app/Services/TransStrings.php:454
-#: builds/fluent-support/app/Services/TransStrings.php:454
+#: app/Services/TransStrings.php:456
+#: builds/fluent-support/app/Services/TransStrings.php:456
 msgid "Ticket Link(Agent)"
 msgstr ""
 
-#: app/Services/TransStrings.php:455
-#: builds/fluent-support/app/Services/TransStrings.php:455
+#: app/Services/TransStrings.php:457
+#: builds/fluent-support/app/Services/TransStrings.php:457
 msgid "Ticket Link(Customer)"
 msgstr ""
 
@@ -5175,14 +5221,14 @@ msgid "Ticket Tags"
 msgstr ""
 
 #: app/Services/TransStrings.php:110 app/Hooks/Handlers/PrivacyHandler.php:75
+#: app/Services/Integrations/FluentCrm/CreateTicketAction.php:80
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:135
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:136
-#: app/Services/Integrations/FluentCrm/CreateTicketAction.php:80
 #: builds/fluent-support/app/Services/TransStrings.php:110
 #: builds/fluent-support/app/Hooks/Handlers/PrivacyHandler.php:75
+#: builds/fluent-support/app/Services/Integrations/FluentCrm/CreateTicketAction.php:80
 #: builds/fluent-support/app/Services/Integrations/FluentForm/FeedIntegration.php:135
 #: builds/fluent-support/app/Services/Integrations/FluentForm/FeedIntegration.php:136
-#: builds/fluent-support/app/Services/Integrations/FluentCrm/CreateTicketAction.php:80
 msgid "Ticket Title"
 msgstr ""
 
@@ -5236,8 +5282,8 @@ msgstr ""
 msgid "Tickets By Product"
 msgstr ""
 
-#: app/Services/TransStrings.php:490
-#: builds/fluent-support/app/Services/TransStrings.php:490
+#: app/Services/TransStrings.php:492
+#: builds/fluent-support/app/Services/TransStrings.php:492
 msgid "Tickets Counts"
 msgstr ""
 
@@ -5256,13 +5302,13 @@ msgstr ""
 msgid "tickets with"
 msgstr ""
 
-#: app/Services/TransStrings.php:706
-#: builds/fluent-support/app/Services/TransStrings.php:706
+#: app/Services/TransStrings.php:708
+#: builds/fluent-support/app/Services/TransStrings.php:708
 msgid "Time Sheet Report By Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:693
-#: builds/fluent-support/app/Services/TransStrings.php:693
+#: app/Services/TransStrings.php:695
+#: builds/fluent-support/app/Services/TransStrings.php:695
 msgid "Time Tracking"
 msgstr ""
 
@@ -5270,7 +5316,7 @@ msgstr ""
 #: app/Hooks/Handlers/CustomerPortalHandler.php:251
 #: builds/fluent-support/app/Services/TransStrings.php:75
 #: builds/fluent-support/app/Hooks/Handlers/AdminBarHandler.php:90
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:248
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:251
 msgid "Title"
 msgstr ""
 
@@ -5284,15 +5330,15 @@ msgstr ""
 msgid "To"
 msgstr ""
 
-#: app/Services/TransStrings.php:554
-#: builds/fluent-support/app/Services/TransStrings.php:554
+#: app/Services/TransStrings.php:556
+#: builds/fluent-support/app/Services/TransStrings.php:556
 msgid ""
 "To create tickets using webhooks please copy this webhook URL and paste to "
 "the site from where you want to create ticket in this site."
 msgstr ""
 
-#: app/Services/TransStrings.php:498
-#: builds/fluent-support/app/Services/TransStrings.php:498
+#: app/Services/TransStrings.php:500
+#: builds/fluent-support/app/Services/TransStrings.php:500
 msgid "to this following address"
 msgstr ""
 
@@ -5301,28 +5347,28 @@ msgstr ""
 msgid "Today"
 msgstr ""
 
-#: app/Services/TransStrings.php:623
-#: builds/fluent-support/app/Services/TransStrings.php:623
+#: app/Services/TransStrings.php:625
+#: builds/fluent-support/app/Services/TransStrings.php:625
 msgid "Today Stats"
 msgstr ""
 
-#: app/Services/TransStrings.php:642
-#: builds/fluent-support/app/Services/TransStrings.php:642
+#: app/Services/TransStrings.php:644
+#: builds/fluent-support/app/Services/TransStrings.php:644
 msgid "Today's Active Tickets By Products"
+msgstr ""
+
+#: app/Modules/StatModule.php:204
+#: builds/fluent-support/app/Modules/StatModule.php:204
+msgid "Total Closed"
 msgstr ""
 
 #: app/Modules/StatModule.php:200
 #: builds/fluent-support/app/Modules/StatModule.php:200
-msgid "Total Closed"
+msgid "Total Interactions"
 msgstr ""
 
 #: app/Modules/StatModule.php:196
 #: builds/fluent-support/app/Modules/StatModule.php:196
-msgid "Total Interactions"
-msgstr ""
-
-#: app/Modules/StatModule.php:192
-#: builds/fluent-support/app/Modules/StatModule.php:192
 msgid "Total Replies"
 msgstr ""
 
@@ -5346,23 +5392,23 @@ msgstr ""
 msgid "Tutor LMS"
 msgstr ""
 
-#: app/Services/TransStrings.php:557
-#: builds/fluent-support/app/Services/TransStrings.php:557
+#: app/Services/TransStrings.php:559
+#: builds/fluent-support/app/Services/TransStrings.php:559
 msgid "Twilio Integration"
 msgstr ""
 
-#: app/Services/TransStrings.php:423
-#: builds/fluent-support/app/Services/TransStrings.php:423
+#: app/Services/TransStrings.php:425
+#: builds/fluent-support/app/Services/TransStrings.php:425
 msgid "Type"
 msgstr ""
 
-#: app/Services/TransStrings.php:524
-#: builds/fluent-support/app/Services/TransStrings.php:524
+#: app/Services/TransStrings.php:526
+#: builds/fluent-support/app/Services/TransStrings.php:526
 msgid "type and press enter"
 msgstr ""
 
-#: app/Services/TransStrings.php:538
-#: builds/fluent-support/app/Services/TransStrings.php:538
+#: app/Services/TransStrings.php:540
+#: builds/fluent-support/app/Services/TransStrings.php:540
 msgid "Type Compare Value"
 msgstr ""
 
@@ -5381,8 +5427,8 @@ msgstr ""
 msgid "Unable to delete reCAPTCHA settings, try again"
 msgstr ""
 
-#: app/Services/TransStrings.php:442
-#: builds/fluent-support/app/Services/TransStrings.php:442
+#: app/Services/TransStrings.php:444
+#: builds/fluent-support/app/Services/TransStrings.php:444
 msgid "Unassigned"
 msgstr ""
 
@@ -5391,15 +5437,15 @@ msgstr ""
 msgid "Unassigned Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:508
-#: builds/fluent-support/app/Services/TransStrings.php:508
+#: app/Services/TransStrings.php:510
+#: builds/fluent-support/app/Services/TransStrings.php:510
 msgid "Uncheck all"
 msgstr ""
 
-#: app/Services/TransStrings.php:388
+#: app/Services/TransStrings.php:390
 #: app/Hooks/Handlers/CustomerPortalHandler.php:240
-#: builds/fluent-support/app/Services/TransStrings.php:388
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:237
+#: builds/fluent-support/app/Services/TransStrings.php:390
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:240
 msgid "Unknown error. Please reload this page"
 msgstr ""
 
@@ -5414,8 +5460,8 @@ msgstr ""
 msgid "Update"
 msgstr ""
 
-#: app/Services/TransStrings.php:418
-#: builds/fluent-support/app/Services/TransStrings.php:418
+#: app/Services/TransStrings.php:420
+#: builds/fluent-support/app/Services/TransStrings.php:420
 msgid "Update Custom Field"
 msgstr ""
 
@@ -5426,13 +5472,13 @@ msgstr ""
 msgid "Update Customer"
 msgstr ""
 
-#: app/Services/TransStrings.php:699
-#: builds/fluent-support/app/Services/TransStrings.php:699
+#: app/Services/TransStrings.php:701
+#: builds/fluent-support/app/Services/TransStrings.php:701
 msgid "Update Estimation"
 msgstr ""
 
-#: app/Services/TransStrings.php:545
-#: builds/fluent-support/app/Services/TransStrings.php:545
+#: app/Services/TransStrings.php:547
+#: builds/fluent-support/app/Services/TransStrings.php:547
 msgid "Update Field"
 msgstr ""
 
@@ -5441,8 +5487,8 @@ msgstr ""
 msgid "Update Response"
 msgstr ""
 
-#: app/Services/TransStrings.php:450
-#: builds/fluent-support/app/Services/TransStrings.php:450
+#: app/Services/TransStrings.php:452
+#: builds/fluent-support/app/Services/TransStrings.php:452
 msgid "Update Settings"
 msgstr ""
 
@@ -5451,13 +5497,13 @@ msgstr ""
 msgid "Update Type"
 msgstr ""
 
-#: app/Services/TransStrings.php:605
-#: builds/fluent-support/app/Services/TransStrings.php:605
+#: app/Services/TransStrings.php:607
+#: builds/fluent-support/app/Services/TransStrings.php:607
 msgid "Update Workflow"
 msgstr ""
 
-#: app/Services/TransStrings.php:397
-#: builds/fluent-support/app/Services/TransStrings.php:397
+#: app/Services/TransStrings.php:399
+#: builds/fluent-support/app/Services/TransStrings.php:399
 msgid "Updating Custom Field Data"
 msgstr ""
 
@@ -5486,8 +5532,8 @@ msgstr ""
 msgid "Upload and store the files to your WordPress File System Storage."
 msgstr ""
 
-#: app/Services/TransStrings.php:555
-#: builds/fluent-support/app/Services/TransStrings.php:555
+#: app/Services/TransStrings.php:557
+#: builds/fluent-support/app/Services/TransStrings.php:557
 msgid "Use incoming webhook to create ticket from external sites."
 msgstr ""
 
@@ -5496,8 +5542,8 @@ msgstr ""
 msgid "Use OpenAI for responses, ticket summaries, and sentiment analysis"
 msgstr ""
 
-#: app/Services/TransStrings.php:663
-#: builds/fluent-support/app/Services/TransStrings.php:663
+#: app/Services/TransStrings.php:665
+#: builds/fluent-support/app/Services/TransStrings.php:665
 msgid "Use Recaptcha"
 msgstr ""
 
@@ -5514,13 +5560,13 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: app/Services/TransStrings.php:620
-#: builds/fluent-support/app/Services/TransStrings.php:620
+#: app/Services/TransStrings.php:622
+#: builds/fluent-support/app/Services/TransStrings.php:622
 msgid "Using advanced filtering you can get more specific tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:666
-#: builds/fluent-support/app/Services/TransStrings.php:666
+#: app/Services/TransStrings.php:668
+#: builds/fluent-support/app/Services/TransStrings.php:668
 msgid "Validate Captcha"
 msgstr ""
 
@@ -5542,23 +5588,23 @@ msgstr ""
 msgid "Verify and Login"
 msgstr ""
 
-#: app/Services/TransStrings.php:425
-#: builds/fluent-support/app/Services/TransStrings.php:425
+#: app/Services/TransStrings.php:427
+#: builds/fluent-support/app/Services/TransStrings.php:427
 msgid "Verify License"
 msgstr ""
 
-#: app/Services/TransStrings.php:395
-#: builds/fluent-support/app/Services/TransStrings.php:395
+#: app/Services/TransStrings.php:397
+#: builds/fluent-support/app/Services/TransStrings.php:397
 msgid "Verify OpenAI"
 msgstr ""
 
-#: app/Services/TransStrings.php:661
-#: builds/fluent-support/app/Services/TransStrings.php:661
+#: app/Services/TransStrings.php:663
+#: builds/fluent-support/app/Services/TransStrings.php:663
 msgid "Version 2"
 msgstr ""
 
-#: app/Services/TransStrings.php:662
-#: builds/fluent-support/app/Services/TransStrings.php:662
+#: app/Services/TransStrings.php:664
+#: builds/fluent-support/app/Services/TransStrings.php:664
 msgid "Version 3"
 msgstr ""
 
@@ -5577,10 +5623,10 @@ msgstr ""
 msgid "View Agent Today Performance"
 msgstr ""
 
-#: app/Services/TransStrings.php:375
+#: app/Services/TransStrings.php:377
 #: app/Hooks/Handlers/CustomerPortalHandler.php:242
-#: builds/fluent-support/app/Services/TransStrings.php:375
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:239
+#: builds/fluent-support/app/Services/TransStrings.php:377
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:242
 msgid "View All"
 msgstr ""
 
@@ -5604,10 +5650,10 @@ msgstr ""
 msgid "View Ticket"
 msgstr ""
 
-#: app/Services/TransStrings.php:387
+#: app/Services/TransStrings.php:389
 #: app/Hooks/Handlers/CustomerPortalHandler.php:241
-#: builds/fluent-support/app/Services/TransStrings.php:387
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:238
+#: builds/fluent-support/app/Services/TransStrings.php:389
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:241
 msgid "View Your Tickets"
 msgstr ""
 
@@ -5616,13 +5662,13 @@ msgstr ""
 msgid "wait time"
 msgstr ""
 
-#: app/Services/TransStrings.php:682
-#: builds/fluent-support/app/Services/TransStrings.php:682
+#: app/Services/TransStrings.php:684
+#: builds/fluent-support/app/Services/TransStrings.php:684
 msgid "Waiting"
 msgstr ""
 
-#: app/Services/TransStrings.php:683
-#: builds/fluent-support/app/Services/TransStrings.php:683
+#: app/Services/TransStrings.php:685
+#: builds/fluent-support/app/Services/TransStrings.php:685
 msgid "waiting"
 msgstr ""
 
@@ -5642,13 +5688,13 @@ msgstr ""
 msgid "Waiting Time"
 msgstr ""
 
-#: app/Modules/StatModule.php:266
-#: builds/fluent-support/app/Modules/StatModule.php:266
+#: app/Modules/StatModule.php:270
+#: builds/fluent-support/app/Modules/StatModule.php:270
 msgid "Waiting Today"
 msgstr ""
 
-#: app/Services/TransStrings.php:564
-#: builds/fluent-support/app/Services/TransStrings.php:564
+#: app/Services/TransStrings.php:566
+#: builds/fluent-support/app/Services/TransStrings.php:566
 msgid "Want to deactivate this license?"
 msgstr ""
 
@@ -5672,41 +5718,41 @@ msgstr ""
 msgid "Web Based"
 msgstr ""
 
-#: app/Services/TransStrings.php:365
+#: app/Services/TransStrings.php:367
 #: app/Hooks/Handlers/CustomerPortalHandler.php:217
-#: builds/fluent-support/app/Services/TransStrings.php:365
+#: builds/fluent-support/app/Services/TransStrings.php:367
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:217
 msgid "What's this support ticket about?"
 msgstr ""
 
-#: app/Services/Helper.php:875
-#: builds/fluent-support/app/Services/Helper.php:875
+#: app/Services/Helper.php:882
+#: builds/fluent-support/app/Services/Helper.php:882
 msgid "WhatsApp"
 msgstr ""
 
-#: app/Services/TransStrings.php:403
-#: builds/fluent-support/app/Services/TransStrings.php:403
+#: app/Services/TransStrings.php:405
+#: builds/fluent-support/app/Services/TransStrings.php:405
 msgid "WhatsApp Phone Number"
 msgstr ""
 
-#: app/Services/TransStrings.php:461
-#: builds/fluent-support/app/Services/TransStrings.php:461
+#: app/Services/TransStrings.php:463
+#: builds/fluent-support/app/Services/TransStrings.php:463
 msgid ""
 "When a customer's ticket/response in with a specific question, you execute "
 "this workflow to send a reply, add a tag and assign it to someone on your "
 "team."
 msgstr ""
 
-#: app/Services/TransStrings.php:470
-#: builds/fluent-support/app/Services/TransStrings.php:470
+#: app/Services/TransStrings.php:472
+#: builds/fluent-support/app/Services/TransStrings.php:472
 msgid ""
 "When the subject line contains \"Bug Report\", you want Fluent Support to "
 "automatically add a tag, send an email to the customer and assign a support "
 "agent."
 msgstr ""
 
-#: app/Services/Helper.php:847
-#: builds/fluent-support/app/Services/Helper.php:847
+#: app/Services/Helper.php:854
+#: builds/fluent-support/app/Services/Helper.php:854
 msgid "WishList Member"
 msgstr ""
 
@@ -5715,23 +5761,23 @@ msgstr ""
 msgid "WooCommerce"
 msgstr ""
 
-#: app/Services/TransStrings.php:512
-#: builds/fluent-support/app/Services/TransStrings.php:512
+#: app/Services/TransStrings.php:514
+#: builds/fluent-support/app/Services/TransStrings.php:514
 msgid "WordPress plugin then you can migrate from this section."
 msgstr ""
 
-#: app/Services/TransStrings.php:697
-#: builds/fluent-support/app/Services/TransStrings.php:697
+#: app/Services/TransStrings.php:699
+#: builds/fluent-support/app/Services/TransStrings.php:699
 msgid "Work Description:"
 msgstr ""
 
-#: app/Services/TransStrings.php:613
-#: builds/fluent-support/app/Services/TransStrings.php:613
+#: app/Services/TransStrings.php:615
+#: builds/fluent-support/app/Services/TransStrings.php:615
 msgid "Workflow Actions (Tasks)"
 msgstr ""
 
-#: app/Services/TransStrings.php:459
-#: builds/fluent-support/app/Services/TransStrings.php:459
+#: app/Services/TransStrings.php:461
+#: builds/fluent-support/app/Services/TransStrings.php:461
 msgid "Workflow Name"
 msgstr ""
 
@@ -5740,19 +5786,19 @@ msgstr ""
 msgid "Workflow Permissions"
 msgstr ""
 
-#: app/Services/TransStrings.php:607
-#: builds/fluent-support/app/Services/TransStrings.php:607
+#: app/Services/TransStrings.php:609
+#: builds/fluent-support/app/Services/TransStrings.php:609
 msgid "Workflow Title"
 msgstr ""
 
-#: app/Services/TransStrings.php:575
-#: builds/fluent-support/app/Services/TransStrings.php:575
+#: app/Services/TransStrings.php:577
+#: builds/fluent-support/app/Services/TransStrings.php:577
 msgid "workflow will perform the following actions:"
 msgstr ""
 
-#: app/Services/TransStrings.php:604 app/Hooks/Handlers/Menu.php:75
+#: app/Services/TransStrings.php:606 app/Hooks/Handlers/Menu.php:75
 #: app/Hooks/Handlers/Menu.php:76 app/Hooks/Handlers/Menu.php:179
-#: builds/fluent-support/app/Services/TransStrings.php:604
+#: builds/fluent-support/app/Services/TransStrings.php:606
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:75
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:76
 #: builds/fluent-support/app/Hooks/Handlers/Menu.php:179
@@ -5763,9 +5809,9 @@ msgstr ""
 msgid "WPManageNinja LLC"
 msgstr ""
 
-#: app/Services/TransStrings.php:378
+#: app/Services/TransStrings.php:380
 #: app/Hooks/Handlers/CustomerPortalHandler.php:204
-#: builds/fluent-support/app/Services/TransStrings.php:378
+#: builds/fluent-support/app/Services/TransStrings.php:380
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:204
 msgid "Write a reply"
 msgstr ""
@@ -5775,23 +5821,23 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: app/Services/TransStrings.php:585
-#: builds/fluent-support/app/Services/TransStrings.php:585
+#: app/Services/TransStrings.php:587
+#: builds/fluent-support/app/Services/TransStrings.php:587
 msgid "Yes, Delete Selected Tickets"
 msgstr ""
 
-#: app/Services/TransStrings.php:460
-#: builds/fluent-support/app/Services/TransStrings.php:460
+#: app/Services/TransStrings.php:462
+#: builds/fluent-support/app/Services/TransStrings.php:462
 msgid "Yes, Delete this"
 msgstr ""
 
-#: app/Services/TransStrings.php:587
-#: builds/fluent-support/app/Services/TransStrings.php:587
+#: app/Services/TransStrings.php:589
+#: builds/fluent-support/app/Services/TransStrings.php:589
 msgid "Yes, Delete this Action"
 msgstr ""
 
-#: app/Services/TransStrings.php:488
-#: builds/fluent-support/app/Services/TransStrings.php:488
+#: app/Services/TransStrings.php:490
+#: builds/fluent-support/app/Services/TransStrings.php:490
 msgid "Yes, Delete this Customer"
 msgstr ""
 
@@ -5800,9 +5846,9 @@ msgstr ""
 msgid "Yesterday"
 msgstr ""
 
-#: app/Services/TransStrings.php:389
+#: app/Services/TransStrings.php:391
 #: app/Hooks/Handlers/CustomerPortalHandler.php:207
-#: builds/fluent-support/app/Services/TransStrings.php:389
+#: builds/fluent-support/app/Services/TransStrings.php:391
 #: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:207
 msgid "You"
 msgstr ""
@@ -5846,8 +5892,8 @@ msgstr ""
 msgid "You are not allowed to signup using this form"
 msgstr ""
 
-#: app/Services/TransStrings.php:523
-#: builds/fluent-support/app/Services/TransStrings.php:523
+#: app/Services/TransStrings.php:525
+#: builds/fluent-support/app/Services/TransStrings.php:525
 msgid "You can not change the slug once save a custom field"
 msgstr ""
 
@@ -5895,20 +5941,20 @@ msgstr ""
 msgid "You have been logged out"
 msgstr ""
 
-#: app/Services/TransStrings.php:491
-#: builds/fluent-support/app/Services/TransStrings.php:491
+#: app/Services/TransStrings.php:493
+#: builds/fluent-support/app/Services/TransStrings.php:493
 msgid "You're Almost Done"
 msgstr ""
 
 #: app/Hooks/Handlers/CustomerPortalHandler.php:259
-#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:256
+#: builds/fluent-support/app/Hooks/Handlers/CustomerPortalHandler.php:259
 msgid ""
 "Your account is currently inactive. You cannot create new tickets or reply "
 "to existing ones. Please contact the site administrator for assistance."
 msgstr ""
 
-#: app/Services/TransStrings.php:518
-#: builds/fluent-support/app/Services/TransStrings.php:518
+#: app/Services/TransStrings.php:520
+#: builds/fluent-support/app/Services/TransStrings.php:520
 msgid ""
 "Your Admin Email Address and Support From Email should not be same. Please "
 "use a different email address."
@@ -5931,8 +5977,8 @@ msgstr ""
 msgid "Your Email Address"
 msgstr ""
 
-#: app/Services/TransStrings.php:520
-#: builds/fluent-support/app/Services/TransStrings.php:520
+#: app/Services/TransStrings.php:522
+#: builds/fluent-support/app/Services/TransStrings.php:522
 msgid "your email piping settings first"
 msgstr ""
 
@@ -5946,13 +5992,13 @@ msgstr ""
 msgid "Your Help Scout authorization code is:"
 msgstr ""
 
-#: app/Services/TransStrings.php:562
-#: builds/fluent-support/app/Services/TransStrings.php:562
+#: app/Services/TransStrings.php:564
+#: builds/fluent-support/app/Services/TransStrings.php:564
 msgid "Your License Key"
 msgstr ""
 
-#: app/Services/TransStrings.php:563
-#: builds/fluent-support/app/Services/TransStrings.php:563
+#: app/Services/TransStrings.php:565
+#: builds/fluent-support/app/Services/TransStrings.php:565
 msgid "Your license key is valid and activated"
 msgstr ""
 
@@ -5962,18 +6008,18 @@ msgstr ""
 msgid "Your Login code for %1s"
 msgstr ""
 
-#: app/Services/TransStrings.php:505
-#: builds/fluent-support/app/Services/TransStrings.php:505
+#: app/Services/TransStrings.php:507
+#: builds/fluent-support/app/Services/TransStrings.php:507
 msgid "Your MailBox is active"
 msgstr ""
 
-#: app/Services/TransStrings.php:513
-#: builds/fluent-support/app/Services/TransStrings.php:513
+#: app/Services/TransStrings.php:515
+#: builds/fluent-support/app/Services/TransStrings.php:515
 msgid "Your masked email address is"
 msgstr ""
 
-#: app/Services/TransStrings.php:496
-#: builds/fluent-support/app/Services/TransStrings.php:496
+#: app/Services/TransStrings.php:498
+#: builds/fluent-support/app/Services/TransStrings.php:498
 msgid "Your masked mailbox email has been issued"
 msgstr ""
 
@@ -6050,13 +6096,13 @@ msgstr ""
 msgid "Your verification code has been expired. Please try again"
 msgstr ""
 
-#: app/Services/TransStrings.php:458
-#: builds/fluent-support/app/Services/TransStrings.php:458
+#: app/Services/TransStrings.php:460
+#: builds/fluent-support/app/Services/TransStrings.php:460
 msgid "Your Workflow Name"
 msgstr ""
 
-#: app/Services/TransStrings.php:669
-#: builds/fluent-support/app/Services/TransStrings.php:669
+#: app/Services/TransStrings.php:671
+#: builds/fluent-support/app/Services/TransStrings.php:671
 msgid "Zendesk Domain"
 msgstr ""
 
@@ -6070,11 +6116,11 @@ msgstr ""
 msgid "Zip"
 msgstr ""
 
-#: app/Models/Customer.php:56 app/Services/TransStrings.php:439
+#: app/Services/TransStrings.php:441 app/Models/Customer.php:56
 #: app/Models/Traits/CustomerTrait.php:138
 #: app/Models/Traits/CustomerTrait.php:140
+#: builds/fluent-support/app/Services/TransStrings.php:441
 #: builds/fluent-support/app/Models/Customer.php:56
-#: builds/fluent-support/app/Services/TransStrings.php:439
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:138
 #: builds/fluent-support/app/Models/Traits/CustomerTrait.php:140
 msgid "Zip Code"

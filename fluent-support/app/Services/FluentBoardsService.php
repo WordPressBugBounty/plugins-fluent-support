@@ -30,7 +30,7 @@ class FluentBoardsService
         $baseUrl = admin_url('admin.php?page=fluent-support#/tickets/');
         $ticketUrl = $baseUrl . $task->source_id . '/view';
 
-        $description = 'This task was created from Fluent Support. Here you can find this ticket: <a href="' . $ticketUrl . '">View Ticket</a>';
+        $description = 'This task was created from Fluent Support. Here you can find this ticket: <a href="' . $ticketUrl . '" target="_blank">View Ticket</a>';
 
         $commentData = [
             'description' => $description,

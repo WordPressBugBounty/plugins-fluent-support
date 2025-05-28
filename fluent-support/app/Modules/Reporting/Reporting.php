@@ -139,10 +139,13 @@ class Reporting
 
         list($groupBy, $orderBy) = $this->getGroupAndOrder($frequency);
 
-        $query = $this->db()->table('fs_conversations')
+        $query = Conversation::query()
             ->select($this->prepareSelect($frequency))
             ->whereBetween('created_at', $this->prepareBetween($frequency, $from, $to))
             ->where('conversation_type', 'response')
+            ->whereHas('person', function ($q) {
+                $q->where('person_type', 'agent');
+            })
             ->groupBy($groupBy)
             ->oldest($orderBy);
 
@@ -157,7 +160,6 @@ class Reporting
         }
 
         $items = $query->get();
-
 
         return $this->getResult($period, $items);
     }

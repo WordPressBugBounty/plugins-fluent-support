@@ -243,13 +243,13 @@ class Conversation extends Model
      * @return array
      * @throws Exception
      */
-    public function deleteResponse ( $ticketId, $responseId )
+    public function deleteResponse($ticketId, $responseId)
     {
         $ticket = Ticket::findOrFail($ticketId);
         $response = static::findOrFail($responseId);
         $agent = Helper::getAgentByUserId();
 
-        $this->checkUserTaskPermission( $ticket->agent_id, $agent->id, 'delete' );
+        $this->checkUserTaskPermission($ticket->agent_id, $agent->id, 'delete');
 
         static::where('id', $response->id)->delete();
         $response->ccinfo()->delete();
@@ -423,16 +423,17 @@ class Conversation extends Model
         }
     }
 
-    // This function will check agent permission to specific task regarding response response
-    private function checkUserTaskPermission ( $ticketAgentId, $agentId, $task )
+    private function checkUserTaskPermission($ticketAgentId, $agentId, $task)
     {
-        if ( !PermissionManager::currentUserCan('fst_manage_other_tickets') ) {
-            if ( $ticketAgentId != $agentId ) {
-                throw new \Exception(esc_html("Sorry, You do not have permission to {$task} this response"));
-            }
-        } else {
-            return true;
+        $permissionKey = $task === 'delete' ? 'fst_delete_tickets' : 'fst_manage_other_tickets';
+
+        if (!PermissionManager::currentUserCan($permissionKey) && $ticketAgentId !== $agentId) {
+            throw new \Exception(
+                esc_html(sprintf(__('Sorry, you do not have permission to %s this response.', 'fluent-support'), $task))
+            );
         }
+
+        return true;
     }
 
 }

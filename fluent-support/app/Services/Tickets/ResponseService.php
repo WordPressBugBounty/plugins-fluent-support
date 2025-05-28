@@ -25,6 +25,7 @@ class ResponseService
 
         $cc_emails = Arr::get($data, 'cc_emails', []);
 
+        $informationalReply = Arr::get($data, 'informational_reply', false);
         // Adding support for shortcode in agent response
         if ($person->person_type == 'agent') {
             $data['content'] = apply_filters('fluent_support/parse_smartcode_data', $data['content'], [
@@ -89,7 +90,7 @@ class ResponseService
             }
 
             if ($convoType == 'response') {
-                if ($resetWaitingSince) {
+                if ($resetWaitingSince && !$informationalReply) {
                     $ticket->last_agent_response = current_time('mysql');
                     $ticket->waiting_since = current_time('mysql');
                 }

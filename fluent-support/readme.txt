@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.8
-Stable tag: 1.8.8
+Stable tag: 1.9.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -244,6 +244,20 @@ Absolutely! Fluent Support offers a customizable support portal, allowing you to
 8. FluentSupport Dashboard
 
 == Changelog ==
+
+= 1.9.0 (Date: May 28, 2025) =
+* Added: Integration with Fluent Community. (Pro)
+* Added: Informational replies on admin ticket responses.
+* Added: Help Scout, Freshdesk & Zendesk Ticket Migration Now Available in Free Version.
+* Improved: Internal note functionality now works for closed tickets.
+* Improved: Responses in closed tickets can now be edited.
+* Fixed: Error message shown for the Priority field when the Product is required in the customer portal.
+* Fixed: Fatal error triggered by the Share Essentials weekly cron job.
+* Fixed: Customer responses not displaying in agent response stats within agent reports.
+* Fixed: Incorrect ticket response count shown in today's stats.
+* Fixed: Broken media upload CSS in the page editor caused by the [fluent_support_admin_portal] shortcode.
+* Fixed: "Waiting For Reply" filter not working in advanced filtering.
+* Fixed: Responsive issues in the Agent Portal.
 
 = 1.8.8 (Date: Apr 22, 2025) =
 * Fixed: Ticket status was not displaying correctly on the ticket view page in the customer portal.

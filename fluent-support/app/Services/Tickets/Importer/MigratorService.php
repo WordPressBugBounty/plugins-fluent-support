@@ -23,14 +23,9 @@ class MigratorService
             $stats[] = $this->mapClassWithHandler('js-helpdesk')->stats();
         }
 
-        if (defined('FLUENTSUPPORTPRO')) {
-            $stats[] = $this->mapClassWithHandler('helpscout')->stats();
-        }
-
-        if (defined('FLUENTSUPPORTPRO')) {
-            $stats[] = $this->mapClassWithHandler('freshdesk')->stats();
-            $stats[] = $this->mapClassWithHandler('zendesk')->stats();
-        }
+        $stats[] = $this->mapClassWithHandler('helpscout')->stats();
+        $stats[] = $this->mapClassWithHandler('freshdesk')->stats();
+        $stats[] = $this->mapClassWithHandler('zendesk')->stats();
 
         return [
             'stats' => $stats
@@ -65,35 +60,19 @@ class MigratorService
     // This method is a helper method of `handleImport` method it's responsible for calling a class by $handler
     private function mapClassWithHandler($handler)
     {
-        $namespace = $this->handleNamespace($handler);
+        $namespace = "FluentSupport\App\Services\Tickets\Importer\\";
 
         $classMapper = apply_filters('fluent_support/migrator_class_mapper', [
             'awesome-support' => 'AwesomeSupportTickets',
             'support-candy'   => 'SupportCandyTickets',
             'js-helpdesk'     => 'JSHelpdeskTickets',
+            'helpscout'       => 'HelpScoutTickets',
+            'freshdesk'       => 'FreshDeskTickets',
+            'zendesk'         => 'ZendeskTickets'
         ]);
-
-        if(defined('FLUENTSUPPORTPRO')){
-            $classMapper['helpscout'] = 'HelpScoutTickets';
-            $classMapper['freshdesk'] = 'FreshDeskTickets';
-            $classMapper['zendesk'] = 'ZendeskTickets';
-        }
 
         $class = $namespace . $classMapper[$handler];
 
         return new $class();
-    }
-
-    private function handleNamespace($handler)
-    {
-        $proHandlers = ['helpscout', 'freshdesk','zendesk'];
-
-        $namespace = "FluentSupport\App\Services\Tickets\Importer\\";
-
-        if(defined('FLUENTSUPPORTPRO') && in_array($handler, $proHandlers)){
-            $namespace = "FluentSupportPro\App\Services\TicketImporter\\";
-        }
-
-        return $namespace;
     }
 }

@@ -34,7 +34,8 @@ class TicketResponseRequest extends RequestGuard
             'content' => 'wp_kses_post',
             'conversation_type' => 'sanitize_text_field',
             'close_ticket' => 'sanitize_text_field',
-            'ticket_id' => 'intval'
+            'ticket_id' => 'intval',
+            'informational_reply' => 'rest_sanitize_boolean'
         ];
 
         if( $data && is_array($data) ) {
