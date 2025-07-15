@@ -191,6 +191,8 @@ class CustomerPortalHandler
             'Status' => __('Status', 'fluent-support'),
             'Next' => __('Next', 'fluent-support'),
             'Prev' => __('Prev', 'fluent-support'),
+            'Reply and Close' => __('Reply and Close', 'fluent-support'),
+            'Refresh' => __('Refresh', 'fluent-support'),
             'agent_and_officials_can_see' => __('Only you and official support agents can view this conversation', 'fluent-support'),
             'reopen_ticket_instruction' => __('If you still have related issues. Please reopen this ticket and reply', 'fluent-support'),
             'ticket_closed'    => __('This ticket was closed on', 'fluent-support'),

@@ -137,9 +137,10 @@ class ExternalPages
     private function serveLocalAttachment($attachment)
     {
         $file_path = realpath($attachment->file_path);
-        $uploads_dir = wp_upload_dir()['basedir'];
-        
-        if (!$file_path || strpos($file_path, $uploads_dir) !== 0 || !file_exists($file_path)) {
+        $uploads     = wp_upload_dir();
+        $uploads_dir = realpath($uploads['basedir']); // Ensures both paths are absolute
+
+        if (!$file_path || !$uploads_dir || strpos($file_path, $uploads_dir) !== 0 || !file_exists($file_path)) {
             wp_die(esc_html__('File not found or access denied', 'fluent-support'), 403);
             return;
         }

@@ -375,7 +375,8 @@ class Menu
             'agent_time_tracking'        => Helper::getBusinessSettings('agent_time_tracking', 'no'),
             'max_file_upload'            => Helper::getBusinessSettings('max_file_upload', 3),
             'ajaxurl'                    => admin_url('admin-ajax.php'),
-            'auth_provider'              => Helper::getAuthProvider()
+            'auth_provider'              => Helper::getAuthProvider(),
+            'fluent_bot_integration'    =>  Helper::fluentBotIntegrationStatus(),
         ));
 
         if (defined('FLUENTCRM')) {
@@ -389,7 +390,7 @@ class Menu
         $appVars['has_pro'] = defined('FLUENTSUPPORTPRO_PLUGIN_VERSION');
         if ($appVars['has_pro']) {
             $appVars['agent_feedback_rating'] = Helper::getBusinessSettings('agent_feedback_rating', 'no');
-            $appVars['ai_integration'] = Helper::AIIntegrationStatus();
+            $appVars['open_ai_integration'] = Helper::openAIIntegrationStatus();
         }
 
         wp_localize_script('fluent_support_admin_app_start', 'fluentSupportAdmin', $appVars);

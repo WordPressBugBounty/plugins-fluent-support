@@ -93,6 +93,10 @@ class CustomerPortalController extends Controller
             $defaultData['ticket_product_id'] = $request->get('product_id');
         }
 
+        if ($request->has('client_priority')) {
+            $defaultData['ticket_client_priority'] = $request->get('client_priority');
+        }
+
         $dataRules = $this->app->applyCustomFilters('custom_field_required_by_conditions_before_ticket_create', [
             'required_fields' => $dataRules['required_fields'],
             'error_messages'  => $dataRules['error_messages'],

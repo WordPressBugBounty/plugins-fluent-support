@@ -497,8 +497,8 @@ class Helper
         $formattedPages = [];
         foreach ($pages as $page) {
             $formattedPages[] = [
-                'id'    => strval($page->ID),
-                'title' => $page->post_title
+                'id'    => intval($page->ID),
+                'title' => $page->post_title ?: __('(no title)', 'fluent-support')
             ];
         }
         return $formattedPages;
@@ -635,7 +635,7 @@ class Helper
         return false;
     }
 
-    public static function AIIntegrationStatus() {
+    public static function openAIIntegrationStatus() {
         $chatGPTSettingsData = Meta::where('object_type', '_fs_openai_settings')->value('value');
 
         if ($chatGPTSettingsData) {
@@ -645,6 +645,16 @@ class Helper
 
         return false;
     }
+
+    public static function fluentBotIntegrationStatus()
+    {
+        $settings = maybe_unserialize(
+            Meta::where('object_type', 'fluent_bot_settings')->value('value')
+        );
+
+        return !empty($settings['isEnabled']) && $settings['isEnabled'] === 'true';
+    }
+
 
     public static function showTicketSummaryAdminBar()
     {
@@ -944,6 +954,97 @@ class Helper
         ];
 
         return $connections;
+    }
+
+    public static function getGlobalSettingsMenu()
+    {
+        $menu = [
+            [
+                'title' => __('Global Settings', 'fluent-support'),
+                'route_name' => 'global_settings',
+                'icon' => 'Document',
+            ],
+            [
+                'title' => __('Ticket Tags', 'fluent-support'),
+                'route_name' => 'tags',
+                'icon' => 'CollectionTag',
+            ],
+            [
+                'title' => __('Ticket Form Config', 'fluent-support'),
+                'route_name' => 'ticket-form-config',
+                'icon' => 'Setting',
+            ],
+            [
+                'title' => __('Custom Fields', 'fluent-support'),
+                'route_name' => 'custom_fields',
+                'icon' => 'Tickets',
+            ],
+            [
+                'title' => __('Products', 'fluent-support'),
+                'route_name' => 'products',
+                'icon' => 'Goods',
+            ],
+            [
+                'title' => __('Support Staff', 'fluent-support'),
+                'route_name' => 'support-staffs',
+                'icon' => 'User',
+            ],
+            [
+                'title' => __('FluentCRM Integration', 'fluent-support'),
+                'route_name' => 'fluentcrm_integration',
+                'icon' => 'Cpu',
+            ],
+            [
+                'title' => __('Incoming Webhook', 'fluent-support'),
+                'route_name' => 'incoming-webhook',
+                'icon' => 'Connection',
+            ],
+            [
+                'title' => __('Notification Integrations', 'fluent-support'),
+                'route_name' => 'integration',
+                'icon' => 'AlarmClock',
+            ],
+            [
+                'title' => __('File Upload Integrations', 'fluent-support'),
+                'route_name' => 'upload_integration',
+                'icon' => 'FolderAdd',
+            ],
+            [
+                'title' => __('Auto Close Settings', 'fluent-support'),
+                'route_name' => 'auto_close',
+                'icon' => 'Timer',
+            ],
+            [
+                'title' => __('Ticket Importer', 'fluent-support'),
+                'route_name' => 'ticket_importer',
+                'icon' => 'Download',
+            ],
+            [
+                'title' => __('Recaptcha', 'fluent-support'),
+                'route_name' => 'reCaptcha',
+                'icon' => 'Key',
+            ],
+            [
+                'title' => __('Integration Statuses', 'fluent-support'),
+                'route_name' => 'integration_statuses',
+                'icon' => 'Connection',
+            ],
+            [
+                'title' => __('OpenAI Integration', 'fluent-support'),
+                'route_name' => 'openai_integration',
+                'icon' => 'Connection',
+            ],
+        ];
+
+        if (defined('FLUENT_SUPPORT_PRO_DIR_FILE')) {
+            $menu[] = [
+                'title' => __('License Management', 'fluent-support'),
+                'route_name' => 'license',
+                'icon' => 'Lock',
+            ];
+        }
+
+        return apply_filters('fluent_support/settings_menu_items', $menu);
     }
 
     public static function getFSIntegrationStatus($connection_name)

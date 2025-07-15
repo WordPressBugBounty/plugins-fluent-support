@@ -426,12 +426,25 @@ class TicketController extends Controller
      */
     public function changeTicketCustomer(Request $request)
     {
-        $updateCustomer = Ticket::where('id', $request->getSafe('ticket_id', 'intval'))
-            ->update(['customer_id' => $request->getSafe('customer', 'intval')]);
-        return [
-            'message' => __('Customer has been updated', 'fluent-support'),
-            'updatedCustomer' => $updateCustomer
-        ];
+        $ticketId = $request->getSafe('ticket_id', 'intval');
+        $newCustomerId = $request->getSafe('customer', 'intval');
+
+        if (!$newCustomerId) {
+            return $this->sendError(__('Invalid customer selected.', 'fluent-support'));
+        }
+
+        try {
+            $updated = Ticket::where('id', $ticketId)
+                ->where('customer_id', '!=', $newCustomerId)
+                ->update(['customer_id' => $newCustomerId]);
+
+            return $updated
+                ? ['message' => __('Customer has been updated', 'fluent-support')]
+                : $this->sendError(__('Ticket not found or customer already assigned.', 'fluent-support'));
+
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage());
+        }
     }
 
     /**
@@ -609,12 +622,12 @@ class TicketController extends Controller
             $filterType = Arr::get($searchData, 'filter_type', '');
             if ($filterType == 'advanced') {
                 return TicketHelper::saveSearchLabel($agent_id,$searchData,$filterType);
-            } 
+            }
 
             return [
                 'message' => __('Invalid filter type.', 'fluent-support'),
             ];
-            
+
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }

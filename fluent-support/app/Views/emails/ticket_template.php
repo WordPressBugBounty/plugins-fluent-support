@@ -19,7 +19,7 @@
         <?php echo wp_kses_post($email_body);  // Make sure to properly sanitize $email_body. ?>
     </div>
 
-    <div style="color: #9e9e9e; margin: 10px 0 14px 0; padding-top: 10px;border-top: 1px solid #eeeeee;">
+    <div style="color: #9e9e9e; margin: 10px 0 14px 0; padding-top: 10px;<?php echo apply_filters('fluent_support_email_template_show_border', true) ? 'border-top: 1px solid #eeeeee;' : ''; ?>">
         <?php echo wp_kses_post($email_footer);  // WPCS: XSS ok. ?>
     </div>
 </body>

@@ -5,6 +5,7 @@ namespace FluentSupport\App\Http\Controllers;
 
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Meta;
+use FluentSupport\App\Models\Product;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\Database\Migrations\AIActivityLogsMigrator;
@@ -353,7 +354,7 @@ class SettingsController extends Controller
             // translators: %s is the error message from the exception
             $translatedMessage = __('An error occurred while saving the settings: %s', 'fluent-support');
             $errorMessage = sprintf($translatedMessage, $e->getMessage());
-        
+
             return $this->sendError([
                 'message' => $errorMessage,
             ]);
@@ -703,4 +704,90 @@ class SettingsController extends Controller
             'connections'  => Helper::getIntegrationStatuses()
         ];
     }
+
+    public function getSettingsMenu()
+    {
+        return Helper::getGlobalSettingsMenu();
+    }
+
+    public function getFluentBotSettings()
+    {
+        $meta = Meta::where([
+            'object_type' => 'fluent_bot_settings',
+            'object_id'   => 1,
+            'key'         => '_fs_fluent_bot_config'
+        ])->first();
+
+        $settings = $meta ? maybe_unserialize($meta->value) : [];
+
+        $productItems = Product::all()->map(function ($product) {
+            return [
+                'id'    => $product->id,
+                'title' => $product->title
+            ];
+        })->values()->all();
+
+        return array_merge([
+            'generalApiKey'    => '',
+            'generalBotId'     => '',
+            'isEnabled'        => false,
+            'productMappings'  => [],
+            'products'         => $productItems
+        ], $settings, [
+            'products' => $productItems
+        ]);
+    }
+
+    public function saveFluentBotSettings(Request $request)
+    {
+        $data = [
+            'generalApiKey'    => $request->getSafe('generalApiKey', 'sanitize_text_field'),
+            'generalBotId'     => $request->getSafe('generalBotId', 'sanitize_text_field'),
+            'isEnabled'        => $request->getSafe('isEnabled', 'sanitize_text_field'),
+            'productMappings'  => []
+        ];
+
+        $productMappings = (array) $request->get('productMappings', []);
+
+        foreach ($productMappings as $mapping) {
+            if (!is_array($mapping)) {
+                continue;
+            }
+
+            $data['productMappings'][] = [
+                'productId'    => intval($mapping['productId'] ?? 0),
+                'productTitle' => sanitize_text_field($mapping['productTitle'] ?? ''),
+                'apiKey'       => sanitize_text_field($mapping['apiKey'] ?? ''),
+                'botId'        => sanitize_text_field($mapping['botId'] ?? ''),
+            ];
+        }
+
+        $serialized = maybe_serialize($data);
+
+        $existing = Meta::where([
+            'object_type' => 'fluent_bot_settings',
+            'object_id'   => 1,
+            'key'         => '_fs_fluent_bot_config'
+        ])->first();
+
+        if ($existing) {
+            $existing->update(['value' => $serialized]);
+        } else {
+            Meta::create([
+                'object_type' => 'fluent_bot_settings',
+                'object_id'   => 1,
+                'key'         => '_fs_fluent_bot_config',
+                'value'       => $serialized
+            ]);
+
+            AIActivityLogsMigrator::migrate();
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Settings saved successfully',
+            'data'    => $data
+        ];
+    }
+
 }
