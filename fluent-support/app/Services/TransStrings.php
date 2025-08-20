@@ -29,6 +29,8 @@ class TransStrings
             'Good Job' => __('Good Job', 'fluent-support'),
             'tickets' => __('tickets', 'fluent-support'),
             'Tickets' => __('Tickets', 'fluent-support'),
+            'Shortcode copied to clipboard:' => __('Shortcode copied to clipboard:', 'fluent-support'),
+            'Failed to copy shortcode' => __('Failed to copy shortcode', 'fluent-support'),
             'Add Task to Fluent Boards' => __(' Add Task to Fluent Boards', 'fluent-support'),
             'are waiting for reply with' => __('are waiting for reply with', 'fluent-support'),
             'wait time' => __('wait time', 'fluent-support'),

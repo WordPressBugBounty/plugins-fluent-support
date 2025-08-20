@@ -86,10 +86,16 @@ class DataExporter
     private function verifyRequest()
     {
         $permission = 'fst_view_all_reports';
-        if (PermissionManager::currentUserCan($permission)) {
+
+        if ( ! isset($_REQUEST['_wpnonce']) || ! wp_verify_nonce($_REQUEST['_wpnonce'], 'fluent-support') ) {
+            wp_die('Security check failed');
+        }
+
+        if ( PermissionManager::currentUserCan($permission) ) {
             return true;
         }
 
-        die('You do not have permission');
+        wp_die('You do not have permission');
     }
+
 }

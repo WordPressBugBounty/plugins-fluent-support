@@ -52,7 +52,8 @@ class CleanupHandler
 
     protected function cleanAIActivityLogs()
     {
-        if (!defined('FLUENT_SUPPORT_PRO_DIR_FILE') || !Helper::AIIntegrationStatus()) {
+        if ((!defined('FLUENT_SUPPORT_PRO_DIR_FILE') || !Helper::openAIIntegrationStatus())
+            && !Helper::fluentBotIntegrationStatus()) {
             return;
         }
 
