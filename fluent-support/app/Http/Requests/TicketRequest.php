@@ -60,7 +60,7 @@ class TicketRequest extends RequestGuard
             'create_wp_user' => 'sanitize_text_field',
             'first_name' => 'sanitize_text_field',
             'last_name' => 'sanitize_text_field',
-            'email' => 'sanitize_text_field',
+            'email' => 'sanitize_email',
             'username' => 'sanitize_text_field',
             'password' => 'sanitize_text_field',
         ];

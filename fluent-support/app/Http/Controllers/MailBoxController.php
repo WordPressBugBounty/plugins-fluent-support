@@ -43,7 +43,8 @@ class MailBoxController extends Controller
      */
     public function save(Request $request, MailBox $mailBox)
     {
-        $data = wp_unslash( $request->getSafe('business') );
+        $data = wp_unslash( $request->get('business', null) );
+        $data = $this->sanitizeMailboxData($data);
 
         $this->validate($data, [
             'name' => 'required',
@@ -67,7 +68,8 @@ class MailBoxController extends Controller
     public function update(Request $request, MailBox $mailBox, $id)
     {
         try{
-            $data = wp_unslash( $request->getSafe('business') );
+            $data = wp_unslash( $request->get('business', null) );
+            $data = $this->sanitizeMailboxData($data);
 
             $this->validate($data, [
                 'name' => 'required',
@@ -161,7 +163,17 @@ class MailBoxController extends Controller
      */
     public function saveEmailSettings( Request $request, MailBoxService $mailBoxService, $id )
     {
-        $data = wp_unslash($request->getSafe('email_settings'));
+        $data = wp_unslash($request->get('email_settings', null));
+        $data = is_array($data) ? [
+            'key'              => isset($data['key']) ? sanitize_key($data['key']) : '',
+            'title'            => isset($data['title']) ? sanitize_text_field($data['title']) : '',
+            'email_subject'    => isset($data['email_subject']) ? sanitize_text_field($data['email_subject']) : '',
+            'email_body'       => isset($data['email_body']) ? wp_kses_post($data['email_body']) : '',
+            'status'           => isset($data['status']) ? sanitize_text_field($data['status']) : '',
+            'can_edit_subject' => isset($data['can_edit_subject']) ? sanitize_text_field($data['can_edit_subject']) : '',
+            'send_attachments' => isset($data['send_attachments']) ? sanitize_text_field($data['send_attachments']) : '',
+        ] : [];
+
         $emailType = $request->getSafe('email_type', 'sanitize_text_field');
 
         $this->validate($data, [
@@ -192,6 +204,49 @@ class MailBoxController extends Controller
      */
     public function getTickets(Request $request, MailBoxService $mailBoxService, $id)
     {
-        return $mailBoxService->getTickets( $request->getSafe('filters'), $id );
+        $filters = $request->get('filters', null);
+        $filters = is_array($filters) ? [
+            'status_type'  => isset($filters['status_type']) ? sanitize_text_field($filters['status_type']) : '',
+            'customer_id'  => isset($filters['customer_id']) ? intval($filters['customer_id']) : 0,
+            'product_id'   => isset($filters['product_id']) ? intval($filters['product_id']) : 0,
+            'mailbox_id'   => isset($filters['mailbox_id']) ? intval($filters['mailbox_id']) : 0,
+            'ticket_title' => isset($filters['ticket_title']) ? sanitize_text_field($filters['ticket_title']) : '',
+            'notes'        => isset($filters['notes']) ? sanitize_text_field($filters['notes']) : '',
+        ] : [];
+
+        return $mailBoxService->getTickets( $filters, $id );
+    }
+
+    /**
+     * Sanitize mailbox data array
+     *
+     * @param mixed $data
+     * @return array
+     */
+    private function sanitizeMailboxData($data)
+    {
+        if (!is_array($data)) {
+            return [];
+        }
+
+        $sanitized = [
+            'name'         => isset($data['name']) ? sanitize_text_field($data['name']) : '',
+            'email'        => isset($data['email']) ? sanitize_email($data['email']) : '',
+            'box_type'     => isset($data['box_type']) ? sanitize_key($data['box_type']) : '',
+            'mapped_email' => isset($data['mapped_email']) ? sanitize_email($data['mapped_email']) : '',
+            'email_footer' => isset($data['email_footer']) ? wp_kses_post($data['email_footer']) : '',
+            'is_default'   => isset($data['is_default']) ? sanitize_text_field($data['is_default']) : 'no',
+        ];
+
+        // Handle nested settings array
+        if (isset($data['settings']) && is_array($data['settings'])) {
+            $sanitized['settings'] = map_deep($data['settings'], 'sanitize_text_field');
+            // Preserve email in settings
+            if (isset($data['settings']['admin_email_address'])) {
+                $sanitized['settings']['admin_email_address'] = sanitize_email($data['settings']['admin_email_address']);
+            }
+        }
+
+        return $sanitized;
     }
 }

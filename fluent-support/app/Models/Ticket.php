@@ -1602,7 +1602,7 @@ class Ticket extends Model
             throw new \Exception(esc_html__('tag_ids param is required', 'fluent-support'));
         }
 
-        $tagIds = $request->getSafe('tag_ids', null, []);
+        $tagIds = $request->get('tag_ids', null);
         if (!is_array($tagIds)) {
             $tagIds = [];
         }

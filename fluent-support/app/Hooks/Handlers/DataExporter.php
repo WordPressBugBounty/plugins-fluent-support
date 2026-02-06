@@ -17,7 +17,9 @@ class DataExporter
         $from_date = $request->getSafe('from_date', 'sanitize_text_field');
         $to_date = $request->getSafe('to_date', 'sanitize_text_field');
         $columns = $request->get('columns', []);
+        $columns = is_array($columns) ? array_map('sanitize_text_field', $columns) : [];
         $agents = $request->get('agents', []);
+        $agents = is_array($agents) ? array_map('intval', $agents) : [];
         if (empty($columns)) {
             $columns = Helper::getExportOptions();
         }

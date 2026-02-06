@@ -17,7 +17,7 @@ class PortalPolicy extends Policy
      */
     public function verifyRequest(Request $request)
     {
-        if ($request->getSafe('on_behalf', 'sanitize_text_field')) {
+        if ($request->get('on_behalf')) {
             return PermissionManager::currentUserCan('fst_sensitive_data') || PermissionManager::currentUserCan('fst_manage_other_tickets');
         }
 

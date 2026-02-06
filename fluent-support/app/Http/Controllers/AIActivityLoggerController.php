@@ -17,12 +17,15 @@ class AIActivityLoggerController extends Controller
     public function getAIActivities(Request $request)
     {
         try {
+            $filters = $request->get('filters', null);
+            $filters = is_array($filters) ? map_deep($filters, 'sanitize_text_field') : [];
+
             return Helper::getAIActivities( [
                 'page' => $request->getSafe('page', 'intval', 1),
                 'per_page' => $request->getSafe('per_page', 'intval', 10),
                 'from' => $request->getSafe('from', 'sanitize_text_field', ''),
                 'to'   => $request->getSafe('to', 'sanitize_text_field', ''),
-                'filters' => $request->getSafe('filters', null, []),
+                'filters' => $filters,
             ] );
         } catch (\Exception $e) {
             return $this->sendError([
@@ -37,7 +40,8 @@ class AIActivityLoggerController extends Controller
      */
     public function updateSettings (Request $request)
     {
-        $settings = $request->getSafe('ai_activity_settings');
+        $settings = $request->get('ai_activity_settings', null);
+        $settings = is_array($settings) ? $settings : [];
         $settings = [
             'delete_days'  => intval($settings['delete_days'] ?? 0),
             'disable_logs' => sanitize_text_field($settings['disable_logs'] ?? '')

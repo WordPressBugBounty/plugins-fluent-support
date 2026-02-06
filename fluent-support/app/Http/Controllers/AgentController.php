@@ -37,13 +37,19 @@ class AgentController extends Controller
      */
     public function addAgent(AgentCreateRequest $request, Agent $agent)
     {
+        $permissions = $request->get('permissions', null);
+        $permissions = is_array($permissions) ? array_map('sanitize_key', $permissions) : [];
+
+        $restrictions = $request->get('restrictions', null);
+        $restrictions = $this->sanitizeRestrictions($restrictions);
+
         $data = [
             'email' => $request->getSafe('email', 'sanitize_email'),
             'first_name' => $request->getSafe('first_name', 'sanitize_text_field'),
             'last_name' => $request->getSafe('last_name', 'sanitize_text_field'),
             'title' => $request->getSafe('title', 'sanitize_text_field'),
-            'permissions' => $request->getSafe('permissions', null, []),
-            'restrictions' => $request->getSafe('restrictions', null, []),
+            'permissions' => $permissions,
+            'restrictions' => $restrictions,
         ];
 
         try {
@@ -71,15 +77,21 @@ class AgentController extends Controller
     {
         $agent = $agent::findOrFail($agent_id);
 
+        $permissions = $request->get('permissions', null);
+        $permissions = is_array($permissions) ? array_map('sanitize_key', $permissions) : [];
+
+        $restrictions = $request->get('restrictions', null);
+        $restrictions = $this->sanitizeRestrictions($restrictions);
+
         $data = [
             'first_name' => $request->getSafe('first_name', 'sanitize_text_field'),
             'last_name' => $request->getSafe('last_name', 'sanitize_text_field'),
             'title' => $request->getSafe('title', 'sanitize_text_field'),
-            'permissions' => $request->getSafe('permissions', null, []),
+            'permissions' => $permissions,
             'telegram_chat_id' => $request->getSafe('telegram_chat_id', 'sanitize_text_field'),
             'slack_user_id' => $request->getSafe('slack_user_id', 'sanitize_text_field'),
             'whatsapp_number' => $request->getSafe('whatsapp_number', 'sanitize_text_field'),
-            'restrictions' => $request->getSafe('restrictions', null, []),
+            'restrictions' => $restrictions,
         ];
 
         if (!$agent->user_id && ($user = get_user_by('email', $agent->email))) {
@@ -138,7 +150,8 @@ class AgentController extends Controller
         try {
             $stats = StatModule::getAgentStat($agent->id); //Get ticket statistics
 
-            $with = $request->getSafe('with');
+            $with = $request->get('with', []);
+            $with = is_array($with) ? map_deep($with, 'sanitize_text_field') : [];
 
             $response = (new Agent())->getAgentStat($stats, $with, $agent->id);
 
@@ -220,5 +233,36 @@ class AgentController extends Controller
         return [
             'ping' => 'pong'
         ];
+    }
+
+    /**
+     * Sanitize restrictions data for agent
+     *
+     * @param mixed $restrictions
+     * @return array
+     */
+    private function sanitizeRestrictions($restrictions)
+    {
+        if (!is_array($restrictions)) {
+            return [
+                'restrictedBusinessBoxes' => [],
+                'businessBoxRestrictions' => false,
+            ];
+        }
+
+        $restrictedBusinessBoxes = isset($restrictions['restrictedBusinessBoxes']) && is_array($restrictions['restrictedBusinessBoxes'])
+            ? array_map('absint', $restrictions['restrictedBusinessBoxes'])
+            : [];
+
+        $businessBoxRestrictions = isset($restrictions['businessBoxRestrictions'])
+            ? rest_sanitize_boolean($restrictions['businessBoxRestrictions'])
+            : false;
+
+        $result = [
+            'restrictedBusinessBoxes' => $restrictedBusinessBoxes,
+            'businessBoxRestrictions' => $businessBoxRestrictions,
+        ];
+
+        return $result;
     }
 }

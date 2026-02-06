@@ -144,7 +144,7 @@ class TicketService
             $queryArgs['simple_filters'] = Arr::get($data, 'filters', []);
             $queryArgs['search'] = trim(Arr::get($data, 'search', ''));
             if ($customerId = Arr::get($data, 'customer_id')) {
-                $queryArgs['customer_id'] = $customerId;
+                $queryArgs['customer_id'] = intval($customerId);
             }
         }
 

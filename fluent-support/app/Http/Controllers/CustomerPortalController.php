@@ -28,7 +28,13 @@ class CustomerPortalController extends Controller
     public function getTickets(Request $request)
     {
 
-        $onBehalf = $request->getSafe('on_behalf', 'sanitize_text_field');
+        $onBehalf = $request->get('on_behalf', []);
+        if ($onBehalf) {
+            $onBehalf = array_map(function ($item) {
+                return sanitize_text_field($item);
+            }, $onBehalf);
+        }
+
         $userIP = $request->getIp();
         $requestedStatus = $request->getSafe('filter_type', 'sanitize_text_field');
         $ticketOptions = $request->getSafe([
@@ -44,9 +50,9 @@ class CustomerPortalController extends Controller
             return [
                 'tickets' => [
                     'data'         => [],
-                    'current_page' => $request->get('page', 1),
+                    'current_page' => $request->getSafe('page', 'intval', 1),
                     'last_page'    => 1,
-                    'per_page'     => $request->get('per_page', 10),
+                    'per_page'     => $request->getSafe('per_page', 'intval', 10),
                     'total'        => 0,
                     'from'         => null,
                     'to'           => null
@@ -142,10 +148,13 @@ class CustomerPortalController extends Controller
             $defaultData['ticket_client_priority'] = $request->getSafe('client_priority', 'sanitize_text_field');
         }
 
+        $customData = $request->get('custom_data', []);
+        $customData = is_array($customData) ? map_deep($customData, 'sanitize_text_field') : [];
+
         $dataRules = $this->app->applyCustomFilters('custom_field_required_by_conditions_before_ticket_create', [
             'required_fields' => $dataRules['required_fields'],
             'error_messages'  => $dataRules['error_messages'],
-            'custom_data'     => $request->get('custom_data', []),
+            'custom_data'     => $customData,
             'default_data'    => $defaultData
         ]);
 
@@ -161,8 +170,18 @@ class CustomerPortalController extends Controller
         $data['title'] = sanitize_text_field($data['title']);
         $data['content'] = wp_kses_post($data['content']);
 
-        $onBehalf = $request->getSafe('on_behalf', 'sanitize_text_field');
+        $onBehalf = $request->get('on_behalf', []);
         $userIP = $request->getIp();
+
+        if ($onBehalf) {
+            $onBehalf = array_map(function ($item) {
+                return sanitize_text_field($item);
+            }, $onBehalf);
+
+            if (!empty($onBehalf['last_ip_address'])) {
+                $userIP = $onBehalf['last_ip_address'];
+            }
+        }
 
         try {
             $customer = (new CustomerPortalService())->resolveCustomer($onBehalf, $userIP, true);
@@ -374,9 +393,17 @@ class CustomerPortalController extends Controller
 
     private function getCustomerAdditionalData($request)
     {
+
+        $onBehalf = $request->get('on_behalf', []);
+        if ($onBehalf) {
+            $onBehalf = array_map(function ($item) {
+                return sanitize_text_field($item);
+            }, $onBehalf);
+        }
+
         $customerAdditionalData = [
             'intended_ticket_hash' => $request->getSafe('intended_ticket_hash', 'sanitize_text_field'),
-            'on_behalf'            => $request->getSafe('on_behalf', 'sanitize_text_field'),
+            'on_behalf'            => $onBehalf,
             'user_ip'              => $request->getIp()
         ];
 

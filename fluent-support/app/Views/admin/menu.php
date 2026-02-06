@@ -49,7 +49,6 @@
                                 <?php if($item['key'] === 'settings'): ?>
                                     <img src="<?php echo esc_url($settingsLogo); ?>" alt="Settings" width="20" height="20" />
                                 <?php elseif($item['key'] === 'upgrade_to_pro'): ?>
-                                    <img src="<?php echo esc_url($upgradeLogo); ?>" alt="Settings" width="20" height="20" />
                                     <?php echo esc_attr($item['label']); ?>
                                 <?php else: ?>
                                     <?php echo esc_attr($item['label']); ?>

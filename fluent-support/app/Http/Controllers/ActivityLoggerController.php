@@ -22,12 +22,15 @@ class ActivityLoggerController extends Controller
     public function getActivities (Request $request, Activity $activity)
     {
         try {
+            $filters = $request->get('filters', null);
+            $filters = is_array($filters) ? map_deep($filters, 'sanitize_text_field') : [];
+
             return $activity->getActivities( [
                 'page' => $request->getSafe('page', 'intval', 1),
                 'per_page' => $request->getSafe('per_page', 'intval', 10),
                 'from' => $request->getSafe('from', 'sanitize_text_field', ''),
                 'to'   => $request->getSafe('to', 'sanitize_text_field', ''),
-                'filters' => $request->getSafe('filters', null, []),
+                'filters' => $filters,
             ] );
         } catch (\Exception $e) {
             return $this->sendError([
@@ -44,7 +47,7 @@ class ActivityLoggerController extends Controller
     {
         try {
             // Get raw array - do not use sanitize_text_field on the whole object (it would turn array into empty string)
-            $raw = $request->getSafe('activity_settings', null, []);
+            $raw = $request->get('activity_settings', null);
             $settings = is_array($raw) ? $raw : [];
             $settings = [
                 'delete_days'         => isset($settings['delete_days']) ? intval($settings['delete_days']) : 14,

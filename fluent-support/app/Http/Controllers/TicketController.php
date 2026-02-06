@@ -53,7 +53,7 @@ class TicketController extends Controller
             'request'     => $sanitizedRequest
         ];
 
-        $withPortalSettings = $request->getSafe('with_portal_settings');
+        $withPortalSettings = $request->getSafe('with_portal_settings', 'sanitize_text_field');
 
         return $profileInfoService->me($settings, $withPortalSettings);
     }
@@ -121,13 +121,15 @@ class TicketController extends Controller
     public function getTicket(Request $request, Ticket $ticket, $ticket_id)
     {
         try {
-            $ticketWith = $request->getSafe('with', 'sanitize_text_field');
+            $ticketWith = $request->get('with');
+            $ticketWith = is_array($ticketWith) ? map_deep($ticketWith, 'sanitize_text_field') : null;
+
             if (!$ticketWith) {
                 $ticketWith = ['customer', 'agent', 'product', 'mailbox', 'tags', 'attachments' => function ($q) {
                     $q->whereIn('status', ['active', 'inline']);
                 }];
             }
-            $withData = $request->getSafe('with_data', null, []);
+            $withData = $request->get('with_data', null);
             $withDataArray = is_array($withData) ? map_deep($withData, 'sanitize_text_field') : [];
             $withCrmData = in_array('fluentcrm_profile', $withDataArray);
 
@@ -240,7 +242,7 @@ class TicketController extends Controller
     public function closeTicket(Ticket $ticket, $ticket_id)
     {
         try {
-            return $ticket->closeTicket($ticket_id, $this->request->getSafe('close_ticket_silently'));
+            return $ticket->closeTicket($ticket_id, $this->request->getSafe('close_ticket_silently', 'rest_sanitize_boolean'));
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage());
         }
@@ -381,7 +383,7 @@ class TicketController extends Controller
     public function approveDraftResponse(TicketResponseRequest $request, Conversation $conversation, $ticket_id, $response_id)
     {
         $data = [
-            'content' => $request->getSafe('content', 'sanitize_text_field')
+            'content' => $request->getSafe('content', 'wp_kses_post')
         ];
         $conversationType = 'response';
 

@@ -59,7 +59,8 @@ class SettingsController extends Controller
     public function saveSettings(Request $request)
     {
         $settingsKey = $request->getSafe('settings_key', 'sanitize_text_field');
-        $settings = wp_unslash($request->getSafe('settings', null, []));
+        $settings = wp_unslash($request->get('settings', null));
+        $settings = is_array($settings) ? map_deep($settings, 'sanitize_text_field') : [];
         (new Settings)->save($settingsKey, $settings);
 
         return [
@@ -86,14 +87,25 @@ class SettingsController extends Controller
      */
     public function setupPortal(Request $request)
     {
-        $mailbox = $request->getSafe('mailbox');
+        $mailbox = $request->get('mailbox', null);
+        $mailbox = is_array($mailbox) ? [
+            'name'     => isset($mailbox['name']) ? sanitize_text_field($mailbox['name']) : '',
+            'email'    => isset($mailbox['email']) ? sanitize_email($mailbox['email']) : '',
+            'box_type' => isset($mailbox['box_type']) ? sanitize_key($mailbox['box_type']) : '',
+            'is_default' => isset($mailbox['is_default']) ? sanitize_text_field($mailbox['is_default']) : 'yes',
+        ] : [];
+
         $this->validate($mailbox, [
             'name'     => 'required',
             'email'    => 'required|email',
             'box_type' => 'required'
         ]);
 
-        $settings = $request->getSafe('global_settings');
+        $settings = $request->get('global_settings', null);
+        $settings = is_array($settings) ? [
+            'create_portal_page' => isset($settings['create_portal_page']) ? sanitize_text_field($settings['create_portal_page']) : 'no',
+            'portal_page_id'     => isset($settings['portal_page_id']) ? intval($settings['portal_page_id']) : 0,
+        ] : [];
 
         $createPage = $settings['create_portal_page'] == 'yes';
 
@@ -742,7 +754,7 @@ class SettingsController extends Controller
         $data = [
             'generalApiKey'    => $request->getSafe('generalApiKey', 'sanitize_text_field'),
             'generalBotId'     => $request->getSafe('generalBotId', 'sanitize_text_field'),
-            'isEnabled'        => $request->getSafe('isEnabled', 'sanitize_text_field'),
+            'isEnabled'        => $request->getSafe('isEnabled', 'rest_sanitize_boolean'),
             'productMappings'  => []
         ];
 

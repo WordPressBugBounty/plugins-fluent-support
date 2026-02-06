@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,11 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.0.1 (Date: February 06, 2026) =
+* Improved onboarding completion UI and post-onboarding navigation
+* Improved sanitization and validation handling
+* Fixed Saved Replies modal showing stale content when editing
 
 = 2.0.0 (Date: February 05, 2026) =
 * Complete admin interface redesign with a modern layout.

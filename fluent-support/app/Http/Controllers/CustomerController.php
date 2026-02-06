@@ -50,7 +50,10 @@ class CustomerController extends Controller
      */
     public function getCustomer(Request $request, Customer $customer, $customer_id)
     {
-        return $customer->getCustomer($customer_id, $request->getSafe('with',null,[]));
+        $with = $request->get('with', null);
+        $with = is_array($with) ? array_map('sanitize_key', $with) : [];
+
+        return $customer->getCustomer($customer_id, $with);
     }
 
     /**
@@ -211,12 +214,21 @@ class CustomerController extends Controller
      */
     public function bulkDelete(Request $request, Customer $customer)
     {
-        $this->validate($request->get(), [
+        // Get and sanitize customer_ids before validation
+        $customerIds = $request->get('customer_ids', []);
+        $customerIds = is_array($customerIds) ? array_map('intval', $customerIds) : [];
+
+        // Filter out any zero values (from invalid input)
+        $customerIds = array_filter($customerIds, function ($id) {
+            return $id > 0;
+        });
+
+        $this->validate(['customer_ids' => $customerIds], [
             'customer_ids' => 'required|array|min:1',
             'customer_ids.*' => 'required|integer|exists:fs_persons,id'
         ]);
 
-        return $customer->bulkDeleteCustomers($request->get('customer_ids'));
+        return $customer->bulkDeleteCustomers($customerIds);
     }
 
     /**

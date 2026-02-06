@@ -18,6 +18,28 @@ use FluentSupport\App\Models\Conversation;
  */
 class ReportingController extends Controller
 {
+    private static function getSanitizedDateRange(Request $request)
+    {
+        $dateRange = $request->get('date_range', []);
+
+        if (is_array($dateRange) && count($dateRange) >= 2) {
+            return [
+                sanitize_text_field($dateRange[0] ?? ''),
+                sanitize_text_field($dateRange[1] ?? '')
+            ];
+        }
+
+        if (is_string($dateRange)) {
+            $parts = array_map('trim', explode(',', $dateRange));
+            return [
+                sanitize_text_field($parts[0] ?? ''),
+                sanitize_text_field($parts[1] ?? '')
+            ];
+        }
+
+        return ['', ''];
+    }
+
     /**
      * getOverallReports method will return the overall statistics of all ticket by ticket statuses
      * The response will have an array with ticket number by ticket status
@@ -46,7 +68,7 @@ class ReportingController extends Controller
      */
     public function getTicketsChart(Request $request, Reporting $reporting)
     {
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         $filter = [
             'agent_id' => $request->getSafe('agent_id', 'intval') ?: null,
@@ -70,7 +92,7 @@ class ReportingController extends Controller
     public static function getResolveChart(Request $request, Reporting $reporting): array
     {
         $type = $request->getSafe('type', 'sanitize_text_field');
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         $filter = [
             'agent_id' => $request->getSafe('agent_id', 'intval') ?: null,
@@ -93,7 +115,7 @@ class ReportingController extends Controller
      */
     public function getResponseChart(Request $request, Reporting $reporting)
     {
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
         $filter = [];
         $stats = $reporting->getResponseGrowth($from, $to);
 
@@ -145,7 +167,7 @@ class ReportingController extends Controller
     public static function getResponseGrowthChart(Request $request,Reporting $reporting): array
     {
         $type = $request->getSafe('type', 'sanitize_text_field');
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         $filter = [
             'product_id' => $request->getSafe('product_id', 'intval') ?: null,
@@ -198,7 +220,7 @@ class ReportingController extends Controller
     {
         //Get logged in agent information
         $agent =  Helper::getAgentByUserId(get_current_user_id());
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         return [
             'stats' => $reporting->getTicketResolveGrowth($from, $to, ['agent_id' => $agent->id])
@@ -214,7 +236,7 @@ class ReportingController extends Controller
     public function getAgentResponseChart(Request $request, Reporting $reporting)
     {
         $agent =  Helper::getAgentByUserId(get_current_user_id());
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         return [
             'stats' => $reporting->getResponseGrowth($from, $to, ['person_id' => $agent->id])
@@ -239,7 +261,7 @@ class ReportingController extends Controller
 
     public function dayTimeStats(Reporting $reporting, Request $request)
     {
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         $filter = [
             'report_type' => $request->getSafe('report_type', 'sanitize_text_field') ?: null,
@@ -256,7 +278,7 @@ class ReportingController extends Controller
     public function ticketResponseStats(Reporting $reporting, Request $request)
     {
 
-        list($from, $to) = $request->getSafe('date_range', 'sanitize_text_field') ?: ['', ''];
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         $filter = [
             'person_type' => $request->getSafe('person_type', 'sanitize_text_field') ?: null,
@@ -275,17 +297,7 @@ class ReportingController extends Controller
      */
     public function getStats(Request $request)
     {
-        $dateRange = $request->get('date_range');
-        $from = $to = '';
-
-        if (is_array($dateRange) && count($dateRange) >= 2) {
-            $from = sanitize_text_field($dateRange[0] ?? '');
-            $to = sanitize_text_field($dateRange[1] ?? '');
-        } elseif (is_string($dateRange)) {
-            $parts = array_map('trim', explode(',', $dateRange));
-            $from = sanitize_text_field($parts[0] ?? '');
-            $to = sanitize_text_field($parts[1] ?? '');
-        }
+        list($from, $to) = self::getSanitizedDateRange($request);
 
         $filters = [
             'mailbox_id' => $request->getSafe('mailbox_id', 'intval') ?: $request->getSafe('business_box', 'intval'),
