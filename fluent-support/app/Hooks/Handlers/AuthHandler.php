@@ -216,6 +216,7 @@ class AuthHandler
     public function authForm($attributes)
     {
         if (get_current_user_id()) {
+            // translators: %s is the URL to the support portal
             return '<p>' . sprintf(__('You are already logged in. <a href="%s">Go to support portal</a>', 'fluent-support'), Helper::getPortalBaseUrl()) . '</p>';
         }
 
@@ -267,9 +268,9 @@ class AuthHandler
     private function renderTextInput($fieldName, $field)
     {
         $inputAtts = array_filter([
-            'type'        => esc_attr(Arr::get($field, 'type')),
-            'id'          => esc_attr(Arr::get($field, 'id')),
-            'placeholder' => esc_attr(Arr::get($field, 'placeholder')),
+            'type'        => esc_attr(Arr::get($field, 'type', '')),
+            'id'          => esc_attr(Arr::get($field, 'id', '')),
+            'placeholder' => esc_attr(Arr::get($field, 'placeholder', '')),
             'name'        => esc_attr($fieldName),
             'required'    => Arr::get($field, 'required') ? 'required' : '',
         ]);
@@ -303,7 +304,7 @@ class AuthHandler
         }
 
         $selectAtts = [
-            'id' => esc_attr(Arr::get($field, 'id')),
+            'id' => esc_attr(Arr::get($field, 'id', '')),
             'name' => esc_attr($fieldName),
             'required' => Arr::get($field, 'required') ? 'required' : '',
         ];
@@ -533,12 +534,16 @@ class AuthHandler
 
         $app = App::getInstance();
         $assets = $app['url.assets'];
-        wp_enqueue_style('fluent_support_login_style', $assets . 'admin/css/all_public.css', [], FLUENT_SUPPORT_VERSION);
+
+        $rtlSuffix = is_rtl() ? '-rtl' : '';
+        $rtlSuffixHandler = $rtlSuffix ? '_rtl' : '';
+        wp_enqueue_style('fluent_support_login_style' . $rtlSuffixHandler, $assets . 'admin/css/all_public' . $rtlSuffix . '.css', [], FLUENT_SUPPORT_VERSION);
+
         wp_enqueue_script('fluent_support_login_helper', $assets . 'portal/js/login_helper.js', [], FLUENT_SUPPORT_VERSION);
 
         //Get Recaptcha settings and enqueue recaptcha script
         $reCaptchaSettingsData = Meta::where('object_type', '_fs_recaptcha_settings')->first();
-        $reCaptchaData = ($reCaptchaSettingsData) ? maybe_unserialize($reCaptchaSettingsData->value, []) : '';
+        $reCaptchaData = ($reCaptchaSettingsData) ? Helper::safeUnserialize($reCaptchaSettingsData->value, []) : '';
 
         if (!empty($reCaptchaData) && isset($reCaptchaData['is_enabled']) && $reCaptchaData['is_enabled'] == "true") {
             unset($reCaptchaData['secretKey']);

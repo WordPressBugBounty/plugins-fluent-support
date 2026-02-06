@@ -15,6 +15,20 @@ class Model extends BaseModel
 
     public function getPerPage()
     {
-        return (isset($_REQUEST['per_page'])) ? intval($_REQUEST['per_page']) : 15;
+        if (!isset($_REQUEST['per_page'])) {
+            return 15;
+        }
+
+        if (isset($_REQUEST['nonce'])) {
+            $nonceAction = (defined('REST_REQUEST') && REST_REQUEST) ? 'wp_rest' : 'fluent-support';
+            
+            if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), $nonceAction)) {
+                return 15;
+            }
+        } elseif (is_admin() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+            return intval(sanitize_text_field(wp_unslash($_REQUEST['per_page']))) ?? 15;
+        }
+
+        return intval(sanitize_text_field(wp_unslash($_REQUEST['per_page'])));
     }
 }

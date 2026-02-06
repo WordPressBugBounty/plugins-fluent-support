@@ -87,7 +87,7 @@ class DataExporter
     {
         $permission = 'fst_view_all_reports';
 
-        if ( ! isset($_REQUEST['_wpnonce']) || ! wp_verify_nonce($_REQUEST['_wpnonce'], 'fluent-support') ) {
+        if ( ! isset($_REQUEST['_wpnonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'fluent-support') ) {
             wp_die('Security check failed');
         }
 

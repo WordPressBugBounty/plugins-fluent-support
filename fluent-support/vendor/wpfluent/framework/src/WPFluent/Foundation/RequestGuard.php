@@ -3,11 +3,19 @@
 namespace FluentSupport\Framework\Foundation;
 
 use FluentSupport\Framework\Foundation\App;
-use FluentSupport\Framework\Validator\Validator;
 use FluentSupport\Framework\Validator\ValidationException;
 
+/**
+ * @property \FluentSupport\Framework\Http\Request\Request $request
+ */
 abstract class RequestGuard
 {
+    /**
+     * The request instance.
+     * @var \FluentSupport\Framework\Http\Request\Request
+     */
+    protected $request;
+
     /**
      * Retrive the validation rules
      * @return array
@@ -39,7 +47,7 @@ abstract class RequestGuard
      * Allow the developer tinker with data after the validation.
      * @return array
      */
-    public function afterValidation()
+    public function afterValidation($validator)
     {
         return [];
     }
@@ -50,42 +58,67 @@ abstract class RequestGuard
      * @param  array $rules Optional
      * @param  array $messages Optional
      * @return array Request Data
-     * @throws FluentSupport\Framework\Validator\ValidationException
+     * @throws \FluentSupport\Framework\Validator\ValidationException
      */
     public function validate($rules = [], $messages = [])
     {
         try {
-            return App::make('request')->validate(
+            return $this->request->validate(
                 $rules ?: (array) $this->rules(),
                 $messages ?: (array) $this->messages()
             );
         } catch (ValidationException $e) {
+            
+            $validator = App::make('validator');
+            
+            $validator->addError($e->errors());
 
-            if (defined('REST_REQUEST') && REST_REQUEST) {
+            if (!($errors = $validator->errors())) {
+                return $this->afterValidation($validator);
+            }
+
+            $e = new ValidationException(
+                'Unprocessable Entity!', 422, null, $e->errors()
+            );
+
+            if ($this->shouldThrowException()) {
                 throw $e;
             } else {
-                App::getInstance()->doCustomAction('handle_exception', $e);
+                App::make()->doCustomAction('handle_exception', $e);
             }
         }
     }
 
     /**
+     * Check if exceptions should be thrown.
+     * 
+     * @return bool
+     */
+    protected function shouldThrowException()
+    {
+        $isTrue = $this->isRest();
+        $isTrue = $isTrue || str_contains('test', App::make()->env());
+        $isTrue = $isTrue || str_contains(strtolower(php_sapi_name()), 'cli');
+        return $isTrue;
+    }
+
+    /**
      * Handles validation including before and after calls
      *
-     * @throws FluentSupport\Framework\Validator\ValidationException
-     * @return null
+     * @throws \FluentSupport\Framework\Validator\ValidationException
+     * @return void
      */
     public static function applyValidation()
     {
         $instance = new static;
 
-        $request = App::getInstance('request');
+        $request = App::make('request');
 
         $request->merge($instance->beforeValidation());
 
         $instance->validate();
 
-        $request->merge($instance->afterValidation());
+        $request->merge($instance->afterValidation(App::make('validator')));
     }
 
     /**
@@ -100,6 +133,27 @@ abstract class RequestGuard
     }
 
     /**
+     * Set an input element to the request.
+     *
+     * @param  string $key
+     * @return mixed
+     */
+    public function __set($key, $value)
+    {
+        return $this->set($key, $value);
+    }
+
+    /**
+     * Set the request instance.
+     * 
+     * @param \FluentSupport\Framework\Http\Request\Request $request
+     */
+    public function setRequestInstance($request)
+    {
+        $this->request = $request;
+    }
+
+    /**
      * Handle the dynamic method calls
      * @param  string $method
      * @param  array $params
@@ -108,7 +162,7 @@ abstract class RequestGuard
     public function __call($method, $params)
     {
         return call_user_func_array(
-            [App::make('request'), $method], $params
+            [$this->request, $method], $params
         );
     }
 }

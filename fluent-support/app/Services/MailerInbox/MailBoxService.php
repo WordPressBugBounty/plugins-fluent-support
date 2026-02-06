@@ -39,7 +39,7 @@ class MailBoxService
     public function deleteMailBox($mailBoxId, $fallbackId )
     {
         if ( $mailBoxId == $fallbackId ) {
-            throw new \Exception('Fallback Box can not be the same as MailBox ID');
+            throw new \Exception(esc_html__('Fallback Box cannot be the same as MailBox ID', 'fluent-support'));
         }
 
         $box = MailBox::findOrFail($mailBoxId);
@@ -205,7 +205,7 @@ class MailBoxService
     public function getTickets ($filters, $boxId )
     {
         if (!$boxId) {
-            throw new \Exception('MailBox ID must be provided');
+            throw new \Exception(esc_html__('MailBox ID must be provided', 'fluent-support'));
         }
 
         $ticketsQuery = Ticket::getTicketsQuery();
@@ -233,11 +233,11 @@ class MailBoxService
     {
 
         if ($data['new_box_id'] == $mailBoxId) {
-            throw new \Exception('New Box can not be the same as MailBox ID');
+            throw new \Exception(esc_html__('New Box cannot be the same as MailBox ID', 'fluent-support'));
         }
 
         if ( $data['move_type'] == 'Custom' && empty($data['ticket_ids']) ) {
-            throw new \Exception('Invalid request submitted, Select ticket first');
+            throw new \Exception(esc_html__('Invalid request submitted. Please select a ticket first', 'fluent-support'));
         }
         $ticketIDs = $data['ticket_ids'];
         $newMailBoxId = (int)$data['new_box_id'];
@@ -258,7 +258,7 @@ class MailBoxService
                 $restrictedBoxes = array_map('intval', $restrictions['restrictedBusinessBoxes']);
 
                 if (in_array($newMailBoxId, $restrictedBoxes)) {
-                    throw new \Exception('Agent is restricted for this mailbox ticket');
+                    throw new \Exception(esc_html__('Agent is restricted for this mailbox ticket', 'fluent-support'));
                 }
             }
         }

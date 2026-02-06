@@ -27,9 +27,53 @@ class DataMetrixMigrator
                 `unassigned_tickets` INT(11) UNSIGNED NULL DEFAULT 0, /* For Global use case only */
                 `close_to_average` INT(11) UNSIGNED NULL DEFAULT 0, /* average close time of the tickets */
                 `created_at` TIMESTAMP NULL,
-                `updated_at` TIMESTAMP NULL
+                `updated_at` TIMESTAMP NULL,
+                INDEX `idx_stat_date` (`stat_date`),
+                INDEX `idx_agent_id` (`agent_id`),
+                INDEX `idx_data_type` (`data_type`)
             ) $charsetCollate;";
-            dbDelta($sql);
+            $created = dbDelta($sql);
+            return $created;
+        } else {
+            static::alterTable($table);
+        }
+
+        return false;
+    }
+
+    public static function alterTable($table) 
+    {
+        static::addMissingIndexes($table);
+    }
+
+    public static function addMissingIndexes($table)
+    {
+        global $wpdb;
+
+        // Escape table name
+        $table = esc_sql($table);
+
+        // Get existing indexes
+        $existing_indexes = $wpdb->get_results("SHOW INDEX FROM `$table`");
+        $existing_index_names = [];
+
+        foreach ($existing_indexes as $index) {
+            $existing_index_names[] = $index->Key_name;
+        }
+
+        // Desired indexes
+        $indexes = [
+            'idx_stat_date' => 'stat_date',
+            'idx_agent_id' => 'agent_id',
+            'idx_data_type' => 'data_type',
+        ];
+
+        // Add missing indexes
+        foreach ($indexes as $index_name => $column_name) {
+            if (!in_array($index_name, $existing_index_names)) {
+                $sql = "ALTER TABLE `$table` ADD INDEX `$index_name` (`$column_name`)";
+                $wpdb->query($sql);
+            }
         }
     }
 }

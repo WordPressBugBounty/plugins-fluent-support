@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') or die;
+
 /**
  * @var $router FluentSupport\Framework\Http\Router
  */
@@ -148,6 +150,7 @@ $router->prefix('reports')->withPolicy('ReportPolicy')->group(function ($router)
     $router->get('/agents-summary', 'ReportingController@getAgentsSummary');
     $router->get('/day-time-stats', 'ReportingController@dayTimeStats');
     $router->get('/ticket-response-stats', 'ReportingController@ticketResponseStats');
+    $router->get('/stats', 'ReportingController@getStats');
 });
 
 $router->prefix('my-reports')->withPolicy('AgentTicketPolicy')->group(function ($router) {
@@ -178,7 +181,10 @@ $router->prefix('customers')->withPolicy('AdminSensitivePolicy')->group(function
 
     $router->get('/{customer_id}', 'CustomerController@getCustomer')->int('customer_id');
     $router->put('/{customer_id}', 'CustomerController@update')->int('customer_id');
+
+    //We will remove this method.
     $router->delete('/{customer_id}', 'CustomerController@delete')->int('customer_id');
+    $router->delete('/bulk-delete', 'CustomerController@bulkDelete');
 
     $router->post('/profile_image/{customer_id}', 'CustomerController@addOrUpdateProfileImage')->int('customer_id');
     $router->post('/reset_avatar/{customer_id}', 'CustomerController@resetAvatar')->int('customer_id');
@@ -216,6 +222,7 @@ $router->prefix('public')->withPolicy('PublicPolicy')->group(function ($router) 
 $router->prefix('fluent-bot')->withPolicy('AgentTicketPolicy')->group(function ($router) {
     $router->get('/preset-prompts', 'FluentBotController@getPresetPrompts')->int('id');
     $router->post('/{id}/generate-response', 'FluentBotController@generateResponse')->int('id');
+    $router->post('/{id}/generate-stream-response', 'FluentBotController@generateStreamResponse')->int('id');
     $router->post('/{id}/get-ticket-summary', 'FluentBotController@getTicketSummary')->int('id');
     $router->post('/{id}/get-ticket-tone', 'FluentBotController@getTicketTone')->int('id');
 });

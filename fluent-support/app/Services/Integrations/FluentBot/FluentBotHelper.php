@@ -4,25 +4,28 @@ namespace FluentSupport\App\Services\Integrations\FluentBot;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Services\Integrations\FluentBot\FluentBotAPI;
 use FluentSupport\Framework\Support\Arr;
+use FluentSupport\App\Services\Helper;
 use WP_Error;
 class FluentBotHelper
 {
-    const BASE_URL = 'https://fluent-ai-backend.jewel-e68.workers.dev/fluent-bot';
+    const BASE_URL = 'https://beta.fluentbot.ai/ai';
 
     const ENDPOINTS = [
         'default' => '/responses',
-        'ticket_reply' => '/fs-chat-completion',
+        'ticket_reply' => '/chat/fs-completion',
     ];
 
-    public function generateResponse($prompt, $ticket, $productId, $previousAIResponse = '')
+    public function generateStreamResponse($prompt, $ticket, $productId, $conversationId = null)
     {
         $prompt = apply_filters('fluent_support/generate_response', $prompt, $ticket);
         $payload = [
             'ticket_conversation' => $this->getTicketMessages($ticket),
-            'messages' => $this->buildMessages($previousAIResponse, $prompt),
+            'source' => 'fluent_support',
+            'prompt' => $prompt,
+            'stream' => true,
+            'conversation_id' => $conversationId ?? null,
         ];
-
-        return $this->makeAPICall($payload, $prompt, $ticket->id,'ticket_reply', $productId);
+        return $this->makeStreamAPICall($payload, $prompt, $ticket->id, 'ticket_reply', $productId);
     }
 
     public function modifyResponse($prompt, $selectedText, $ticketId)
@@ -84,12 +87,40 @@ class FluentBotHelper
             return $credentials;
         }
 
-        $payload['botId'] = $credentials['botId'];
+        // Use bot_id instead of botId for the new API
+        $payload['bot_id'] = $credentials['botId'];
 
         $api = new FluentBotAPI($credentials['apiKey'], $apiUrl);
-        return $api->makeRequest($ticketId, $payload, $prompt);
+        $result = $api->makeRequest($ticketId, $prompt, $payload);
+
+        // For ticket_reply endpoint, return the full result with conversation_id
+        // For other endpoints, return just the content for backward compatibility
+        if ($type === 'ticket_reply' && is_array($result) && isset($result['content'])) {
+            return $result;
+        } elseif (is_array($result) && isset($result['content'])) {
+            return $result['content'];
+        }
+
+        return $result;
     }
 
+    private function makeStreamAPICall(array $payload, string $prompt, int $ticketId, string $type = 'default', $productId = null)
+    {
+        $apiUrl = static::BASE_URL . static::ENDPOINTS[$type];
+
+        $credentials = $this->resolveApiCredentials($productId);
+
+        if (is_wp_error($credentials)) {
+            echo "data: " . json_encode(['error' => $credentials->get_error_message()]) . "\n\n";
+            return;
+        }
+
+        // Use bot_id instead of botId for the new API
+        $payload['bot_id'] = $credentials['botId'];
+
+        $api = new FluentBotAPI($credentials['apiKey'], $apiUrl);
+        $api->makeStreamRequest($ticketId, $prompt, $payload);
+    }
 
     private function resolveApiCredentials($productId)
     {
@@ -99,7 +130,7 @@ class FluentBotHelper
             'key'         => '_fs_fluent_bot_config'
         ])->first();
 
-        $config = $meta ? unserialize($meta->value) : [];
+        $config = $meta ? Helper::safeUnserialize($meta->value) : [];
 
         $apiKey = $config['generalApiKey'] ?? '';
         $botId = $config['generalBotId'] ?? '';
@@ -114,10 +145,10 @@ class FluentBotHelper
             }
         }
 
-        if (!$apiKey || !$botId) {
+        if (!$botId) {
             return new \WP_Error(
                 'missing_bot_credentials',
-                __('API Key and Bot ID are not set for this product.', 'fluent-support')
+                __('Bot ID is not set for this product.', 'fluent-support')
             );
         }
 
@@ -134,13 +165,13 @@ class FluentBotHelper
 
         if (!empty($ticketArray['content'])) {
             $messages[] = [
-                'role' => 'Customer',
+                'role' => 'customer',
                 'message' => $this->cleanText($ticketArray['content']),
             ];
         }
 
         foreach (Arr::get($ticketArray, 'responses', []) as $response) {
-            $role = Arr::get($response, 'person.person_type') === 'customer' ? 'Customer' : 'Support Agent';
+            $role = Arr::get($response, 'person.person_type') === 'customer' ? 'customer' : 'support_agent';
             $messages[] = [
                 'role' => $role,
                 'message' => $this->cleanText(Arr::get($response, 'content', '')),
@@ -173,20 +204,7 @@ class FluentBotHelper
         return $messages;
     }
 
-    private function buildMessages(string $previousAIResponse = '', string $prompt = ''): array
-    {
-        $messages = [];
 
-        if ($previousAIResponse) {
-            $messages[] = ['role' => 'ai', 'message' => $previousAIResponse];
-        }
-
-        if ($prompt) {
-            $messages[] = ['role' => 'human', 'message' => $prompt];
-        }
-
-        return $messages;
-    }
 
     private function cleanText(string $text): string
     {

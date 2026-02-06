@@ -69,8 +69,7 @@ class TicketQueryService
             }
         }
 
-        $ticketsQuery->orderBy($this->args['sort_by'], $this->args['sort_type']);
-
+        $ticketsQuery->orderBy(sanitize_sql_orderby($this->args['sort_by']), sanitize_sql_orderby($this->args['sort_type']));
         do_action_ref_array('fluent_support\main_tickets_query', [&$ticketsQuery, $this->args]);
         $this->model = $ticketsQuery;
     }
@@ -112,17 +111,18 @@ class TicketQueryService
             $group = [];
             //$filterItem is individual item under a group(And/OR)
             foreach ($filterGroup as $filterItem) {
-                if (count($filterItem['source']) != 2 || empty($filterItem['source'][0]) || empty($filterItem['source'][1]) || empty($filterItem['operator'])) {
+                $source = $filterItem['source'] ?? [];
+                if (!is_array($source) || count($source) != 2 || empty($source[0]) || empty($source[1]) || empty($filterItem['operator'])) {
                     continue;
                 }
 
-                $provider = $filterItem['source'][0];
+                $provider = $source[0];
 
                 if (!isset($group[$provider])) {
                     $group[$provider] = [];
                 }
 
-                $property = $filterItem['source'][1];
+                $property = $source[1];
 
                 $group[$provider][] = [
                     'property' => $property,

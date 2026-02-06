@@ -66,7 +66,7 @@ class SupportCandyTickets extends BaseImporter
         ];
 
         if (!$hasMore) {
-            $response['message'] = __('All tickets has been importer successfully', 'fluent-support');
+            $response['message'] = __('All tickets have been imported successfully', 'fluent-support');
             update_option('_fs_migrate_support_candy', current_time('mysql'), 'no');
         }
 
@@ -305,7 +305,7 @@ class SupportCandyTickets extends BaseImporter
 
         return [
             'has_more' => false,
-            'message'  => __('All Support Candy Tickets and associated data has been deleted. You may now deactivate Support Candy Plugin and start using Fluent Support', 'fluent-support')
+            'message'  => __('All Support Candy Tickets and associated data have been deleted. You may now deactivate Support Candy Plugin and start using Fluent Support', 'fluent-support')
         ];
     }
 }

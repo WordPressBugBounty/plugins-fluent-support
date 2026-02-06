@@ -9,7 +9,7 @@ use FluentSupport\App\Models\Product;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\Database\Migrations\AIActivityLogsMigrator;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Hooks\Handlers\ReCaptchaHandler;
 
 /**
@@ -43,7 +43,7 @@ class SettingsController extends Controller
         $settings = Meta::where('object_type', 'integration_settings')->get();
         $integrationSettings = [];
         foreach ($settings as $index => $setting) {
-            $data = maybe_unserialize($setting->value);
+            $data = Helper::safeUnserialize($setting->value);
             if (!empty($data['status']) && $data && $data['status'] == 'yes') {
                 $integrationSettings[] = $setting->key;
             }
@@ -236,7 +236,7 @@ class SettingsController extends Controller
 
     public function setupInstallation(Request $request)
     {
-        $installFluentForm = $request->get('install_fluentform', 'no');
+        $installFluentForm = $request->getSafe('install_fluentform', 'sanitize_text_field', 'no');
 
         if ($installFluentForm == 'yes' && !defined('FLUENTFORM')) {
             $this->installFluentForm();
@@ -260,7 +260,7 @@ class SettingsController extends Controller
 
     public function saveReCaptchaSettings(Request $request)
     {
-        $data = $request->get('reCaptcha');
+        $data = $request->getSafe('reCaptcha', 'sanitize_text_field');
 
         if ('clear-reCaptcha-settings' == $data) {
             if (Meta::where('object_type', '_fs_recaptcha_settings')->delete()) {
@@ -320,10 +320,9 @@ class SettingsController extends Controller
 
     public function saveOpenAISettings(Request $request)
     {
-        $data = $request->get();
         $data = [
-            'api_key' => sanitize_text_field($data['api_key']),
-            'model' => sanitize_text_field($data['model']),
+            'api_key' => $request->getSafe('api_key', 'sanitize_text_field', ''),
+            'model' => $request->getSafe('model', 'sanitize_text_field', ''),
         ];
 
         $response = Helper::authorizeChatGPTAPIKey($data);
@@ -384,7 +383,7 @@ class SettingsController extends Controller
     {
         $chatGPTSettingsData = Meta::where('object_type', '_fs_openai_settings')->first();
         if ($chatGPTSettingsData) {
-            $settings = maybe_unserialize($chatGPTSettingsData->value);
+            $settings = Helper::safeUnserialize($chatGPTSettingsData->value);
             return $this->sendSuccess($settings);
         }
 
@@ -395,7 +394,7 @@ class SettingsController extends Controller
     {
         $reCaptchaSettingsData = Meta::where('object_type', '_fs_recaptcha_settings')->first();
         if ($reCaptchaSettingsData) {
-            $settings = maybe_unserialize($reCaptchaSettingsData->value);
+            $settings = Helper::safeUnserialize($reCaptchaSettingsData->value);
             return $this->sendSuccess($settings);
         }
 
@@ -493,16 +492,16 @@ class SettingsController extends Controller
             ]);
         }
 
-        $plugin_id = 'fluent-crm';
+        $plugin_id = 'fluentform';
         $plugin = [
-            'name'      => 'Fluent CRM',
-            'repo-slug' => 'fluent-crm',
-            'file'      => 'fluent-crm.php',
+            'name'      => 'Fluent Forms',
+            'repo-slug' => 'fluentform',
+            'file'      => 'fluentform.php',
         ];
 
         $this->backgroundInstaller($plugin, $plugin_id);
 
-        if (defined('FLUENTCRM')) {
+        if (defined('FLUENTFORM')) {
             return [
                 'is_installed' => true,
                 'message'      => __('Fluent Forms plugin has been installed and activated successfully', 'fluent-support')
@@ -718,7 +717,7 @@ class SettingsController extends Controller
             'key'         => '_fs_fluent_bot_config'
         ])->first();
 
-        $settings = $meta ? maybe_unserialize($meta->value) : [];
+        $settings = $meta ? Helper::safeUnserialize($meta->value) : [];
 
         $productItems = Product::all()->map(function ($product) {
             return [

@@ -6,7 +6,7 @@ use FluentSupport\App\Models\Attachment;
 use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\Helper;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Services\Includes\UploadService;
 
 /**
@@ -65,7 +65,9 @@ class UploaderController extends Controller
         ];
 
         $validationMessages = [
+            // translators: %s is a comma-separated list of allowed file types (e.g., "jpg, png, pdf")
             'file.mimetypes' => sprintf(__('Only %s files are allowed.', 'fluent-support'), implode(', ', $mimeHeadings)),
+            // translators: %.01f is the maximum file size in megabytes
             'file.max'       => sprintf(__('The file cannot be more than %.01fMB. Please upload somewhere like Dropbox/Google Drive and paste the link in the response', 'fluent-support'), $maxFileSize),
         ];
 
@@ -80,7 +82,7 @@ class UploaderController extends Controller
 
     private function resolvePerson($ticketId, Request $request)
     {
-        if ($request->get('is_agent') == 'yes') {
+        if ($request->getSafe('is_agent', 'sanitize_text_field') == 'yes') {
             return Helper::getCurrentAgent();
         }
 

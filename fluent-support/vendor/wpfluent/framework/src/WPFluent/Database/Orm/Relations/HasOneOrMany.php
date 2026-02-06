@@ -6,11 +6,16 @@ use FluentSupport\Framework\Support\Helper;
 use FluentSupport\Framework\Database\Orm\Model;
 use FluentSupport\Framework\Database\Orm\Builder;
 use FluentSupport\Framework\Database\Orm\Collection;
+use FluentSupport\Framework\Database\UniqueConstraintViolationException;
 use FluentSupport\Framework\Database\Orm\Relations\Concerns\InteractsWithDictionary;
+use FluentSupport\Framework\Database\Orm\Relations\Concerns\SupportsInverseRelations;
 
+/**
+ * @template TRelatedModel of Model
+ */
 abstract class HasOneOrMany extends Relation
 {
-    use InteractsWithDictionary;
+    use InteractsWithDictionary, SupportsInverseRelations;
 
     /**
      * The foreign key of the parent model.
@@ -51,9 +56,12 @@ abstract class HasOneOrMany extends Relation
      */
     public function make(array $attributes = [])
     {
-        return Helper::tap($this->related->newInstance($attributes), function ($instance) {
-            $this->setForeignAttributesForCreate($instance);
-        });
+        return Helper::tap(
+            $this->related->newInstance($attributes),
+            function ($instance) {
+                $this->setForeignAttributesForCreate($instance);
+            }
+        );
     }
 
     /**
@@ -99,8 +107,11 @@ abstract class HasOneOrMany extends Relation
     {
         $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
-        $this->getRelationQuery()->{$whereIn}(
-            $this->foreignKey, $this->getKeys($models, $this->localKey)
+        $this->whereInEager(
+            $whereIn,
+            $this->foreignKey,
+            $this->getKeys($models, $this->localKey),
+            $this->getRelationQuery()
         );
     }
 
@@ -139,8 +150,12 @@ abstract class HasOneOrMany extends Relation
      * @param  string  $type
      * @return array
      */
-    protected function matchOneOrMany(array $models, Collection $results, $relation, $type)
-    {
+    protected function matchOneOrMany(
+        array $models,
+        Collection $results,
+        $relation,
+        $type
+    ) {
         $dictionary = $this->buildDictionary($results);
 
         // Once we have the dictionary we can simply spin through the parent models to
@@ -232,11 +247,30 @@ abstract class HasOneOrMany extends Relation
      */
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create(array_merge($attributes, $values));
+        if (is_null($instance = (clone $this)->where($attributes)->first())) {
+            $instance = $this->createOrFirst($attributes, $values);
         }
 
         return $instance;
+    }
+
+    /**
+     * Attempt to create the record. If a unique constraint
+     * violation occurs, attempt to find the matching record.
+     *
+     * @param  array  $attributes
+     * @param  array  $values
+     * @return TRelatedModel
+     */
+    public function createOrFirst(array $attributes = [], array $values = [])
+    {
+        try {
+            return $this->getQuery()->withSavepointIfNeeded(fn () => $this->create(array_merge($attributes, $values)));
+        } catch (UniqueConstraintViolationException $e) {
+            if ($instance = $this->useWritePdo()->where($attributes)->first()) {
+                return $instance;
+            } throw $e;
+        }
     }
 
     /**
@@ -248,11 +282,35 @@ abstract class HasOneOrMany extends Relation
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
-        return Helper::tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values);
+        return Helper::tap(
+            $this->firstOrCreate($attributes, $values),
+            function ($instance) use ($values) {
+                if (! $instance->wasRecentlyCreated) {
+                    $instance->fill($values)->save();
+                }
+            }
+        );
+    }
 
-            $instance->save();
-        });
+    /**
+     * Insert new records or update the existing ones.
+     *
+     * @param  array  $values
+     * @param  array|string  $uniqueBy
+     * @param  array|null  $update
+     * @return int
+     */
+    public function upsert(array $values, $uniqueBy, $update = null)
+    {
+        if (! empty($values) && ! is_array(reset($values))) {
+            $values = [$values];
+        }
+
+        foreach ($values as $key => $value) {
+            $values[$key][$this->getForeignKeyName()] = $this->getParentKey();
+        }
+
+        return $this->getQuery()->upsert($values, $uniqueBy, $update);
     }
 
     /**
@@ -266,6 +324,19 @@ abstract class HasOneOrMany extends Relation
         $this->setForeignAttributesForCreate($model);
 
         return $model->save() ? $model : false;
+    }
+
+    /**
+     * Attach a model instance without raising any events to the parent model.
+     *
+     * @param  TRelatedModel  $model
+     * @return TRelatedModel|false
+     */
+    public function saveQuietly(Model $model)
+    {
+        return Model::withoutEvents(function () use ($model) {
+            return $this->save($model);
+        });
     }
 
     /**
@@ -284,6 +355,20 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Attach a collection of models to the parent instance
+     * without raising any events to the parent model.
+     *
+     * @param  iterable<TRelatedModel>  $models
+     * @return iterable<TRelatedModel>
+     */
+    public function saveManyQuietly($models)
+    {
+        return Model::withoutEvents(function () use ($models) {
+            return $this->saveMany($models);
+        });
+    }
+
+    /**
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
@@ -291,11 +376,25 @@ abstract class HasOneOrMany extends Relation
      */
     public function create(array $attributes = [])
     {
-        return Helper::tap($this->related->newInstance($attributes), function ($instance) {
-            $this->setForeignAttributesForCreate($instance);
+        return Helper::tap(
+            $this->related->newInstance($attributes),
+            function ($instance) {
+                $this->setForeignAttributesForCreate($instance);
+                $instance->save();
+            }
+        );
+    }
 
-            $instance->save();
-        });
+    /**
+     * Create a new instance of the related model
+     * without raising any events to the parent model.
+     *
+     * @param  array  $attributes
+     * @return TRelatedModel
+     */
+    public function createQuietly(array $attributes = [])
+    {
+        return Model::withoutEvents(fn () => $this->create($attributes));
     }
 
     /**
@@ -309,6 +408,18 @@ abstract class HasOneOrMany extends Relation
         $attributes[$this->getForeignKeyName()] = $this->getParentKey();
 
         return $this->related->forceCreate($attributes);
+    }
+
+    /**
+     * Create a new instance of the related model with
+     * mass assignment without raising model events.
+     *
+     * @param  array  $attributes
+     * @return TRelatedModel
+     */
+    public function forceCreateQuietly(array $attributes = [])
+    {
+        return Model::withoutEvents(fn () => $this->forceCreate($attributes));
     }
 
     /**
@@ -326,6 +437,18 @@ abstract class HasOneOrMany extends Relation
         }
 
         return $instances;
+    }
+
+    /**
+     * Create a Collection of new instances of the related
+     * model without raising any events to the parent model.
+     *
+     * @param  iterable  $records
+     * @return \FluentSupport\Framework\Database\Orm\Collection<int, TRelatedModel>
+     */
+    public function createManyQuietly(iterable $records)
+    {
+        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**
@@ -347,10 +470,15 @@ abstract class HasOneOrMany extends Relation
      * @param  array|mixed  $columns
      * @return \FluentSupport\Framework\Database\Orm\Builder
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
+    public function getRelationExistenceQuery(
+        Builder $query,
+        Builder $parentQuery,
+        $columns = ['*']
+    ) {
         if ($query->getQuery()->from == $parentQuery->getQuery()->from) {
-            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
+            return $this->getRelationExistenceQueryForSelfRelation(
+                $query, $parentQuery, $columns
+            );
         }
 
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
@@ -364,15 +492,50 @@ abstract class HasOneOrMany extends Relation
      * @param  array|mixed  $columns
      * @return \FluentSupport\Framework\Database\Orm\Builder
      */
-    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
-        $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
+    public function getRelationExistenceQueryForSelfRelation(
+        Builder $query,
+        Builder $parentQuery,
+        $columns = ['*']
+    ) {
+        $query->from(
+            $query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash()
+        );
 
         $query->getModel()->setTable($hash);
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedParentKeyName(), '=', $hash.'.'.$this->getForeignKeyName()
+            $this->getQualifiedParentKeyName(),
+            '=',
+            $hash.'.'.$this->getForeignKeyName()
         );
+    }
+
+    /**
+     * Alias to set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function take($value)
+    {
+        return $this->limit($value);
+    }
+
+    /**
+     * Set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function limit($value)
+    {
+        if ($this->parent->exists) {
+            $this->query->limit($value);
+        } else {
+            $this->query->groupLimit($value, $this->getExistenceCompareKey());
+        }
+
+        return $this;
     }
 
     /**

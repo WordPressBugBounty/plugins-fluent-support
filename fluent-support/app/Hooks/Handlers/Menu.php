@@ -9,7 +9,7 @@ use FluentSupport\App\Models\Product;
 use FluentSupport\App\Models\TicketTag;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\Helper;
-use FluentSupport\App\Services\TransStrings;
+use FluentSupport\App\Services\TranslationStrings;
 
 class Menu
 {
@@ -72,10 +72,19 @@ class Menu
 
         add_submenu_page(
             'fluent-support',
-            __('Workflows', 'fluent-support'),
-            __('Workflows', 'fluent-support'),
-            ($isAdmin) ? 'manage_options' : 'fst_manage_workflows',
-            'fluent-support#/workflows',
+            __('Reports', 'fluent-support'),
+            __('Reports', 'fluent-support'),
+            ($isAdmin) ? 'manage_options' : 'fst_sensitive_data',
+            'fluent-support#/reports',
+            array($this, 'renderApp')
+        );
+
+        add_submenu_page(
+            'fluent-support',
+            __('Customers', 'fluent-support'),
+            __('Customers', 'fluent-support'),
+            ($isAdmin) ? 'manage_options' : 'fst_sensitive_data',
+            'fluent-support#/customers',
             array($this, 'renderApp')
         );
 
@@ -90,22 +99,39 @@ class Menu
 
         add_submenu_page(
             'fluent-support',
+            __('Business Inboxes', 'fluent-support'),
+            __('Business Inboxes', 'fluent-support'),
+            ($isAdmin) ? 'manage_options' : 'fst_manage_settings',
+            'fluent-support#/mailboxes',
+            array($this, 'renderApp')
+        );
+
+        add_submenu_page(
+            'fluent-support',
+            __('Workflows', 'fluent-support'),
+            __('Workflows', 'fluent-support'),
+            ($isAdmin) ? 'manage_options' : 'fst_manage_workflows',
+            'fluent-support#/workflows',
+            array($this, 'renderApp')
+        );
+
+        add_submenu_page(
+            'fluent-support',
+            __('Saved Replies', 'fluent-support'),
+            __('Saved Replies', 'fluent-support'),
+            ($isAdmin) ? 'manage_options' : 'fst_manage_saved_replies',
+            'fluent-support#/saved_replies',
+            array($this, 'renderApp')
+        );
+
+        add_submenu_page(
+            'fluent-support',
             __('Settings', 'fluent-support'),
             __('Settings', 'fluent-support'),
             ($isAdmin) ? 'manage_options' : 'fst_manage_settings',
             'fluent-support#/settings',
             array($this, 'renderApp')
         );
-
-        add_submenu_page(
-            'fluent-support',
-            __('Reports', 'fluent-support'),
-            __('Reports', 'fluent-support'),
-            ($isAdmin) ? 'manage_options' : 'fst_sensitive_data',
-            'fluent-support#/reports',
-            array($this, 'renderApp')
-        );
-
     }
 
     public function renderApp()
@@ -134,6 +160,24 @@ class Menu
             ],
         ];
 
+        $canManageSettings = PermissionManager::currentUserCan('fst_manage_settings');
+
+        if ($canManageSettings) {
+            $menuItems[] = [
+                'key'       => 'mailboxes',
+                'label'     => __('Business Inboxes', 'fluent-support'),
+                'permalink' => $baseUrl . 'mailboxes'
+            ];
+        }
+
+        if (PermissionManager::currentUserCan('fst_view_activity_logs')) {
+            $menuItems[] = [
+                'key'       => 'activity',
+                'label'     => __('Activities', 'fluent-support'),
+                'permalink' => $baseUrl . 'activity'
+            ];
+        }
+
         $hasSensitiveAccess = PermissionManager::currentUserCan('fst_sensitive_data');
         if ($hasSensitiveAccess) {
             $menuItems[] = [
@@ -143,43 +187,36 @@ class Menu
             ];
         }
 
-        $secondaryItems = [];
+        // Build the "More" dropdown children
+        $moreChildren = [];
 
         if (PermissionManager::currentUserCan('fst_manage_saved_replies')) {
-            $secondaryItems = [
-                [
-                    'key'       => 'saved_replies',
-                    'label'     => __('Saved Replies', 'fluent-support'),
-                    'permalink' => $baseUrl . 'saved-replies'
-                ]
-            ];
-        }
-
-        if (PermissionManager::currentUserCan('fst_view_activity_logs')) {
-            $secondaryItems[] = [
-                'key'       => 'activity',
-                'label'     => __('Activities', 'fluent-support'),
-                'permalink' => $baseUrl . 'activity'
-            ];
-        }
-
-        $canManageSettings = PermissionManager::currentUserCan('fst_manage_settings');
-
-        if ($canManageSettings) {
-            $secondaryItems[] = [
-                'key'       => 'mailboxes',
-                'label'     => __('Business Inboxes', 'fluent-support'),
-                'permalink' => $baseUrl . 'mailboxes'
+            $moreChildren['saved_replies'] = [
+                'key'       => 'saved_replies',
+                'label'     => __('Saved Replies', 'fluent-support'),
+                'permalink' => $baseUrl . 'saved-replies'
             ];
         }
 
         if (PermissionManager::currentUserCan('fst_manage_workflows')) {
-            $secondaryItems[] = [
+            $moreChildren['workflows'] = [
                 'key'       => 'workflows',
                 'label'     => __('Workflows', 'fluent-support'),
                 'permalink' => $baseUrl . 'workflows'
             ];
         }
+
+        // Add the "More" dropdown if there are children
+        if (!empty($moreChildren)) {
+            $menuItems[] = [
+                'key'       => 'more',
+                'label'     => __('More', 'fluent-support'),
+                'permalink' => '#',
+                'children'  => $moreChildren
+            ];
+        }
+
+        $secondaryItems = [];
 
         if ($canManageSettings) {
             $secondaryItems[] = [
@@ -224,6 +261,9 @@ class Menu
         $app->view->render('admin.menu', [
             'base_url'       => $baseUrl,
             'logo'           => $assets . 'images/logo.svg',
+            'settingsLogo'   => $assets . 'images/gear.svg',
+            'upgradeLogo'     => $assets . 'images/crown.svg',
+            'assets'         => $assets,
             'menuItems'      => $menuItems,
             'secondaryItems' => isset($secondaryItems) ? $secondaryItems : [],
         ]);
@@ -242,15 +282,15 @@ class Menu
 
         $assets = $app['url.assets'];
 
-        add_filter('admin_footer_text', function ($text) {
-            return '<span id="footer-thankyou">We value your feedback! If the plugin is helpful, please rate Fluent Support with <a target="_blank" rel="nofollow" href="https://wordpress.org/support/plugin/fluent-support/reviews/#new-post">★★★★★</a> on WordPress.org. For assistance, check out the <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/navigate-with-the-keyboard-shortcut">keyboard shortcuts</a> and <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/">documentation</a>.</span>';
-        });
+//        add_filter('admin_footer_text', function ($text) {
+//            return '<span id="footer-thankyou">We value your feedback! If the plugin is helpful, please rate Fluent Support with <a target="_blank" rel="nofollow" href="https://wordpress.org/support/plugin/fluent-support/reviews/#new-post">★★★★★</a> on WordPress.org. For assistance, check out the <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/navigate-with-the-keyboard-shortcut">keyboard shortcuts</a> and <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/">documentation</a>.</span>';
+//        });
 
         wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '2.4.3');
 
-        wp_enqueue_style(
-            'fluent_support_admin_app', $assets . 'admin/css/alpha-admin.css', [], FLUENT_SUPPORT_VERSION
-        );
+        $rtlSuffix = is_rtl() ? '-rtl' : '';
+        $rtlSuffixHandler = $rtlSuffix ? '_rtl' : '';
+        wp_enqueue_style('fluent_support_admin_app' . $rtlSuffixHandler, $assets . 'admin/css/alpha-admin' . $rtlSuffix . '.css', [], FLUENT_SUPPORT_VERSION);
 
         $agents = Agent::select(['id', 'first_name', 'last_name'])
             ->where('person_type', 'agent')
@@ -332,7 +372,7 @@ class Menu
             return $tag;
         }, $tags);
 
-        $i18ns = TransStrings::getTransStrings();
+        $i18ns = TranslationStrings::getAdminStrings();
         $i18ns['allowed_files_and_size'] = Helper::getFileUploadMessage();
 
         /*

@@ -2,6 +2,8 @@
 
 namespace FluentSupport\App\Models;
 
+use FluentSupport\App\Services\Helper;
+
 class Attachment extends Model
 {
     protected $table = 'fs_attachments';
@@ -32,7 +34,7 @@ class Attachment extends Model
     public static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($model) {
             $uid = wp_generate_uuid4();
             $model->file_hash = md5($uid . wp_rand(0, 1000));
@@ -46,7 +48,7 @@ class Attachment extends Model
 
     public function getSettingsAttribute($settings)
     {
-        return \maybe_unserialize($settings);
+        return Helper::safeUnserialize($settings);
     }
 
     /**
@@ -57,7 +59,7 @@ class Attachment extends Model
     {
         return add_query_arg([
             'fst_file'    => $this->file_hash,
-            'secure_sign' => md5($this->id . date('YmdH'))
+            'secure_sign' => md5($this->id . gmdate('YmdH'))
         ], site_url('/index.php'));
     }
 }

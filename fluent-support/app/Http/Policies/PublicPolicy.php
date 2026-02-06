@@ -2,7 +2,7 @@
 
 namespace FluentSupport\App\Http\Policies;
 
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\Framework\Foundation\Policy;
 
 class PublicPolicy extends Policy

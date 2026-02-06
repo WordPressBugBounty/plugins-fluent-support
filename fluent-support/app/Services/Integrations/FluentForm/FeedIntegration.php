@@ -162,7 +162,7 @@ class FeedIntegration extends IntegrationManagerController
                 $this->getCustomField(), //Getting Fluent Support Custom Field To Map
                 [
                     'component' => 'html_info',
-                    'html_info' => __('<h4>Please provide the ticket provider info. If user is logged in then it will use that info. For Public users you can set your customer info</h4>', 'fluent-support')
+                    'html_info' => '<h4>' . __('Please provide the ticket provider info. If user is logged in then it will use that info. For Public users you can set your customer info', 'fluent-support') . '</h4>'
                 ],
                 [
                     'key'                => 'CustomerFields',
@@ -193,7 +193,7 @@ class FeedIntegration extends IntegrationManagerController
                     'key'                => 'customer_other_fields',
                     'require_list'       => false,
                     'label'              => __('Customer Other Fields', 'fluent-support'),
-                    'tips'               => __('Select which Fluent Forms fields pair with their<br /> respective Fluent Support fields.'),
+                    'tips'               => __('Select which Fluent Forms fields pair with their<br /> respective Fluent Support fields.', 'fluent-support'),
                     'field_label_remote' => __('Fluent Support Field', 'fluent-support'),
                     'field_label_local'  => __('Form Field', 'fluent-support'),
                     'component'          => 'dropdown_many_fields',
@@ -246,7 +246,7 @@ class FeedIntegration extends IntegrationManagerController
 
             $fields[] = [
                 'key'      => $customFieldValue['slug'],
-                'label'    => __($customFieldValue['label'], 'fluent-support')
+                'label'    => $customFieldValue['label']
             ];
         }
 
@@ -293,7 +293,8 @@ class FeedIntegration extends IntegrationManagerController
             }
 
             if( $type=='checkbox' &&  array_key_exists($slug, $ticketCustomField)) {
-                $ticketCustomField[$slug] = explode(',', Arr::get($ticketCustomField, $slug));
+                $value = Arr::get($ticketCustomField, $slug, '');
+                $ticketCustomField[$slug] = $value ? explode(',', (string)$value) : [];
             } else {
                 $ticketCustomField[$slug] = Arr::get($ticketCustomField, $slug);
             }
@@ -305,8 +306,8 @@ class FeedIntegration extends IntegrationManagerController
             'title' => sanitize_text_field(wp_unslash(Arr::get($data, 'ticket_title'))),
             'content' => wp_unslash(wp_kses_post(Arr::get($data, 'ticket_content'))),
             'attachments' => sanitize_text_field(Arr::get($data, 'ticket_attachments')),
-            'client_priority' => strtolower(sanitize_text_field(Arr::get($data, 'client_priority'))),
-            'priority' => strtolower(sanitize_text_field(Arr::get($data, 'client_priority'))),
+            'client_priority' => strtolower(sanitize_text_field(Arr::get($data, 'client_priority', ''))),
+            'priority' => strtolower(sanitize_text_field(Arr::get($data, 'client_priority', ''))),
             'custom_fields' => $ticketCustomField,
             'source' => 'web'
         ];
@@ -391,7 +392,8 @@ class FeedIntegration extends IntegrationManagerController
         do_action('fluentform/log_data', [
             'title'            => $feed['settings']['name'],
             'status'           => 'success',
-            'description'      => __('Support ticket has been created at Fluent Support. Ticket ID: '.$ticket->id, 'fluent-support'),
+            // translators: %d is the ticket ID number
+            'description'      => sprintf(__('Support ticket has been created at Fluent Support. Ticket ID: %d', 'fluent-support'), $ticket->id),
             'parent_source_id' => $form->id,
             'source_id'        => $entry->id,
             'component'        => $this->integrationKey,
@@ -450,11 +452,10 @@ class FeedIntegration extends IntegrationManagerController
                                 'attachment_id' => $attachmentId
                             ]);
                         } catch (\Exception $e) {
-                            error_log("Failed to create attachment record: " . $e->getMessage());
+
                         }
                     }
                 } catch (\Exception $e) {
-                    error_log("Error processing attachment: " . $e->getMessage());
                     continue;
                 }
             }

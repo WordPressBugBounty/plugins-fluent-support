@@ -8,12 +8,12 @@ use FluentSupport\Framework\Support\Helper;
 use FluentSupport\Framework\Support\ForwardsCalls;
 use FluentSupport\Framework\Support\MacroableTrait;
 use FluentSupport\Framework\Support\HelperFunctionsTrait;
-use FluentSupport\Framework\Database\MultipleRecordsFoundException;
 use FluentSupport\Framework\Database\Orm\Model;
 use FluentSupport\Framework\Database\Orm\Builder;
 use FluentSupport\Framework\Database\Orm\Collection;
-use FluentSupport\Framework\Database\Orm\ModelNotFoundException;
 use FluentSupport\Framework\Database\Query\Expression;
+use FluentSupport\Framework\Database\Orm\ModelNotFoundException;
+use FluentSupport\Framework\Database\MultipleRecordsFoundException;
 
 /**
  * @mixin \FluentSupport\Framework\Database\Orm\Builder
@@ -45,6 +45,14 @@ abstract class Relation
      * @var \FluentSupport\Framework\Database\Orm\Model
      */
     protected $related;
+
+    /**
+     * Indicates whether the eagerly loaded relation
+     * should implicitly return an empty collection.
+     *
+     * @var bool
+     */
+    protected $eagerKeysWereEmpty = false;
 
     /**
      * Indicates if the relation is adding constraints.
@@ -160,7 +168,9 @@ abstract class Relation
      */
     public function getEager()
     {
-        return $this->get();
+        return $this->eagerKeysWereEmpty
+                    ? $this->query->getModel()->newCollection()
+                    : $this->get();
     }
 
     /**
@@ -176,12 +186,14 @@ abstract class Relation
     {
         $result = $this->take(2)->get($columns);
 
-        if ($result->isEmpty()) {
+        $count = $result->count();
+
+        if ($count === 0) {
             throw (new ModelNotFoundException)->setModel(get_class($this->related));
         }
 
-        if ($result->count() > 1) {
-            throw new MultipleRecordsFoundException;
+        if ($count > 1) {
+            throw new MultipleRecordsFoundException($count);
         }
 
         return $result->first();
@@ -249,8 +261,11 @@ abstract class Relation
      * @param  array|mixed  $columns
      * @return \FluentSupport\Framework\Database\Orm\Builder
      */
-    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-    {
+    public function getRelationExistenceQuery(
+        Builder $query,
+        Builder $parentQuery,
+        $columns = ['*']
+    ) {
         return $query->select($columns)->whereColumn(
             $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
         );
@@ -264,7 +279,9 @@ abstract class Relation
      */
     public function getRelationCountHash($incrementJoinCount = true)
     {
-        return 'laravel_reserved_'.($incrementJoinCount ? static::$selfJoinCount++ : static::$selfJoinCount);
+        return 'laravel_reserved_'.(
+            $incrementJoinCount ? static::$selfJoinCount++ : static::$selfJoinCount
+        );
     }
 
     /**
@@ -309,6 +326,16 @@ abstract class Relation
     public function getBaseQuery()
     {
         return $this->query->getQuery();
+    }
+
+    /**
+     * Get a base query builder instance.
+     *
+     * @return \FluentSupport\Framework\Database\Query\Builder
+     */
+    public function toBase()
+    {
+        return $this->query->toBase();
     }
 
     /**
@@ -372,6 +399,27 @@ abstract class Relation
     }
 
     /**
+     * Add a whereIn eager constraint for the given set of model keys to be loaded.
+     *
+     * @param  string  $whereIn
+     * @param  string  $key
+     * @param  array  $modelKeys
+     * @param  \FluentSupport\Framework\Database\Orm\Builder|null  $query
+     * @return void
+     */
+    protected function whereInEager(
+        string $whereIn,
+        string $key, array $modelKeys,
+        ?Builder $query = null
+    ) {
+        ($query ?? $this->query)->{$whereIn}($key, $modelKeys);
+
+        if ($modelKeys === []) {
+            $this->eagerKeysWereEmpty = true;
+        }
+    }
+
+    /**
      * Get the name of the "where in" method for eager loading.
      *
      * @param  \FluentSupport\Framework\Database\Orm\Model  $model
@@ -428,7 +476,7 @@ abstract class Relation
      * @param  bool  $merge
      * @return array
      */
-    public static function morphMap(array $map = null, $merge = true)
+    public static function morphMap(?array $map = null, $merge = true)
     {
         $map = static::buildMorphMapFromModels($map);
 
@@ -446,7 +494,7 @@ abstract class Relation
      * @param  string[]|null  $models
      * @return array|null
      */
-    protected static function buildMorphMapFromModels(array $models = null)
+    protected static function buildMorphMapFromModels(?array $models = null)
     {
         if (is_null($models) || Arr::isAssoc($models)) {
             return $models;
@@ -466,6 +514,17 @@ abstract class Relation
     public static function getMorphedModel($alias)
     {
         return static::$morphMap[$alias] ?? null;
+    }
+
+    /**
+     * Get the alias associated with a custom polymorphic class.
+     *
+     * @param  string  $className
+     * @return int|string
+     */
+    public static function getMorphAlias(string $className)
+    {
+        return array_search($className, static::$morphMap, true) ?: $className;
     }
 
     /**

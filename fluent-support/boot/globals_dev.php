@@ -1,10 +1,12 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Enable Query Log
  */
-if (!function_exists('wpfluent_eqL')) {
-    function wpfluent_eql()
+if (!function_exists('fluent_support_eqL')) {
+    function fluent_support_eqL()
     {
         defined('SAVEQUERIES') || define('SAVEQUERIES', true);
     }
@@ -13,8 +15,8 @@ if (!function_exists('wpfluent_eqL')) {
 /**
  * Get Query Log
  */
-if (!function_exists('wpfluent_gql')) {
-    function wpfluent_gql()
+if (!function_exists('fluent_support_gql')) {
+    function fluent_support_gql()
     {
         $result = [];
         foreach ((array)$GLOBALS['wpdb']->queries as $key => $query) {

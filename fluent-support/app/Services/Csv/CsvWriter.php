@@ -66,7 +66,7 @@ class CsvWriter
     public function output($filename)
     {
         if (!is_null($filename) && file_exists($this->filePath)) {
-            $filename = filter_var($filename, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW);
+            $filename = preg_replace('/[\x00-\x1F]/', '', sanitize_file_name($filename));
             header('Cache-control: private');
             header('Content-Type: application/octet-stream');
             header('Content-Length: '.filesize($this->filePath));

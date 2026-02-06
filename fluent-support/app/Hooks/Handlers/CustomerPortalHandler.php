@@ -8,6 +8,7 @@ use FluentSupport\App\Models\Product;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\Blocks\BlockHelper;
 use FluentSupport\App\Services\Helper;
+use FluentSupport\App\Services\TranslationStrings;
 use FluentSupport\Framework\Support\Arr;
 use FluentSupportPro\App\Services\ProHelper;
 
@@ -27,9 +28,9 @@ class CustomerPortalHandler
             esc_html__('You don\'t have permission to access customer support portal', 'fluent-support')
         );
 
-        $person = Helper::getCurrentPerson();
+        $person = Helper::getCurrentCustomer();
 
-        if (PermissionManager::currentUserPermissions()) {
+        if (!$person && PermissionManager::currentUserPermissions()) {
             $adminPortalUrl = Helper::getPortalAdminBaseUrl();
 
             /**
@@ -173,93 +174,7 @@ class CustomerPortalHandler
         $assets = $app['url.assets'];
 
 
-        $i18ns = [
-            'Conversation' => __('Conversation', 'fluent-support'),
-            'Back to All Tickets' => __('Back to All Tickets', 'fluent-support'),
-            'Click Here to Write a reply' => __('Click Here to Write a reply', 'fluent-support'),
-            'All' => __('All', 'fluent-support'),
-            'All Tickets'    => __('All Tickets', 'fluent-support'),
-            'Open' => __('Open', 'fluent-support'),
-            'open' => __('open', 'fluent-support'),
-            'Closed' => __('Closed', 'fluent-support'),
-            'new' => __('new', 'fluent-support'),
-            'Logout' => __('Logout', 'fluent-support'),
-            'active' => __('active', 'fluent-support'),
-            'on-hold' => __('on-hold', 'fluent-support'),
-            'closed' => __('closed', 'fluent-support'),
-            'Date' => __('Date', 'fluent-support'),
-            'Status' => __('Status', 'fluent-support'),
-            'Next' => __('Next', 'fluent-support'),
-            'Prev' => __('Prev', 'fluent-support'),
-            'Reply and Close' => __('Reply and Close', 'fluent-support'),
-            'Refresh' => __('Refresh', 'fluent-support'),
-            'agent_and_officials_can_see' => __('Only you and official support agents can view this conversation', 'fluent-support'),
-            'reopen_ticket_instruction' => __('If you still have related issues. Please reopen this ticket and reply', 'fluent-support'),
-            'ticket_closed'    => __('This ticket was closed on', 'fluent-support'),
-            'Close Ticket' => __('Close Ticket', 'fluent-support'),
-            'not_to_share_private_info' => __('Please do not share any private information.', 'fluent-support'),
-            'replied' => __('replied', 'fluent-support'),
-            'conversation_started' => __('started the conversation', 'fluent-support'),
-            'Click to upload' => __('Click to upload', 'fluent-support'),
-            'This ticket is' => __('This ticket is', 'fluent-support'),
-            'Private' => __('Private', 'fluent-support'),
-            'Write a reply' => __('Write a reply', 'fluent-support'),
-            'Additional info' => __('Additional info', 'fluent-support'),
-            'Reply' => __('Reply', 'fluent-support'),
-            'You' => __('You', 'fluent-support'),
-            'no_open_support_tickets' => __('Looks like you did not open any support tickets yet', 'fluent-support'),
-            'no_support_ticket_found' => __('No support tickets found for this filter', 'fluent-support'),
-            'Delete Customer' => __('Delete Customer', 'fluent-support'),
-            'Update Customer' => __('Update Customer', 'fluent-support'),
-            'Create Customer' => __('Create Customer', 'fluent-support'),
-            'Browse Files' => __('Browse Files', 'fluent-support'),
-            'Add Attachment' => __('Add Attachment', 'fluent-support'),
-            'btn_text' => __('Create Ticket', 'fluent-support'),
-
-            'subject_placeholder' => __('What\'s this support ticket about?', 'fluent-support'),
-            'service_placeholder' => __('Select related Product/Service', 'fluent-support'),
-            'suggestion_loading' => __('Looking for similar articles...', 'fluent-support'),
-            'articles_heading' => __('Suggested articles', 'fluent-support'),
-            'priority_placeholder' => __('Select Priority', 'fluent-support'),
-            'Page' => __('Page', 'fluent-support'),
-            'page' => __('page', 'fluent-support'),
-            'of' => __('of', 'fluent-support'),
-
-            'subject' => __('Subject', 'fluent-support'),
-            'ticket_details' => __('Ticket Details', 'fluent-support'),
-            'details_help' => __('Please provide details about your problem', 'fluent-support'),
-            'product_services' => __('Related Product/Service', 'fluent-support'),
-            'priority' => __('Priority', 'fluent-support'),
-            'Create Ticket' => __('Create Ticket', 'fluent-support'),
-            'submit_heading' => __('Submit a Support Ticket', 'fluent-support'),
-            'All Products' => __('All Products', 'fluent-support'),
-            'Please input' => __('Please input', 'fluent-support'),
-            'Search' => __('Search', 'fluent-support'),
-            'No tickets found' => __('No tickets found', 'fluent-support'),
-            'create_ticket_cta' => __('Create Ticket', 'fluent-support'),
-            'Reopen This ticket' => __('Reopen This ticket', 'fluent-support'),
-            'by' => __('by', 'fluent-support'),
-            'Unknown error. Please reload this page' => __('Unknown error. Please reload this page', 'fluent-support'),
-            'View Your Tickets' => __('View Your Tickets', 'fluent-support'),
-            'View All' => __('View All', 'fluent-support'),
-            'Support Staff' => __('Support Staff', 'fluent-support'),
-            'Thread Starter' => __('Thread Starter', 'fluent-support'),
-            'Thread Follower' => __('Thread Follower', 'fluent-support'),
-            'Sort By' => __('Sort By', 'fluent-support'),
-            'Ascending' => __('Ascending', 'fluent-support'),
-            'Descending' => __('Descending', 'fluent-support'),
-            'Apply' => __('Apply', 'fluent-support'),
-            'Ticket ID' => __('Ticket ID', 'fluent-support'),
-            'Title' => __('Title', 'fluent-support'),
-            'Created at' => __('Created at', 'fluent-support'),
-            'Subject' => __('Subject', 'fluent-support'),
-            'Suggested Articles' => __('Suggested Articles', 'fluent-support'),
-            'Log Out' => __('Log Out', 'fluent-support'),
-            'Completed' => __('Completed', 'fluent-support'),
-            'Processing' => __('Processing', 'fluent-support'),
-            'Failed' => __('Failed', 'fluent-support'),
-            'customer_inactive_message' => __('Your account is currently inactive. You cannot create new tickets or reply to existing ones. Please contact the site administrator for assistance.', 'fluent-support'),
-        ];
+        $i18ns = TranslationStrings::getPortalStrings();
 
         $i18ns['allowed_files_and_size'] = Helper::getFileUploadMessage();
 
@@ -301,7 +216,10 @@ class CustomerPortalHandler
 
         wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '2.4.3');
         wp_enqueue_script('fs_tk_customer_portal', $assets . 'portal/js/app.js', ['jquery'], FLUENT_SUPPORT_VERSION, true);
-        wp_enqueue_style('fs_tk_customer_portal', $assets . 'portal/css/app.css', [], FLUENT_SUPPORT_VERSION);
+
+        $rtlSuffix = is_rtl() ? '-rtl' : '';
+        $rtlSuffixHandler = $rtlSuffix ? '_rtl' : '';
+        wp_enqueue_style('fs_tk_customer_portal' . $rtlSuffixHandler, $assets . 'portal/css/app' . $rtlSuffix . '.css', [], FLUENT_SUPPORT_VERSION);
 
         wp_localize_script('fs_tk_customer_portal', 'fs_customer_portal', $data);
     }

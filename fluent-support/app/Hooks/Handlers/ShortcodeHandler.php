@@ -7,7 +7,13 @@ class ShortcodeHandler
     public function fluentSupportPortal($args)
     {
         if(isset($args['attributes'])) {
-            $args['attributes'] = json_decode($args['attributes'], true);
+            $attributes_value = $args['attributes'];
+            $decoded = base64_decode($attributes_value, true);
+            if ($decoded !== false && json_decode($decoded) !== null) {
+                $args['attributes'] = json_decode($decoded, true);
+            } else {
+                $args['attributes'] = json_decode($attributes_value, true);
+            }
         }
 
         $args = shortcode_atts( array(
@@ -18,7 +24,6 @@ class ShortcodeHandler
 
         if ($args['attributes']) {
             add_filter('fluent_support/customer_portal_vars', function ($vars) use($args) {
-
                 $vars['attributes'] = $args['attributes'];
                 return $vars;
             });
@@ -26,7 +31,6 @@ class ShortcodeHandler
 
         if($args['show_logout'] == 'yes') {
             add_filter('fluent_support/customer_portal_vars', function ($vars) {
-
                 $vars['show_logout'] = true;
                 return $vars;
             });

@@ -2,6 +2,8 @@
 
 namespace FluentSupport\Framework\Http;
 
+use Closure;
+
 class Router
 {
     /**
@@ -9,6 +11,18 @@ class Router
      * @var \FluentSupport\Framework\Foundation\Application
      */
     protected $app = null;
+
+    /**
+     * Name for the route.
+     * @var array
+     */
+    protected $name = [];
+
+    /**
+     * Mapping of named routes.
+     * @var array
+     */
+    protected $namedRoutes = [];
     
     /**
      * Prefix for the route
@@ -61,16 +75,20 @@ class Router
     /**
      * Create a route group
      * @param  array $attributes
-     * @param  \Closure|null $callback
+     * @param  Closure|null $callback
      * @return null
      */
-    public function group($attributes = [], \Closure $callback = null)
+    public function group($attributes = [], ?Closure $callback = null)
     {
         $this->groupCount += 1;
 
-        if ($attributes instanceof \Closure) {
+        if ($attributes instanceof Closure) {
             $callback = $attributes;
             $attributes = [];
+        }
+
+        if (isset($attributes['name'])) {
+            $this->name($attributes['name']);
         }
 
         if (isset($attributes['prefix'])) {
@@ -114,7 +132,7 @@ class Router
             }
         }
 
-        // If the current group doesn't have a after middleware
+        // If the current group doesn't have an after middleware
         // but the parent group has then bring it in this group.
         if (!isset($this->middleware['after'][$this->groupCount])) {
             if (isset($this->middleware['after'][$this->groupCount - 1])) {
@@ -125,6 +143,19 @@ class Router
         }
 
         return new Group($this, $callback);
+    }
+
+    /**
+     * Set the route name
+     * 
+     * @param  string $name
+     * @return self
+     */
+    public function name($name)
+    {
+        $this->name[] = $name;
+
+        return $this;
     }
 
     /**
@@ -143,7 +174,7 @@ class Router
     /**
      * Set the namespace for the action/controller
      * 
-     * @param  string $namespace
+     * @param  string $ns
      * @return self
      */
     public function namespace($ns)
@@ -151,6 +182,19 @@ class Router
         $this->namespace[] = $ns;
 
         return $this;
+    }
+
+    /**
+     * Set the default route policy.
+     * 
+     * @return self
+     */
+    public function withDefaultPolicy()
+    {
+        return $this->withPolicy(
+            // @phpstan-ignore-next-line
+            $this->app->__namespace__.'\\App\\Http\\Policies\\Policy'
+        );
     }
 
     /**
@@ -222,6 +266,7 @@ class Router
     {
         $callback($this);
         $this->groupCount -= 1;
+        array_pop($this->name);
         array_pop($this->prefix);
         array_pop($this->namespace);
         array_pop($this->middleware['before']);
@@ -232,7 +277,7 @@ class Router
     /**
      * Declare a GET route endpoint
      * @param  string $uri
-     * @param  string|Closure $handler
+     * @param  array|string|Closure $handler
      * @return \FluentSupport\Framework\Http\Route
      */
     public function get($uri, $handler)
@@ -247,7 +292,7 @@ class Router
     /**
      * Declare a POST route endpoint
      * @param  string $uri
-     * @param  string|Closure $handler
+     * @param  array|string|Closure $handler
      * @return \FluentSupport\Framework\Http\Route
      */
     public function post($uri, $handler)
@@ -262,7 +307,7 @@ class Router
     /**
      * Declare a PUT route endpoint
      * @param  string $uri
-     * @param  string|Closure $handler
+     * @param  array|string|Closure $handler
      * @return \FluentSupport\Framework\Http\Route
      */
     public function put($uri, $handler)
@@ -277,7 +322,7 @@ class Router
     /**
      * Declare a PATCH route endpoint
      * @param  string $uri
-     * @param  string|Closure $handler
+     * @param  array|string|Closure $handler
      * @return \FluentSupport\Framework\Http\Route
      */
     public function patch($uri, $handler)
@@ -292,7 +337,7 @@ class Router
     /**
      * Declare a DELETE route endpoint
      * @param  string $uri
-     * @param  string|Closure $handler
+     * @param  array|string|Closure $handler
      * @return \FluentSupport\Framework\Http\Route
      */
     public function delete($uri, $handler)
@@ -307,7 +352,7 @@ class Router
     /**
      * Declare a route endpoint that matches any HTTP Verb/Method
      * @param  string $uri
-     * @param  string|Closure $handler
+     * @param  array|string|Closure $handler
      * @return \FluentSupport\Framework\Http\Route
      */
     public function any($uri, $handler)
@@ -335,6 +380,10 @@ class Router
             $handler,
             $method
         );
+
+        if ($this->name) {
+            $route->withName($this->name);
+        }
 
         if ($this->namespace) {
             $route->withNamespace($this->namespace);
@@ -364,7 +413,9 @@ class Router
     {
         $version = $this->app->config->get('app.rest_version');
 
-        $namespace = trim($this->app->config->get('app.rest_namespace'), '/');
+        $namespace = trim(
+            $this->app->config->get('app.rest_namespace', ''), '/'
+        );
 
         return "{$namespace}/{$version}";
     }
@@ -405,5 +456,29 @@ class Router
     public function getRoutes()
     {
         return $this->routes;
+    }
+
+    /**
+     * Set a named route in the router.
+     * 
+     * @param string $name
+     * @param Route  $route
+     */
+    public function setNamedRoute($name, Route $route)
+    {
+        $this->namedRoutes[$name] = $route;
+
+        return $route;
+    }
+
+    /**
+     * Get a route by name.
+     * 
+     * @param  string $name
+     * @return Route|null
+     */
+    public function getByName($name)
+    {
+        return $this->namedRoutes[$name] ?? null;
     }
 }

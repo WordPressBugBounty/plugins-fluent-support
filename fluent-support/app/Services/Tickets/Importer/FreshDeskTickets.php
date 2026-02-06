@@ -3,6 +3,7 @@
 namespace FluentSupport\App\Services\Tickets\Importer;
 
 use FluentSupport\App\Models\Meta;
+use FluentSupport\App\Services\Helper;
 
 class FreshDeskTickets extends BaseImporter
 {
@@ -21,7 +22,7 @@ class FreshDeskTickets extends BaseImporter
     public function stats()
     {
         $metadata = Meta::where('object_type', '_fs_freshdesk_migration_info')->first();
-        $previouslyImported = maybe_unserialize($metadata->value ?? []);
+        $previouslyImported = Helper::safeUnserialize($metadata->value ?? []);
         $previouslyImported['domain'] = $metadata->key ?? '';
         return [
             'name' => esc_html('Freshdesk'),
@@ -123,7 +124,7 @@ class FreshDeskTickets extends BaseImporter
                 }
 
                 $lastCustomerResponse = $singleTicket->stats->requester_responded_at ?? $singleTicket->stats->status_updated_at;
-                $lastAgentResponse = $singleTicket->stats->agent_responded_at ? date('Y-m-d h:i:s', strtotime($singleTicket->stats->agent_responded_at)) : NULL;
+                $lastAgentResponse = !empty($singleTicket->stats->agent_responded_at) ? gmdate('Y-m-d h:i:s', strtotime($singleTicket->stats->agent_responded_at)) : null;
 
                 $formattedTickets[] = [
                     'title' => sanitize_text_field($ticket->subject),
@@ -136,9 +137,9 @@ class FreshDeskTickets extends BaseImporter
                     'status' => $this->getStatus($ticket->status),
                     'client_priority' => $this->getPriority($ticket->priority),
                     'priority' => $this->getPriority($ticket->priority),
-                    'created_at' => date('Y-m-d h:i:s', strtotime($ticket->created_at)),
-                    'updated_at' => date('Y-m-d h:i:s', strtotime($ticket->updated_at)),
-                    'last_customer_response' => date('Y-m-d h:i:s', strtotime($lastCustomerResponse)),
+                    'created_at' => $ticket->created_at ? gmdate('Y-m-d h:i:s', strtotime($ticket->created_at)) : null,
+                    'updated_at' => $ticket->updated_at ? gmdate('Y-m-d h:i:s', strtotime($ticket->updated_at)) : null,
+                    'last_customer_response' => $lastCustomerResponse ? gmdate('Y-m-d h:i:s', strtotime($lastCustomerResponse)) : null,
                     'last_agent_response' => $lastAgentResponse,
                     'attachments' => $attachments
                 ];
@@ -170,8 +171,8 @@ class FreshDeskTickets extends BaseImporter
             $ticketReply = [
                 'content' => wp_kses_post($reply->body),
                 'conversation_type' => ($reply->source == 2) ? 'note' : 'response',
-                'created_at' => date('Y-m-d h:i:s', strtotime($reply->created_at)),
-                'updated_at' => date('Y-m-d h:i:s', strtotime($reply->updated_at)),
+                'created_at' => $reply->created_at ? gmdate('Y-m-d h:i:s', strtotime($reply->created_at)) : null,
+                'updated_at' => $reply->updated_at ? gmdate('Y-m-d h:i:s', strtotime($reply->updated_at)) : null,
                 'is_customer_reply' => ($requester->id === $reply->user_id),
             ];
 
@@ -185,7 +186,7 @@ class FreshDeskTickets extends BaseImporter
                 }
             }
 
-            if (count($reply->attachments)) {
+            if (!empty($reply->attachments) && count($reply->attachments)) {
                 $ticketReply['attachments'] = $this->getAttachments($reply->attachments);
 
                 if (is_wp_error($ticketReply['attachments'])) {

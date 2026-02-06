@@ -31,8 +31,8 @@ class StatModule
             $endDate = $currentDate;
         }
 
-        $startDate = date('Y-m-d 00:00.01', strtotime($startDate));
-        $endDate = date('Y-m-d 23:59.59', strtotime($endDate));
+        $startDate = gmdate('Y-m-d 00:00.01', strtotime($startDate));
+        $endDate = gmdate('Y-m-d 23:59.59', strtotime($endDate));
 
         //Get list of new ticket by agent
         $newTickets = Ticket::where('agent_id', $agentId)
@@ -136,8 +136,8 @@ class StatModule
      */
     public static function getTodayStats($agentId = false)
     {
-        $start = date('Y-m-d 00:00.01');
-        $end = date('Y-m-d 23:59.59');
+        $start = gmdate('Y-m-d 00:00.01');
+        $end = gmdate('Y-m-d 23:59.59');
 
         $newTickets = Ticket::whereBetween('created_at', [$start, $end]);
 
@@ -196,10 +196,10 @@ class StatModule
                 'title' => __('Total Replies', 'fluent-support'),
                 'count' => $replies_count
             ],
-            'interactions_count' => [
-                'title' => __('Total Interactions', 'fluent-support'),
-                'count' => $interactions_count
-            ],
+            // 'interactions_count' => [
+            //     'title' => __('Total Interactions', 'fluent-support'),
+            //     'count' => $interactions_count
+            // ],
             'total_closed'       => [
                 'title' => __('Total Closed', 'fluent-support'),
                 'count' => $total_closed
@@ -258,12 +258,15 @@ class StatModule
     public static function getAgentTodayStats()
     {
         $stats = [];
-        Agent::select(['id', 'first_name'])->get()->each(function ($agent) use (&$stats) {
+        Agent::get()->each(function ($agent) use (&$stats) {
             $agentStat = static::getTodayStats($agent->id);
             $waiting = static::countAwaitingTickets('agent_id', $agent->id);
             if(!empty($agentStat['responses']['count']) || $waiting) {
                 $stats[] = [
-                    'agent_name' => $agent->first_name,
+                    'agent_id'    => $agent->id,
+                    'agent_name' => $agent->full_name,
+                    'agent_email' => $agent->email,
+                    'avatar'      => $agent->photo,
                     'stats'      => array_merge(
                         [
                             'waiting_today' => [

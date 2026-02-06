@@ -171,7 +171,8 @@ class Helper
         $settings = (new Settings())->globalBusinessSettings();
         $maxFileSize = floatval($settings['max_file_size']);
 
-        return sprintf(__('Supported Types: %s and max file size: %.01fMB', 'fluent-support'), implode(', ', $mimeHeadings), $maxFileSize);
+        // translators: %1$s is a comma-separated list of supported file types, %2$.01f is the maximum file size in megabytes
+        return sprintf(__('Supported Types: %1$s and max file size: %2$.01fMB', 'fluent-support'), implode(', ', $mimeHeadings), $maxFileSize);
     }
 
     public static function getMimeGroups()
@@ -243,7 +244,7 @@ class Helper
             ->first();
 
         if ($data) {
-            $value = maybe_unserialize($data->value);
+            $value = static::safeUnserialize($data->value);
             if ($value) {
                 return $value;
             }
@@ -302,7 +303,7 @@ class Helper
             ->first();
 
         if ($data) {
-            $value = maybe_unserialize($data->value);
+            $value = static::safeUnserialize($data->value);
             if ($value) {
                 return $value;
             }
@@ -340,7 +341,6 @@ class Helper
     public static function getTicketViewUrl($ticket)
     {
         $baseUrl = self::getPortalBaseUrl();
-
         return $baseUrl . '/#/ticket/' . $ticket->id . '/view';
     }
 
@@ -355,7 +355,7 @@ class Helper
         $baseUrl = add_query_arg([
             'fs_view'      => 'ticket',
             'support_hash' => $ticket->hash,
-            'ticket_id'    => $ticket->id
+            'ticket_id'    => $ticket->id,
         ], $baseUrl);
 
         return $baseUrl . '#/ticket/' . $ticket->id . '/view';
@@ -454,7 +454,7 @@ class Helper
             ->first();
 
         if ($data) {
-            $value = maybe_unserialize($data->value);
+            $value = static::safeUnserialize($data->value);
             if ($value) {
                 return $value;
             }
@@ -557,7 +557,7 @@ class Helper
     {
         $orderBys = ['ASC', 'DESC'];
 
-        $orderType = trim(strtoupper($orderType));
+        $orderType = trim(strtoupper((string)($orderType ?? '')));
 
         return in_array($orderType, $orderBys) ? $orderType : 'DESC';
     }
@@ -639,7 +639,7 @@ class Helper
         $chatGPTSettingsData = Meta::where('object_type', '_fs_openai_settings')->value('value');
 
         if ($chatGPTSettingsData) {
-            $settings = maybe_unserialize($chatGPTSettingsData);
+            $settings = static::safeUnserialize($chatGPTSettingsData);
             return !empty($settings['api_key']);
         }
 
@@ -648,7 +648,7 @@ class Helper
 
     public static function fluentBotIntegrationStatus()
     {
-        $settings = maybe_unserialize(
+        $settings = static::safeUnserialize(
             Meta::where('object_type', 'fluent_bot_settings')->value('value')
         );
 
@@ -669,6 +669,10 @@ class Helper
 
     public static function generateMessageID($email)
     {
+        if (!$email || !is_string($email)) {
+            return false;
+        }
+
         $emailParts = explode('@', $email);
         if (count($emailParts) != 2) {
             return false;
@@ -790,6 +794,13 @@ class Helper
                 'description'    => __('The most popular e-commerce platform for WordPress', 'fluent-support'),
                 'doc_url'  => 'https://fluentsupport.com/docs/woocommerce-integration/',
             ],
+            'fluent-cart'     => [
+                'title'          => __('FluentCart', 'fluent-support'),
+                'logo'           => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/integrations/fluent-cart.webp',
+                'is_integrated'  => defined('FLUENTCART_VERSION'),
+                'description'    => __('A New Era of eCommerce with WordPress', 'fluent-support'),
+                'doc_url'       => 'https://fluentsupport.com/docs/fluentcart-integration/',
+            ],
             'lifter-lms'     => [
                 'title'          => __('LifterLMS', 'fluent-support'),
                 'logo'           => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/integrations/lifter-lms.png',
@@ -833,14 +844,14 @@ class Helper
                 'doc_url'       => 'https://fluentsupport.com/docs/fluentcrm-integration/',
             ],
             'fluent-community'  => [
-                'title'          => __('Fluent Community', 'fluent-support'),
+                'title'          => __('FluentCommunity', 'fluent-support'),
                 'logo'           => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/integrations/fluent-community.png',
                 'is_integrated'   => defined('FLUENT_COMMUNITY_PLUGIN_VERSION'),
                 'description'    => __('Build and manage vibrant online communities with integrated LMS features directly within WordPress.', 'fluent-support'),
                 'doc_url'       => 'https://fluentsupport.com/docs/fluentcommunity-integration/',
             ],
             'fluent-forms'  => [
-                'title'          => __('Fluent FORMS', 'fluent-support'),
+                'title'          => __('Fluent Forms', 'fluent-support'),
                 'logo'           => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/integrations/fluent-forms.png',
                 'is_integrated'   => defined('FLUENTFORM'),
                 'description'    => __('A robust form plugin suitable for any business', 'fluent-support'),
@@ -962,77 +973,77 @@ class Helper
             [
                 'title' => __('Global Settings', 'fluent-support'),
                 'route_name' => 'global_settings',
-                'icon' => 'Document',
+                'icon' => 'settings',
             ],
             [
                 'title' => __('Ticket Tags', 'fluent-support'),
                 'route_name' => 'tags',
-                'icon' => 'CollectionTag',
+                'icon' => 'ticketTag',
             ],
             [
                 'title' => __('Ticket Form Config', 'fluent-support'),
                 'route_name' => 'ticket-form-config',
-                'icon' => 'Setting',
+                'icon' => 'formConfig',
             ],
             [
                 'title' => __('Custom Fields', 'fluent-support'),
                 'route_name' => 'custom_fields',
-                'icon' => 'Tickets',
+                'icon' => 'customFields',
             ],
             [
                 'title' => __('Products', 'fluent-support'),
                 'route_name' => 'products',
-                'icon' => 'Goods',
+                'icon' => 'products',
             ],
             [
                 'title' => __('Support Staff', 'fluent-support'),
                 'route_name' => 'support-staffs',
-                'icon' => 'User',
+                'icon' => 'supportStaffs',
             ],
             [
                 'title' => __('FluentCRM Integration', 'fluent-support'),
                 'route_name' => 'fluentcrm_integration',
-                'icon' => 'Cpu',
+                'icon' => 'crmIntegration',
             ],
             [
                 'title' => __('Incoming Webhook', 'fluent-support'),
                 'route_name' => 'incoming-webhook',
-                'icon' => 'Connection',
+                'icon' => 'incomingWebhook',
             ],
             [
                 'title' => __('Notification Integrations', 'fluent-support'),
                 'route_name' => 'integration',
-                'icon' => 'AlarmClock',
+                'icon' => 'notification',
             ],
             [
                 'title' => __('File Upload Integrations', 'fluent-support'),
                 'route_name' => 'upload_integration',
-                'icon' => 'FolderAdd',
+                'icon' => 'fileUpload',
             ],
             [
                 'title' => __('Auto Close Settings', 'fluent-support'),
                 'route_name' => 'auto_close',
-                'icon' => 'Timer',
+                'icon' => 'autoClose',
             ],
             [
                 'title' => __('Ticket Importer', 'fluent-support'),
                 'route_name' => 'ticket_importer',
-                'icon' => 'Download',
+                'icon' => 'importer',
             ],
             [
                 'title' => __('Recaptcha', 'fluent-support'),
                 'route_name' => 'reCaptcha',
-                'icon' => 'Key',
+                'icon' => 'reCaptcha',
             ],
             [
                 'title' => __('Integration Statuses', 'fluent-support'),
                 'route_name' => 'integration_statuses',
-                'icon' => 'Connection',
+                'icon' => 'status',
             ],
             [
                 'title' => __('OpenAI Integration', 'fluent-support'),
                 'route_name' => 'openai_integration',
-                'icon' => 'Connection',
+                'icon' => 'aiIntegration',
             ],
         ];
 
@@ -1040,7 +1051,7 @@ class Helper
             $menu[] = [
                 'title' => __('License Management', 'fluent-support'),
                 'route_name' => 'license',
-                'icon' => 'Lock',
+                'icon' => 'license',
             ];
         }
 
@@ -1097,7 +1108,7 @@ class Helper
         $reCaptchaSettingsData = Meta::where('object_type', '_fs_recaptcha_settings')->first();
 
         if ($reCaptchaSettingsData) {
-            $settings = maybe_unserialize($reCaptchaSettingsData->value);
+            $settings = static::safeUnserialize($reCaptchaSettingsData->value);
             $status = Arr::get($settings, 'is_enabled', false);
             return $status == 'true' ? true : false;
         }
@@ -1138,7 +1149,18 @@ class Helper
             $activitiesQuery->where('agent_id', $agentId);
         }
 
-        return $activitiesQuery->paginate($perPage, ['*'], 'page', $page);
+        $activities = $activitiesQuery->paginate($perPage, ['*'], 'page', $page);
+
+        $settings = static::getSettings();
+
+        return [
+            'data' => $activities->items(),
+            'total' => $activities->total(),
+            'per_page' => $activities->perPage(),
+            'current_page' => $activities->currentPage(),
+            'last_page' => $activities->lastPage(),
+            'settings' => $settings['ai_activity_settings']
+        ];
     }
 
     public static function updateAISettings($settings)
@@ -1154,7 +1176,7 @@ class Helper
         Helper::updateOption('_ai_activity_settings', $settings);
 
         return [
-            'message' => __('AI Activity settings has been updated', 'fluent-support')
+            'message' => __('AI Activity settings have been updated', 'fluent-support')
         ];
     }
 
@@ -1169,11 +1191,30 @@ class Helper
 
         $settings = wp_parse_args($settings, $defaults);
 
-        if (! $settings ) throw new \Exception('No activity settings found');
+        if (! $settings ) throw new \Exception(esc_html__('No activity settings found', 'fluent-support'));
 
         return [
             'ai_activity_settings' => $settings
         ];
+    }
+
+    /**
+     * Check if activity logs are disabled for a given option key
+     * @param string $optionKey The option key to check
+     * @return bool
+     */
+    public static function areLogsDisabled($optionKey)
+    {
+        if (empty($optionKey)) {
+            return false;
+        }
+
+        $settings = Helper::getOption($optionKey, []);
+        $defaults = [
+            'disable_logs' => 'no'
+        ];
+        $settings = wp_parse_args($settings, $defaults);
+        return isset($settings['disable_logs']) && $settings['disable_logs'] === 'yes';
     }
 
     public static function getIp($anonymize = false)
@@ -1190,29 +1231,36 @@ class Helper
         }
 
         $ipAddress = '';
+        $remoteAddr = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
+
         if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
             //If it's a valid Cloudflare request
-            if (self::isCfIp($_SERVER['REMOTE_ADDR'])) {
+            if (self::isCfIp($remoteAddr)) {
                 //Use the CF-Connecting-IP header.
-                $ipAddress = $_SERVER['HTTP_CF_CONNECTING_IP'];
+                $ipAddress = sanitize_text_field(wp_unslash($_SERVER['HTTP_CF_CONNECTING_IP']));
             } else {
                 //If it isn't valid, then use REMOTE_ADDR.
-                $ipAddress = $_SERVER['REMOTE_ADDR'];
+                $ipAddress = $remoteAddr;
             }
-        } else if ($_SERVER['REMOTE_ADDR'] == '127.0.0.1') {
+        } else if ($remoteAddr == '127.0.0.1') {
             // most probably it's local reverse proxy
             if (isset($_SERVER["HTTP_CLIENT_IP"])) {
-                $ipAddress = $_SERVER["HTTP_CLIENT_IP"];
+                $ipAddress = sanitize_text_field(wp_unslash($_SERVER["HTTP_CLIENT_IP"]));
             } else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                $ipAddress = (string)rest_is_ip_address(trim(current(preg_split('/,/', sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR']))))));
+                $forwardedFor = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_FORWARDED_FOR']));
+                $splitResult = preg_split('/,/', $forwardedFor);
+                $firstIp = is_array($splitResult) ? current($splitResult) : '';
+                $ipAddress = (string)rest_is_ip_address(trim((string)$firstIp));
             }
         }
 
         if (!$ipAddress) {
-            $ipAddress = $_SERVER['REMOTE_ADDR'];
+            $ipAddress = $remoteAddr;
         }
 
-        $ipAddress = preg_replace('/^(\d+\.\d+\.\d+\.\d+):\d+$/', '\1', $ipAddress);
+        if ($ipAddress) {
+            $ipAddress = preg_replace('/^(\d+\.\d+\.\d+\.\d+):\d+$/', '\1', $ipAddress);
+        }
 
         $ipAddress = apply_filters('fluent_auth/user_ip', $ipAddress);
 
@@ -1228,7 +1276,7 @@ class Helper
     public static function isCfIp($ip = '')
     {
         if (!$ip) {
-            $ip = $_SERVER['REMOTE_ADDR'];
+            $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
         }
         $cloudflareIPRanges = array(
             '103.21.244.0/22',
@@ -1262,6 +1310,10 @@ class Helper
 
     private static function ipInRange($ip, $range)
     {
+        if (!$ip || !$range || !is_string($ip) || !is_string($range)) {
+            return false;
+        }
+
         if (strpos($range, '/') !== false) {
             // $range is in IP/NETMASK format
             list($range, $netmask) = explode('/', $range, 2);
@@ -1431,4 +1483,18 @@ class Helper
         }
     }
 
+    /**
+     * Safely unserialize data.
+     *
+     * @param string $data The serialized data.
+     * @return mixed The unserialized data or the original data if not serialized.
+     */
+    public static function safeUnserialize($data)
+    {
+        if (is_serialized($data)) { // Don't attempt to unserialize data that wasn't serialized going in.
+            return @unserialize(trim($data), ['allowed_classes' => false]);
+        }
+
+        return $data;
+    }
 }

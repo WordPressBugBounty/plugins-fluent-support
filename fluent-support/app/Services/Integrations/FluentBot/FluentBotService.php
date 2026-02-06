@@ -16,9 +16,14 @@ class FluentBotService
         return (new FluentBotHelper())->modifyResponse($prompt, $selectedText, $ticketId);
     }
 
-    public function generateResponse(string $responseContent, $ticket, $productId, $previousAIResponse = '')
+    public function generateResponse(string $responseContent, $ticket, $productId, $conversationId = null)
     {
-        return (new FluentBotHelper())->generateResponse($responseContent, $ticket, $productId, $previousAIResponse);
+        return (new FluentBotHelper())->generateResponse($responseContent, $ticket, $productId, $conversationId);
+    }
+
+    public function generateStreamResponse(string $responseContent, $ticket, $productId, $conversationId = null)
+    {
+        return (new FluentBotHelper())->generateStreamResponse($responseContent, $ticket, $productId, $conversationId);
     }
 
     public function getTicketSummary($ticket)

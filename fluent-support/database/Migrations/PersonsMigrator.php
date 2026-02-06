@@ -9,7 +9,6 @@ class PersonsMigrator
     public static function migrate()
     {
         global $wpdb;
-
         $charsetCollate = $wpdb->get_charset_collate();
 
         $table = $wpdb->prefix . static::$tableName;
@@ -39,23 +38,77 @@ class PersonsMigrator
                 `remote_uid` BIGINT(20) UNSIGNED NULL,
                 `last_response_at` TIMESTAMP NULL,
                 `created_at` TIMESTAMP NULL,
-                `updated_at` TIMESTAMP NULL
+                `updated_at` TIMESTAMP NULL,
+                INDEX `idx_email` (`email`),
+                INDEX `idx_user_id` (`user_id`),
+                INDEX `idx_ip_address` (`ip_address`)
             ) $charsetCollate;";
-            dbDelta($sql);
+            $created = dbDelta($sql);
+            return $created;
         } else {
-            // @todo: We will remove this on final release
-            // This is only for beta users
-            $existing_columns = $wpdb->get_col("DESC {$table}", 0);
-            if(!in_array('title', $existing_columns)) {
-                $query = 'ALTER TABLE '.$table.' ADD `title` VARCHAR(192) NULL AFTER `email`';
-                $wpdb->query($query);
-            }
+            static::alterTable($table);
+        }
 
-            if(!in_array('description', $existing_columns)) {
-                $query = 'ALTER TABLE '.$table.' ADD `description`  MEDIUMTEXT NULL AFTER `user_id`';
-                $wpdb->query($query);
-            }
+        return false;
+    }
 
+    public static function alterTable($table) 
+    {
+        static::addMissingColumns($table);
+        static::addMissingIndexes($table);
+    }
+
+    public static function addMissingColumns($table)
+    {
+        global $wpdb;
+
+        // Escape table name
+        $table = esc_sql($table);
+
+        // Get existing columns
+        $existing_columns = $wpdb->get_col("DESC `$table`", 0);
+
+        // @todo: We will remove this on final release
+        // This is only for beta users
+        if (!in_array('title', $existing_columns)) {
+            $query = 'ALTER TABLE `' . $table . '` ADD `title` VARCHAR(192) NULL AFTER `email`';
+            $wpdb->query($query);
+        }
+
+        if (!in_array('description', $existing_columns)) {
+            $query = 'ALTER TABLE `' . $table . '` ADD `description` MEDIUMTEXT NULL AFTER `user_id`';
+            $wpdb->query($query);
+        }
+    }
+
+    public static function addMissingIndexes($table)
+    {
+        global $wpdb;
+
+        // Escape table name
+        $table = esc_sql($table);
+
+        // Get existing indexes
+        $existing_indexes = $wpdb->get_results("SHOW INDEX FROM `$table`");
+        $existing_index_names = [];
+
+        foreach ($existing_indexes as $index) {
+            $existing_index_names[] = $index->Key_name;
+        }
+
+        // Desired indexes
+        $indexes = [
+            'idx_email' => 'email',
+            'idx_user_id' => 'user_id',
+            'idx_ip_address' => 'ip_address',
+        ];
+
+        // Add missing indexes
+        foreach ($indexes as $index_name => $column_name) {
+            if (!in_array($index_name, $existing_index_names)) {
+                $sql = "ALTER TABLE `$table` ADD INDEX `$index_name` (`$column_name`)";
+                $wpdb->query($sql);
+            }
         }
     }
 }

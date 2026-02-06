@@ -73,7 +73,8 @@ class Settings
 
         $defaults = [
             'portal_page_id'        => '',
-            'login_message'         => sprintf(__('%1sPlease login or create an account to access the Customer Support Portal%2s [fluent_support_auth]', 'fluent-support'), '<p>', '</p>'),
+            // translators: %1$s is opening paragraph tag, %2$s is closing paragraph tag
+            'login_message'         => sprintf(__('%1$sPlease login or create an account to access the Customer Support Portal%2$s [fluent_support_auth]', 'fluent-support'), '<p>', '</p>'),
             'disable_public_ticket' => 'no',
             'accepted_file_types'   => ['images', 'csv', 'documents', 'zip', 'json'],
             'max_file_size'         => 2,
@@ -82,7 +83,7 @@ class Settings
             'enable_admin_bar_summary' => 'no',
             'enable_draft_mode' => 'no',
             'agent_feedback_rating' => 'no',
-            'keyboard_shortcuts'   => 'no'
+            'keyboard_shortcuts'   => 'yes'
         ];
 
         //Get default/existing settings from database using the key global_business_settings
@@ -130,7 +131,9 @@ class Settings
                 'show_id'     => true,
                 'placeholder' => __('Select Portal Page', 'fluent-support'),
                 'options'     => Helper::getWPPages(),//Get list of published pages
-                'inline_help' => __('Please provide the page id where you want to show the tickets for your customers. Use shortcode <code>[fluent_support_portal]</code> in that page', 'fluent-support')
+                'inline_help' => __('Please provide the page id where you want to show the tickets for your customers. Use shortcode <code>[fluent_support_portal]</code> in that page', 'fluent-support'),
+                'admin_url'   => admin_url(),
+                'home_url'    => home_url('/'),
             ],
             'login_message'         => [
                 'type'        => 'wp-editor',
@@ -138,31 +141,34 @@ class Settings
                 'inline_help' => __('Please provide message for not logged in users. You can place login shortcode too. Use shortcode <code>[fluent_support_login]</code> to show built-in login form. For the user registration use this shortcode <code>[fluent_support_signup]</code> and for both form please use <code>[fluent_support_auth]</code>', 'fluent-support')
             ],
             'disable_public_ticket' => [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
+                'label'       => __('Public Ticket Interaction', 'fluent-support'),
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
                 'checkbox_label' => __('Disable Public Ticket interaction', 'fluent-support'),
                 'inline_help'    => __('If you enable this then only logged in user can reply the tickets. Otherwise, url will be signed and intended user can reply without logging in', 'fluent-support')
             ],
             'accepted_file_types'   => [
-                'wrapper_class' => 'fs_half_field',
+                'wrapper_class' => '',
                 'type'    => 'checkbox-group',
                 'label'   => __('Accepted File Types', 'fluent-support'),
                 'options' => $formattedMimeGroups
             ],
             'max_file_size' => [
-                'wrapper_class' => 'fs_half_field',
+                'wrapper_class' => 'fs_settings_half_field',
                 'type'    => 'input-text',
                 'data_type' => 'number',
                 'label'   => __('Max File Size (in MegaByte)', 'fluent-support'),
             ],
             'max_file_upload' => [
-                'wrapper_class' => 'fs_half_field',
+                'wrapper_class' => 'fs_settings_half_field',
                 'type'    => 'input-text',
                 'data_type' => 'number',
                 'label'   => __('Maximum File Upload', 'fluent-support'),
             ],
             'del_files_on_close' => [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
@@ -170,6 +176,7 @@ class Settings
                 'inline_help'    => __('If you enable this feature, all attachments associated with a ticket will be deleted when the ticket is closed.', 'fluent-support')
             ],
             'enable_admin_bar_summary' => [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
@@ -177,6 +184,7 @@ class Settings
                 'inline_help'    => __('If you enable this, logged in user can see the ticket summary from top nav bar.', 'fluent-support')
             ],
             'enable_draft_mode' => [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
@@ -184,12 +192,13 @@ class Settings
                 'inline_help'    => __('If you enable this setting, any written response will be saved as a draft if an agent accidentally closes a ticket.', 'fluent-support')
             ],
             'custom_registration_form_field'   => [
-                'wrapper_class' => 'inline-checkbox',
+                'wrapper_class' => '',
                 'type'    => 'checkbox-group',
                 'label'   => __('Custom Registration Form Field', 'fluent-support'),
                 'options' => $customRegistrationFormOptions
             ],
             'enable_two_fa' => [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
@@ -197,16 +206,18 @@ class Settings
                 'inline_help'    => __('If you enable this setting, users will be required to submit a second form of authentication, such as a code sent to their email, to login.', 'fluent-support')
             ],
             'keyboard_shortcuts' => [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
                 'checkbox_label' => __('Enable Keyboard Shortcuts', 'fluent-support'),
-                'inline_help'    => __("If you enable this, agents can use keyboard shortcuts for faster actions.", 'fluent-support')
+                'inline_help'    => __("If you enable this, agents can use keyboard shortcuts for faster actions.", 'fluent-support'),
+                'shortcut_modal' => $this->getKeyboardShortcutModalData()
             ]
         ];
-
         if (defined('FLUENTSUPPORTPRO_PLUGIN_VERSION')) {
             $fields['agent_feedback_rating'] = [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
@@ -215,15 +226,82 @@ class Settings
             ];
 
             $fields['agent_time_tracking'] = [
+                'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
                 'true_label'     => 'yes',
                 'false-label'    => 'no',
                 'checkbox_label' => __('Agent Time Tracking', 'fluent-support'),
                 'inline_help' => __("If you enable this setting, the agent can specify the amount of time needed to complete a ticket.", 'fluent-support')
             ];
+
+            if (defined('FLUENTCART_VERSION')) {
+                $fields['enable_fc_menu'] = [
+                    'type'           => 'inline-checkbox',
+                    'checkbox_label' => 'Add support link to FluentCart account navigation',
+                    'inline_help'    => __("If you enable this setting, support link will be added to FluentCart account navigation.", 'fluent-support'),
+                    'true_label'     => 'yes',
+                    'false_label'    => 'no'
+                ];
+            }
         }
 
         return $fields;
+    }
+
+    /**
+     * Returns translatable keyboard shortcut modal data for the settings form.
+     *
+     * @return array{title: string, mac_label: string, win_label: string, action_label: string, shortcut_label: string, mac_shortcuts: array, win_shortcuts: array}
+     */
+    public function getKeyboardShortcutModalData()
+    {
+        $actionLabel = __('Action', 'fluent-support');
+        $shortcutLabel = __('Shortcut', 'fluent-support');
+
+        $macShortcuts = [
+            ['action' => __('Tickets – Advanced filter toggle', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + f'],
+            ['action' => __('Tickets – Refresh', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + q'],
+            ['action' => __('Tickets – Create Ticket', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + n'],
+            ['action' => __('Tickets – Reset filter', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + r'],
+            ['action' => __('Tickets – All Tickets', 'fluent-support'), 'shortcut' => '⌘ + ⇧ + a'],
+            ['action' => __('Tickets – My Tickets', 'fluent-support'), 'shortcut' => '⌘ + ⇧ + m'],
+            ['action' => __('Tickets – Unassigned', 'fluent-support'), 'shortcut' => '⌘ + ⇧ + u'],
+            ['action' => __('Tickets – Waiting for reply', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + w'],
+            ['action' => __('Tickets – Bookmarks', 'fluent-support'), 'shortcut' => '⌘ + ⇧ + b'],
+            ['action' => __('Tickets – Toggle (Open, active, close, all)', 'fluent-support'), 'shortcut' => '⌘ + ⇧ + → / ←'],
+            ['action' => __('Ticket Reply – Reply', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + r'],
+            ['action' => __('Ticket Reply – Personal note', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + n'],
+            ['action' => __('Ticket Reply – Merge', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + m'],
+            ['action' => __('Ticket Reply – Bookmarks', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + b'],
+            ['action' => __('Ticket Reply – Refresh', 'fluent-support'), 'shortcut' => '⌘ + ⌥ + q'],
+        ];
+
+        $winShortcuts = [
+            ['action' => __('Tickets – Advanced filter toggle', 'fluent-support'), 'shortcut' => 'Alt + Win + Shift + f'],
+            ['action' => __('Tickets – Refresh', 'fluent-support'), 'shortcut' => 'Alt + Win + q'],
+            ['action' => __('Tickets – Create Ticket', 'fluent-support'), 'shortcut' => 'Alt + Win + n'],
+            ['action' => __('Tickets – Reset filter', 'fluent-support'), 'shortcut' => 'Alt + Win + Shift + r'],
+            ['action' => __('Tickets – All Tickets', 'fluent-support'), 'shortcut' => 'Win + Shift + a'],
+            ['action' => __('Tickets – My Tickets', 'fluent-support'), 'shortcut' => 'Alt + Win + Shift + m'],
+            ['action' => __('Tickets – Unassigned', 'fluent-support'), 'shortcut' => 'Win + Shift + u'],
+            ['action' => __('Tickets – Waiting for reply', 'fluent-support'), 'shortcut' => 'Alt + Win + Shift + w'],
+            ['action' => __('Tickets – Bookmarks', 'fluent-support'), 'shortcut' => 'Win + Shift + b'],
+            ['action' => __('Ticket Reply – Reply', 'fluent-support'), 'shortcut' => 'Alt + Win + Shift + r'],
+            ['action' => __('Ticket Reply – Personal note', 'fluent-support'), 'shortcut' => 'Alt + Win + n'],
+            ['action' => __('Ticket Reply – Merge', 'fluent-support'), 'shortcut' => 'Ctrl + Alt + Win + m'],
+            ['action' => __('Ticket Reply – Bookmarks', 'fluent-support'), 'shortcut' => 'Ctrl + Alt + Win + b'],
+            ['action' => __('Ticket Reply – Refresh', 'fluent-support'), 'shortcut' => 'Alt + Win + q'],
+        ];
+
+        return [
+            'title'         => __('Keyboard Shortcuts', 'fluent-support'),
+            'mac_label'     => __('macOS', 'fluent-support'),
+            'win_label'     => __('Windows', 'fluent-support'),
+            'action_label'  => $actionLabel,
+            'shortcut_label'=> $shortcutLabel,
+            'mac_shortcuts' => $macShortcuts,
+            'win_shortcuts' => $winShortcuts,
+        ];
     }
 
     public function saveBoxEmailSettings($box, $emailKey, $settings)

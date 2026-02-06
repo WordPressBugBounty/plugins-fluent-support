@@ -4,6 +4,7 @@ namespace FluentSupport\Framework\Support;
 
 use Closure;
 use ArrayAccess;
+use InvalidArgumentException;
 use FluentSupport\Framework\Support\Helper;
 use FluentSupport\Framework\Support\Collection;
 use FluentSupport\Framework\Support\MacroableTrait;
@@ -11,6 +12,17 @@ use FluentSupport\Framework\Support\MacroableTrait;
 class Arr
 {
     use MacroableTrait;
+
+    /**
+     * Makes a collection from array
+     * 
+     * @param  array $array
+     * @return \FluentSupport\Framework\Support\Collection
+     */
+    public static function of(array $array)
+    {
+        return Helper::collect($array);
+    }
 
     /**
      * Determine whether the given value is array accessible.
@@ -175,6 +187,28 @@ class Arr
     }
 
     /**
+     * Alias of exists.
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int  $key
+     * @return bool
+     */
+    public static function keyExists($array, $key)
+    {
+        return static::exists($array, $key);
+    }
+
+    /**
+     * Alias of exists.
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int  $key
+     * @return bool
+     */
+    public static function arrayKeyExists($array, $key)
+    {
+        return static::exists($array, $key);
+    }
+
+    /**
      * Return the first element in an array passing a given truth test.
      *
      * @param  iterable  $array
@@ -182,7 +216,7 @@ class Arr
      * @param  mixed  $default
      * @return mixed
      */
-    public static function first($array, callable $callback = null, $default = null)
+    public static function first($array, ?callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
             if (empty($array)) {
@@ -204,6 +238,102 @@ class Arr
     }
 
     /**
+     * Returns the key of the first item (matching the specified
+     * callback if given) or null if there is no such item.
+     * 
+     * @param  array $array
+     * @param  callable|null $callback
+     * @return mixed
+     */
+    public static function firstKey($array, ?callable $callback = null)
+    {
+        if (!$callback) {
+            return array_key_first($array);
+        }
+
+        foreach ($array as $k => $v) {
+            if ($callback($v, $k, $array)) {
+                return $k;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Recursively filter an array like array_filter.
+     * 
+     * @param  array $array
+     * @param  callable|null $cb
+     * @param  integer $mode (ARRAY_FILTER_USE_BOTH = 1 | ARRAY_FILTER_USE_KEY = 2)
+     * @return array
+     */
+    public static function filterRecursive($array, ?callable $cb = null, $mode = 0)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                if (is_int($key)) {
+                    $result[] = static::filterRecursive($value, $cb, $mode);
+                } else {
+                    $result[$key] = static::filterRecursive($value, $cb, $mode);
+                }
+            } else {
+                if (is_null($cb)) {
+                    if ($value) {
+                        if (is_int($key)) {
+                            $result[] = $value;
+                        } else {
+                            $result[$key] = $value;
+                        }
+                    }
+                } else {
+                    if ($mode && call_user_func($cb, $value, $key)) {
+                        if (is_int($key)) {
+                            $result[] = $value;
+                        } else {
+                            $result[$key] = $value;
+                        }
+                    } elseif (!$mode && call_user_func($cb, $value)) {
+                        if (is_int($key)) {
+                            $result[] = $value;
+                        } else {
+                            $result[$key] = $value;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Recursively search the value and return the path of first match.
+     * 
+     * @param array $array
+     * @param mixed $value
+     * @param bool $ci (false for case insensitive search, true otherwise)
+     * @return string|null
+     */
+    public static function findPath($array, $value, $ci = false)
+    {
+        if (!$ci) {
+            $value = strtolower($value);
+            $array = static::map($array, 'strtolower');
+        }
+
+        foreach ($array as $key => $val) {
+            if ($val === $value) {
+                return $key;
+            } elseif (is_array($val) && $path = static::findPath($val, $value, $ci)) {
+                return $key . '.' . $path;
+            }
+        }
+    }
+
+    /**
      * Return the last element in an array passing a given truth test.
      *
      * @param  array  $array
@@ -211,7 +341,7 @@ class Arr
      * @param  mixed  $default
      * @return mixed
      */
-    public static function last($array, callable $callback = null, $default = null)
+    public static function last($array, ?callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
             return empty($array) ? Helper::value($default) : end($array);
@@ -221,10 +351,35 @@ class Arr
     }
 
     /**
+     * Returns the key of the last item (matching the specified
+     * callback if given) or null if there is no such item.
+     * 
+     * @param  array $array
+     * @param  callable|null $callback
+     * @return mixed
+     */
+    public static function lastKey($array, ?callable $callback = null)
+    {
+        if (!$callback) {
+            return array_key_last($array);
+        }
+
+        $lastKey = null;
+
+        foreach ($array as $k => $v) {
+            if ($callback($v, $k, $array)) {
+                $lastKey = $k;
+            }
+        }
+
+        return $lastKey;
+    }
+
+    /**
      * Flatten a multi-dimensional array into a single level.
      *
      * @param  iterable  $array
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return array
      */
     public static function flatten($array, $depth = INF)
@@ -332,7 +487,7 @@ class Arr
     }
 
     /**
-     * Check if an item or items exist in an array using "dot" notation.
+     * Check if an item or items (using key) exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|array  $keys
@@ -398,31 +553,50 @@ class Arr
     }
 
     /**
+     * Alias of contains.
+     *
+     * @param  array $array
+     * @param  string|array  $value
+     * @return bool
+     */
+    public static function inArray($array, $value)
+    {
+        return static::contains($array, $value);
+    }
+
+    /**
      * Determines if an array is associative.
      *
-     * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
+     * An array is "associative" if it doesn't have
+     * sequential numerical keys beginning with zero.
      *
      * @param  array  $array
      * @return bool
      */
     public static function isAssoc(array $array)
     {
-        $keys = array_keys($array);
-
-        return array_keys($keys) !== $keys;
+        return !static::isList($array);
     }
 
     /**
      * Determines if an array is a list.
      *
-     * An array is a "list" if all array keys are sequential integers starting from 0 with no gaps in between.
+     * An array is a "list" if all array keys are sequential
+     * integers starting from 0 with no gaps in between.
      *
      * @param  array  $array
      * @return bool
      */
     public static function isList($array)
     {
-        return ! self::isAssoc($array);
+        $i = -1;
+        foreach ($array as $k => $v) {
+            ++$i;
+            if ($k !== $i) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -457,6 +631,37 @@ class Arr
     public static function only($array, $keys)
     {
         return array_intersect_key($array, array_flip((array) $keys));
+    }
+
+    /**
+     * Select an array of values from an array.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * @return array
+     */
+    public static function select($array, $keys)
+    {
+        $keys = static::wrap($keys);
+
+        return array_map(function ($item) use ($keys) {
+            $result = [];
+            
+            $item = (array) $item;
+            
+            foreach ($keys as $key) {
+                
+                if (static::accessible($item) && static::has($item, $key)) {
+                    
+                    [$first] = explode('.', $key);
+
+                    $result[$first] = static::get($item, $first);
+                }
+            }
+
+            return $result;
+
+        }, (array) $array);
     }
 
     /**
@@ -654,12 +859,14 @@ class Arr
      */
     public static function shuffle($array, $seed = null)
     {
-        if (is_null($seed)) {
-            shuffle($array);
-        } else {
+        if (!is_null($seed)) {
             mt_srand($seed);
-            shuffle($array);
+            usort($array, function () {
+                return mt_rand(-1, 1);
+            });
             mt_srand();
+        } else {
+            shuffle($array);
         }
 
         return $array;
@@ -678,32 +885,190 @@ class Arr
     }
 
     /**
+     * Sort an array in descending order.
+     *
+     * @param  array       $array  The input array.
+     * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $flags
+     * @return array
+     * 
+     * @see https://www.php.net/manual/en/function.rsort.php
+     */
+    public static function rsort($array, $flags = SORT_REGULAR)
+    {
+        rsort($array, $flags);
+        return $array;
+    }
+
+    /**
+     * Sort an array in ascending order and maintain index association.
+     *
+     * @param  array  $array
+     * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $flags
+     * @return array
+     * @see https://www.php.net/manual/en/function.asort.php
+     */
+    public static function asort($array, $flags = SORT_REGULAR)
+    {
+        asort($array, $flags);
+        return $array;
+    }
+
+    /**
+     * Sort an array in descending order and maintain index association.
+     *
+     * @param  array  $array
+     * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $flags
+     * @return array
+     * @see https://www.php.net/manual/en/function.arsort.php
+     */
+    public static function arsort($array, $flags = SORT_REGULAR)
+    {
+        arsort($array, $flags);
+        return $array;
+    }
+
+    /**
+     * Sort an array by key in ascending order.
+     *
+     * @param  array  $array
+     * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $flags
+     * @return array
+     * @see https://www.php.net/manual/en/function.ksort.php
+     */
+    public static function ksort($array, $flags = SORT_REGULAR)
+    {
+        ksort($array, $flags);
+        return $array;
+    }
+
+    /**
+     * Sort an array by key in descending order.
+     *
+     * @param  array  $array
+     * @param  int-mask-of<SORT_REGULAR|SORT_NUMERIC|SORT_STRING|SORT_LOCALE_STRING|SORT_NATURAL|SORT_FLAG_CASE>  $flags
+     * @return array
+     * @see https://www.php.net/manual/en/function.krsort.php
+     */
+    public static function krsort($array, $flags = SORT_REGULAR)
+    {
+        krsort($array, $flags);
+        return $array;
+    }
+
+    /**
+     * Sort an array using a "natural order" algorithm.
+     *
+     * @param  array  $array
+     * @return array
+     * @see https://www.php.net/manual/en/function.natsort.php
+     */
+    public static function natsort($array)
+    {
+        natsort($array);
+        return $array;
+    }
+
+    /**
+     * Sort an array using a case insensitive "natural order" algorithm.
+     *
+     * @param  array  $array
+     * @return array
+     * @see https://www.php.net/manual/en/function.natcasesort.php
+     */
+    public static function natcasesort($array)
+    {
+        natcasesort($array);
+        return $array;
+    }
+
+    /**
+     * Sort an array by values using a user-defined comparison function.
+     *
+     * @param  array  $array
+     * @return array
+     * @see https://www.php.net/manual/en/function.usort.php
+     */
+    public static function usort($array, callable $callback)
+    {
+        usort($array, $callback);
+        return $array;
+    }
+
+    /**
+     * Sort an array with a user-defined comparison
+     * function and maintain index association.
+     *
+     * @param  array  $array
+     * @return array
+     * @see https://www.php.net/manual/en/function.uasort.php
+     */
+    public static function uasort($array, callable $callback)
+    {
+        uasort($array, $callback);
+        return $array;
+    }
+
+    /**
+     * Sort an array by keys using a user-defined comparison function.
+     *
+     * @param  array  $array
+     * @return array
+     * @see https://www.php.net/manual/en/function.uksort.php
+     */
+    public static function uksort($array, callable $callback)
+    {
+        uksort($array, $callback);
+        return $array;
+    }
+
+    /**
      * Recursively sort an array by keys and values.
      *
      * @param  array  $array
      * @param  int  $options
-     * @param  bool  $descending
+     * @param  bool  $desc
      * @return array
      */
-    public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false)
+    public static function sortRecursive(
+        $array,
+        $options = SORT_REGULAR,
+        $desc = false
+    )
     {
         foreach ($array as &$value) {
             if (is_array($value)) {
-                $value = static::sortRecursive($value, $options, $descending);
+                $value = static::sortRecursive($value, $options, $desc);
             }
         }
 
         if (static::isAssoc($array)) {
-            $descending
+            $desc
                     ? krsort($array, $options)
                     : ksort($array, $options);
         } else {
-            $descending
+            $desc
                     ? rsort($array, $options)
                     : sort($array, $options);
         }
 
         return $array;
+    }
+
+    /**
+     * Recursively sort an array by keys and values in Descending order.
+     *
+     * @param  array  $array
+     * @param  int  $options
+     * @param  bool  $desc
+     * @return array
+     */
+    public static function sortRecursiveDesc(
+        $array,
+        $options = SORT_REGULAR,
+        $desc = false
+    )
+    {
+        return static::sortRecursive($array, $options, true);
     }
 
     /**
@@ -730,6 +1095,16 @@ class Arr
     }
 
     /**
+     * Transforms an array to \stdClass
+     * @param  array $array
+     * @return \stdClass
+     */
+    public static function toObject($array)
+    {
+        return Helper::objectCreate($array);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array
@@ -751,6 +1126,19 @@ class Arr
     {
         return static::where($array, function ($value) {
             return ! is_null($value);
+        });
+    }
+
+    /**
+     * Filter items where the value is not null.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function whereNotTrue($array, $strict = false)
+    {
+        return static::where($array, function ($value) use ($strict) {
+            return $strict ? $value === false : !$value;
         });
     }
 
@@ -783,6 +1171,73 @@ class Arr
     public static function map($value, $callback)
     {
         return map_deep($value, $callback);
+    }
+
+    /**
+     * Check if the value(s) exist in an array using "dot" notation.
+     *
+     * @param  array $array
+     * @param  string|array  $values
+     * @return bool
+     */
+    public static function contains(array $array, $values)
+    {
+        $result = [];
+        
+        $values = is_array($values) ? $values : [$values];
+
+        foreach ($values as $value) {
+
+            if (in_array($value, $array)) {
+                $result[] = $value;
+                continue;
+            }
+
+            $segments = explode('.', $value);
+
+            $value = array_pop($segments);
+
+            $nested = (array) static::get($array, implode('.', $segments));
+
+            if ($nested && in_array($value, $nested)) {
+                $result[] = $value;
+            }
+        }
+
+        return count($result) === count($values);
+    }
+
+    /**
+     * Check if the any value exist in an array using "dot" notation.
+     *
+     * @param  array $array
+     * @param  string|array  $values
+     * @return bool
+     */
+    public static function containsAny(array $array, $values)
+    {
+        $result = [];
+        
+        $values = is_array($values) ? $values : [$values];
+
+        foreach ($values as $value) {
+
+            if (in_array($value, $array)) {
+                return true;
+            }
+
+            $segments = explode('.', $value);
+
+            $value = array_pop($segments);
+
+            $nested = (array) static::get($array, implode('.', $segments));
+
+            if ($nested && in_array($value, $nested)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -859,5 +1314,479 @@ class Arr
         }
 
         return $array2;
+    }
+
+    /**
+     * Recursively merge the given array with defaults.
+     * Overwrite $array with $defaults if only $array
+     * contains null or empty values or doesn't exist.
+     *
+     * @param  array  $array
+     * @param  array  $defaults
+     * @return array
+     */
+    public static function mergeMissingValues(array $array, array $defaults)
+    {
+        $merged = array_merge($defaults, $array);
+
+        foreach ($merged as $key => $value) {
+            if (
+                is_array($value) &&
+                isset($defaults[$key]) &&
+                is_array($defaults[$key])
+            ) {
+                // Recursively merge arrays
+                $merged[$key] = static::mergeMissingValues(
+                    $value, $defaults[$key]
+                );
+            } elseif (
+                isset($defaults[$key]) &&
+                (is_null($value) || $value === '')
+            ) {
+                // Replace null or empty values
+                $merged[$key] = $defaults[$key];
+            }
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Return matching items from array (similar to mysql's %LIKE%)
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function like($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '~i';
+        }
+
+        return preg_grep($pattern, $array);
+    }
+
+    /**
+     * Return non-matching items from array (similar to mysql's NOT %LIKE%)
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function notLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '~i';
+        }
+
+        return preg_grep($pattern, $array, PREG_GREP_INVERT);
+    }
+
+    /**
+     * Return matching starting of items from array (similar to mysql's %LIKE)
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function startsLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~^'. preg_quote($pattern, '~') . '~i';
+        }
+
+        return preg_grep($pattern, $array);
+    }
+
+    /**
+     * Return non-matching starting of items from array (similar to mysql's NOT %LIKE)
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function DoesNotStartLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern = '~^(?!' . preg_quote($pattern, '~') . ')~i';
+        }
+
+        return preg_grep($pattern, $array);
+    }
+
+    /**
+     * Return matching ending of items from array (similar to mysql's LIKE%)
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function endsLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '$~i';
+        }
+
+        return preg_grep($pattern, $array);
+    }
+
+    /**
+     * Return non-matching ending of items from array (similar to mysql's NOT LIKE%)
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function DoesNotEndLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '$~i';
+        }
+
+        return preg_grep($pattern, $array, PREG_GREP_INVERT);
+    }
+
+    /**
+     * Return matching items from array by keys
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function keysLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '~i';
+        }
+
+        $values = [];
+        
+        $keys = preg_grep($pattern, array_keys($array));
+        
+        foreach ($keys as $key) {
+            $values[$key] = $array[$key];
+        }
+        
+        return $values;
+    }
+
+    /**
+     * Return non-matching items from array by keys
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function keysNotLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '~i';
+        }
+
+        $values = [];
+        
+        $keys = preg_grep($pattern, array_keys($array), 1);
+        
+        foreach ($keys as $key) {
+            $values[$key] = $array[$key];
+        }
+        
+        return $values;
+    }
+
+    /**
+     * Return matching starting of items from array by keys
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function keysStartLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~^'. preg_quote($pattern, '~') . '~i';
+        }
+
+        $values = [];
+        
+        $keys = preg_grep($pattern, array_keys($array));
+        
+        foreach ($keys as $key) {
+            $values[$key] = $array[$key];
+        }
+        
+        return $values;
+    }
+
+    /**
+     * Return non-matching starting of items from array by keys
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function keysDoesNotStartLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern = '~^(?!' . preg_quote($pattern, '~') . ')~i';
+        }
+
+        $values = [];
+        
+        $keys = preg_grep($pattern, array_keys($array));
+        
+        foreach ($keys as $key) {
+            $values[$key] = $array[$key];
+        }
+        
+        return $values;
+    }
+
+    /**
+     * Return matching ending of items from array by keys
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function keysEndLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '$~i';
+        }
+
+        $values = [];
+        
+        $keys = preg_grep($pattern, array_keys($array));
+        
+        foreach ($keys as $key) {
+            $values[$key] = $array[$key];
+        }
+        
+        return $values;
+    }
+
+    /**
+     * Return non-matching ending of items from array by keys
+     * 
+     * @param  string $pattern (plain string or regex)
+     * @param  array $array
+     * @return array|false
+     */
+    public static function keysDoesNotEndLike($array, $pattern)
+    {
+        if (!preg_match('/^([\/#~]).*\1$/', $pattern)) {
+            $pattern =  '~'. preg_quote($pattern, '~') . '$~i';
+        }
+
+        $values = [];
+        
+        $keys = preg_grep($pattern, array_keys($array), PREG_GREP_INVERT);
+        
+        foreach ($keys as $key) {
+            $values[$key] = $array[$key];
+        }
+        
+        return $values;
+    }
+
+    /**
+     * Insert a new item in the array at the given position.
+     * 
+     * @param  array $array
+     * @param  int $pos
+     * @param  mixed $newItem
+     * @return array
+     */
+    public static function insertAt($array, $pos, $newItem)
+    {
+        if (!isset($array[$pos])) {
+            $array[] = $newItem;
+        } else {
+            $array = array_splice($array, $pos, 0, $newItem);
+        }
+        
+        return $array;
+    }
+
+    /**
+     * Inserts an item before the specified key in the given array. If the
+     * key is not found, inserts the item at the beginning of the array.
+     *
+     * @param  array $array
+     * @param  mixed $key
+     * @param  mixed $newKey
+     * @param  mixed $newValue
+     * @return array $newArray
+     */
+    public static function insertBefore($array, $key, $newKey, $newValue)
+    {
+        $newArray = [];
+        $keyFound = false;
+
+        foreach ($array as $k => $v) {
+            if ($k === $key) {
+                $newArray[$newKey] = $newValue;
+                $keyFound = true;
+            }
+            $newArray[$k] = $v;
+        }
+
+        if (!$keyFound) {
+            $newArray = [$newKey => $newValue] + $newArray;
+        }
+
+        return $newArray;
+    }
+
+    /**
+     * Inserts an item after the specified key in the given array. If the
+     * key is not found, inserts the item at the end of the array.
+     *
+     * @param  array $array
+     * @param  mixed $key
+     * @param  mixed $newKey
+     * @param  mixed $newValue
+     * @return array $newArray
+     */
+    public static function insertAfter($array, $key, $newKey, $newValue)
+    {
+        $newArray = [];
+        $keyFound = false;
+
+        foreach ($array as $k => $v) {
+            $newArray[$k] = $v;
+            if ($k === $key) {
+                $newArray[$newKey] = $newValue;
+                $keyFound = true;
+            }
+        }
+
+        if (!$keyFound) {
+            $newArray[$newKey] = $newValue;
+        }
+
+        return $newArray;
+    }
+
+    /**
+     * Tests whether at least one element in the array passes
+     * the test implemented by the provided callback.
+     * 
+     * @param  array $array
+     * @param  callable $callback
+     * @return bool
+     */
+    public static function some($array, callable $callback)
+    {
+        foreach ($array as $k => $v) {
+            if ($callback($v, $k, $array)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Tests whether all elements in the array pass the
+     * test implemented by the provided callback.
+     *
+     * @param  array $array
+     * @param  callable $callback
+     * @return bool
+     */
+    public static function every($array, callable $callback)
+    {
+        foreach ($array as $k => $v) {
+            if (!$callback($v, $k, $array)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Finds the first element in the array that satisfies the
+     * condition implemented by the callback function.
+     *
+     * @param array $array
+     * @param callable $callback
+     * @return mixed
+     */
+    public static function find($array, callable $callback, $findKey = false)
+    {
+        foreach ($array as $k => $v) {
+            if ($callback($v, $k, $array)) {
+                return $findKey ? $k : $v;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds the first key in the array that satisfies the
+     * condition implemented by the callback function.
+     *
+     * @param array $array
+     * @param callable $callback
+     * @return mixed
+     */
+    public static function findKey($array, callable $callback)
+    {
+        return static::find($array, $callback, true);
+    }
+
+    /**
+     * Find similar words in an array.
+     * 
+     * @param  string  $needle
+     * @param  array   $haystack
+     * @param  integer $accuracy
+     * @return string|null         
+     */
+    public static function findSimilar($needle, array $haystack, $accuracy = 60)
+    {
+        $matches = [];
+
+        foreach ($haystack as $item) {
+            if (Str::isSimilar($needle, $item, $accuracy)) {
+                $matches[] = $item;
+            }
+        }
+
+        return $matches ? $matches[0] : null;
+    }
+
+    /**
+     * Pass the items through a series of callbacks.
+     * 
+     * @param  array   $items
+     * @param  array   $callbacks
+     * @param  integer $mode
+     * @return array
+     */
+    public static function passThrough(array $items, array $callbacks, $mode = 0)
+    {
+        foreach ($items as $key => &$item) {
+            reset($callbacks);
+            foreach ($callbacks as $callback) {
+                switch ($mode) {
+                    case 1:
+                        $items[$key] = $callback($key);
+                        break;
+                    case 2:
+                        $items[$key] = $callback($key, $item ?? '');
+                        break;
+                    default:
+                        $items[$key] = $callback($item ?? '');
+                }
+            }
+        }
+
+        return $items;
     }
 }

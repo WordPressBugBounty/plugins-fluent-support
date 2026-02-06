@@ -3,7 +3,7 @@
 namespace FluentSupport\App\Http\Controllers;
 
 use FluentSupport\App\Modules\IntegrationSettingsModule;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 
 /**
  *  SlackController class is responsible for getting and save Slack settings

@@ -42,11 +42,11 @@ class TwoFaHandler
             'login_hash' => $hash,
             'user_id' => $user->ID,
             'status' => 'issued',
-            'ip_address' => $_SERVER['HTTP_USER_AGENT'],
+            'ip_address' => isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '',
             'use_type' => 'email_2_fa',
             'user_email' => $user->user_email,
             'two_fa_code_hash' => wp_hash_password($twoFaCode),
-            'valid_till' => date('Y-m-d H:i:s', current_time('timestamp') + 10 * 30),
+            'valid_till' => gmdate('Y-m-d H:i:s', current_time('timestamp') + 10 * 30),
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql'),
             'used_count' => 0
@@ -96,8 +96,15 @@ class TwoFaHandler
             ], 423);
         }
 
-        $logHash = Meta::where('key', $hash)->first();
-        $logHash = maybe_unserialize($logHash->value, []);
+        $logHashMeta = Meta::where('key', $hash)->first();
+
+        if (!$logHashMeta) {
+            wp_send_json([
+                'message' => __('Your provided code or url is not valid', 'fluent-support')
+            ], 423);
+        }
+
+        $logHash = Helper::safeUnserialize($logHashMeta->value, []);
 
         if (!$logHash) {
             wp_send_json([
@@ -115,7 +122,8 @@ class TwoFaHandler
             return false;
         }
 
-        if (strtotime($logHash['created_at']) < current_time('timestamp') - 600 || $logHash['used_count'] > 5 || $logHash['status'] != 'issued') {
+        $createdAt = $logHash['created_at'] ?? '';
+        if (($createdAt && strtotime($createdAt) < current_time('timestamp') - 600) || ($logHash['used_count'] ?? 0) > 5 || ($logHash['status'] ?? '') != 'issued') {
             wp_send_json([
                 'message' => __('Sorry, your login code has been expired. Please try to login again', 'fluent-support')
             ], 423);
@@ -142,21 +150,25 @@ class TwoFaHandler
     private function send2FaEmail($data, $user, $autoLoginUrl = false)
     {
         $emailTo = $user->user_email;
+        // translators: %1s is the site name
         $emailSubject = sprintf(__('Your Login code for %1s', 'fluent-support'), get_bloginfo('name'));
 
         $pStart = '<p style="font-family: Arial, sans-serif; font-size: 16px; font-weight: normal; margin: 0; margin-bottom: 16px;">';
 
+        // translators: %s is the user's display name
         $message = $pStart . sprintf(__('Hello %s,', 'fluent-support'), $user->display_name) . '</p>' .
+            // translators: %s is the site name
             $pStart . sprintf(__('Someone requested to login to %s and here is the Login code that you can use in the login form', 'fluent-support'), get_bloginfo('name')) . '</p>' .
-            $pStart . '<b>' . sprintf(__('Verification Code: %s', 'fluent-security'), $data['twoFaCode']) . '</b></p>' .
+            // translators: %s is the two-factor authentication code
+            $pStart . '<b>' . sprintf(__('Verification Code: %s', 'fluent-support'), $data['twoFaCode']) . '</b></p>' .
             '<br />' .
-            $pStart . __('This code is valid for 10 minutes and is meant to ensure the security of your account. If you did not initiate this request, please ignore this email.', 'fluent-security') . '</p>';
+            $pStart . __('This code is valid for 10 minutes and is meant to ensure the security of your account. If you did not initiate this request, please ignore this email.', 'fluent-support') . '</p>';
 
         $message = apply_filters('fluent_support/signup_verification_email_body', $message, $data['twoFaCode'], $data);
 
         $data = [
             'body'        => $message,
-            'pre_header'  => __('Activate your account', 'fluent-security'),
+            'pre_header'  => __('Activate your account', 'fluent-support'),
             'show_footer' => false
         ];
 

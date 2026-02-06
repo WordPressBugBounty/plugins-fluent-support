@@ -100,8 +100,13 @@ class Ticket extends Model
      */
     public function scopeSearchBy($query, $search)
     {
+
+        if(!$search) {
+            return $query;
+        }
+
         if (strpos($search, ':')) {
-            $array = explode(':', $search);
+            $array = explode(':', (string) $search);
             $column = $array[0];
             $value = $array[1];
             $columns = $this->fillable;
@@ -223,7 +228,7 @@ class Ticket extends Model
     {
         $supportedColumns = ['product_id', 'client_priority', 'priority', 'mailbox_id'];
         foreach ($filters as $filterKey => $filterValue) {
-            if (!$filterValue && ($filterValue !== '0' || $filterValue !== 0)) {
+            if (!$filterValue && ($filterValue !== '0' && $filterValue !== 0)) {
                 continue;
             }
             //If filer using status
@@ -235,7 +240,12 @@ class Ticket extends Model
                     $query->whereIn('status', $statusArray);
                 }
             } else if (in_array($filterKey, $supportedColumns)) {
-                $query->where($filterKey, $filterValue);
+                // Use whereIn for all supported columns (they all now support multi-select)
+                if (is_array($filterValue)) {
+                    $query->whereIn($filterKey, $filterValue);
+                } else {
+                    $query->where($filterKey, $filterValue);
+                }
             } else if ($filterKey == 'waiting_for_reply') {
                 if ($filterValue != 'yes') {
                     continue;
@@ -243,16 +253,53 @@ class Ticket extends Model
                 //Apply filter where no response by agent
                 $query = $this->scopeWaitingOnly($query);
             } else if ($filterKey == 'agent_id') {
-                //Apply filter where ticket is not assigned
-                if ($filterValue == 'unassigned') {
-                    $query->whereNull($filterKey);
-                } else {
-                    if (defined('FLUENTSUPPORTPRO')) {
-                        if (isset($filters['watcher']) && $filters['watcher'] == 'watcher') {
-                            $watcherTickets = TicketHelper::getWatcherTicketIds($filterValue);
-                            $query->whereIn('id', $watcherTickets);
+                // Handle array of agent IDs for multi-select
+                if (is_array($filterValue)) {
+                    // Check if 'unassigned' is in the array
+                    $hasUnassigned = in_array('unassigned', $filterValue);
+                    $agentIds = array_filter($filterValue, function($v) {
+                        return $v !== 'unassigned';
+                    });
+
+                    if ($hasUnassigned && !empty($agentIds)) {
+                        // Include both unassigned and specific agents
+                        $query->where(function($q) use ($agentIds) {
+                            $q->whereNull('agent_id')
+                              ->orWhereIn('agent_id', $agentIds);
+                        });
+                    } elseif ($hasUnassigned) {
+                        // Only unassigned
+                        $query->whereNull('agent_id');
+                    } elseif (!empty($agentIds)) {
+                        // Only specific agents
+                        if (defined('FLUENTSUPPORTPRO')) {
+                            if (isset($filters['watcher']) && $filters['watcher'] == 'watcher') {
+                                $watcherTickets = [];
+                                foreach ($agentIds as $agentId) {
+                                    $watcherTickets = array_merge($watcherTickets, TicketHelper::getWatcherTicketIds($agentId));
+                                }
+                                $query->whereIn('id', array_unique($watcherTickets));
+                            } else {
+                                $query->whereIn('agent_id', $agentIds);
+                            }
                         } else {
-                            //Apply filter, get only assigned ticket
+                            $query->whereIn('agent_id', $agentIds);
+                        }
+                    }
+                } else {
+                    // Single value (backward compatibility)
+                    if ($filterValue == 'unassigned') {
+                        $query->whereNull($filterKey);
+                    } else {
+                        if (defined('FLUENTSUPPORTPRO')) {
+                            if (isset($filters['watcher']) && $filters['watcher'] == 'watcher') {
+                                $watcherTickets = TicketHelper::getWatcherTicketIds($filterValue);
+                                $query->whereIn('id', $watcherTickets);
+                            } else {
+                                //Apply filter, get only assigned ticket
+                                $query->where($filterKey, $filterValue);
+                            }
+                        } else {
                             $query->where($filterKey, $filterValue);
                         }
                     }
@@ -387,14 +434,14 @@ class Ticket extends Model
 
             case 'days_before':
                 $filter['operator'] = '<';
-                $filter['value'] = date('Y-m-d', current_time('timestamp') - $filter['value'] * 24 * 60 * 60);
+                $filter['value'] = gmdate('Y-m-d', time() - $filter['value'] * 24 * 60 * 60);
                 break;
 
             case 'days_within':
                 $filter['operator'] = 'BETWEEN';
                 $filter['value'] = [
-                    date('Y-m-d', current_time('timestamp') - $filter['value'] * 24 * 60 * 60),
-                    date('Y-m-d') . ' 23:59:59'
+                    gmdate('Y-m-d', time() - $filter['value'] * 24 * 60 * 60),
+                    gmdate('Y-m-d') . ' 23:59:59'
                 ];
                 break;
             case 'date_range':
@@ -519,7 +566,7 @@ class Ticket extends Model
         $query->whereHas($provider, function ($query) use ($fields, $search, $operator) {
             $query->where(array_shift($fields), $operator, $search);
 
-            $nameArray = explode(' ', $search);
+            $nameArray = explode(' ', (string) $search);
 
             if (count($nameArray) >= 2) {
                 $query->orWhere(function ($q) use ($nameArray, $operator) {
@@ -927,7 +974,9 @@ class Ticket extends Model
     {
         if (empty($ticketData['mailbox_id'])) {
             $mailbox = Helper::getDefaultMailBox();
-            $ticketData['mailbox_id'] = $mailbox->id;
+            if ($mailbox) {
+                $ticketData['mailbox_id'] = $mailbox->id;
+            }
         } else {
             $mailbox = MailBox::findOrFail($ticketData['mailbox_id']); // just for validation
         }
@@ -1034,6 +1083,8 @@ class Ticket extends Model
 
         $createCustomer = Customer::create($customerData);
 
+        do_action('fluent_support/customer_created', $createCustomer);
+
         if (!$createCustomer) {
             return false;
         }
@@ -1059,13 +1110,16 @@ class Ticket extends Model
         $ticket = self::with($ticketWith)->findOrFail($ticketId);
 
         if (in_array($ticket->mailbox_id, $restrictedBusinessBoxes)) {
-            throw new \Exception('Ticket cannot be fetched due to restricted mailbox');
+            throw new \Exception(esc_html__('Ticket cannot be fetched due to restricted mailbox', 'fluent-support'));
         }
 
         $customFieldsKey = apply_filters('fluent_support/custom_registration_form_fields_key', Helper::getBusinessSettings('custom_registration_form_field'));
-        $ticket->customer->custom_field_keys = $customFieldsKey;
 
-        if ($ticket->customer->user_id) {
+        if ($ticket->customer) {
+            $ticket->customer->custom_field_keys = $customFieldsKey;
+        }
+
+        if ($ticket->customer && $ticket->customer->user_id) {
             $customFieldKeysUsingHook = apply_filters('fluent_support/custom_registration_form_fields_key', []);
 
             foreach ($customFieldKeysUsingHook as $key) {
@@ -1116,7 +1170,7 @@ class Ticket extends Model
         foreach ($responses as $response) {
             $response->content = links_add_target(make_clickable(wpautop($response->content, false)));
             if (!empty($response->ccinfo)) {
-                $val = maybe_unserialize($response->ccinfo->value);
+                $val = Helper::safeUnserialize($response->ccinfo->value);
                 if(isset($val['cc_email']) && !empty($val['cc_email'])){
                     $response->cc_info = $val['cc_email'];
                 } else {
@@ -1241,7 +1295,7 @@ class Ticket extends Model
         ])->first();
 
         if ($draft) {
-            $draft->value = maybe_unserialize($draft->value);
+            $draft->value = Helper::safeUnserialize($draft->value);
         }
 
         return [
@@ -1262,7 +1316,7 @@ class Ticket extends Model
     private function checkIfValidAgent($agent)
     {
         if (!$agent) {
-            throw new \Exception('Sorry, You do not have permission. Please add yourself as support agent first');
+            throw new \Exception(esc_html__('Sorry, You do not have permission. Please add yourself as support agent first', 'fluent-support'));
         } else {
             return true;
         }
@@ -1358,7 +1412,7 @@ class Ticket extends Model
         $message = sprintf(
             /* translators: %s: The name of the property that was updated */
             __('%s has been updated', 'fluent-support'),
-            esc_html(str_replace('_', ' ', ucwords($propName)))
+            esc_html(str_replace('_', ' ', ucwords((string) $propName)))
         );
         return [
             'message'     => $message,
@@ -1373,7 +1427,7 @@ class Ticket extends Model
 
         if ($propName === 'agent_id') {
             if (!PermissionManager::currentUserCan('fst_assign_agents')) {
-                throw new \Exception('Permission denied to assign agent', 403);
+                throw new \Exception(esc_html__('Permission denied to assign agent', 'fluent-support'), 403);
             }
 
             $agent = Agent::findOrFail($propValue);
@@ -1383,7 +1437,7 @@ class Ticket extends Model
                 $mailboxId = (int)$ticket->mailbox_id;
 
                 if (in_array($mailboxId, $restrictions['restrictedBusinessBoxes'], true)) {
-                    throw new \Exception('Agent is restricted for this mailbox ticket', 403);
+                    throw new \Exception(esc_html__('Agent is restricted for this mailbox ticket', 'fluent-support'), 403);
                 }
             }
         }
@@ -1443,7 +1497,7 @@ class Ticket extends Model
         } else if ($action == 'assign_tags') {
             return $this->bulkAssignTag($query->get());
         } else {
-            throw new \Exception('Sorry no action found as available');
+            throw new \Exception(esc_html__('Sorry no action found as available', 'fluent-support'));
         }
     }
 
@@ -1479,10 +1533,10 @@ class Ticket extends Model
         $request = \FluentSupport\App\App::getInstance('request');
 
         if (!$request->has('agent_id')) {
-            throw new \Exception('agent_id param is required');
+            throw new \Exception(esc_html__('agent_id param is required', 'fluent-support'));
         }
 
-        $agent = Agent::findOrFail($request->get('agent_id'));
+        $agent = Agent::findOrFail($request->getSafe('agent_id', 'intval'));
 
         $query->where(function ($q) use ($agent) {
             $q->where('agent_id', '!=', $agent->id)
@@ -1545,10 +1599,14 @@ class Ticket extends Model
         $request = \FluentSupport\App\App::getInstance('request');
 
         if (!$request->has('tag_ids')) {
-            throw new \Exception('tag_ids param is required');
+            throw new \Exception(esc_html__('tag_ids param is required', 'fluent-support'));
         }
 
-        $tags = array_filter(array_map('absint', $request->get('tag_ids', [])));
+        $tagIds = $request->getSafe('tag_ids', null, []);
+        if (!is_array($tagIds)) {
+            $tagIds = [];
+        }
+        $tags = array_filter(array_map('absint', $tagIds));
 
         $query->each(function ($ticket) use ($tags) {
             $ticket->applyTags($tags);
@@ -1563,7 +1621,7 @@ class Ticket extends Model
     private function checkAgentPermission($ticket)
     {
         if (!PermissionManager::hasTicketPermission($ticket)) {
-            throw new \Exception('Sorry, You do not have permission to this ticket');
+            throw new \Exception(esc_html__('Sorry, You do not have permission to this ticket', 'fluent-support'));
         }
     }
 
@@ -1604,7 +1662,7 @@ class Ticket extends Model
             ->first();
 
         if ($exist) {
-            $value = maybe_unserialize($exist->value);
+            $value = Helper::safeUnserialize($exist->value);
             if ($valueKey) {
                 if (!is_array($value)) {
                     return $default;
@@ -1625,7 +1683,7 @@ class Ticket extends Model
             ->first();
 
         if ($exist) {
-            $existingValue = maybe_unserialize($exist->value);
+            $existingValue = Helper::safeUnserialize($exist->value);
 
             if (!is_array($existingValue)) {
                 $existingValue = [];

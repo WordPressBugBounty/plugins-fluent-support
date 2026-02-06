@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') or die;
 
 /**
  * @var $app \FluentSupport\Framework\Foundation\Application;
@@ -11,7 +12,12 @@ add_filter('fluent_support/parse_smartcode_data', function ($string, $data) {
 add_filter('fluent_support/dashboard_notice', function ($messages) {
     if(defined('FLUENTSUPPORTPRO_PLUGIN_VERSION') && version_compare(FLUENT_SUPPORT_PRO_MIN_VERSION, FLUENTSUPPORTPRO_PLUGIN_VERSION, '>')) {
         $updateUrl = admin_url('plugins.php?s=fluent-support-pro&plugin_status=all&fluentsupport_pro_check_update=' . time());
-        $html = '<div class="fs_box fs_dashboard_box"><div class="fs_box_header" style="background-color: #FFEACA">Heads UP! Fluent Support Pro update available</div><div class="fs_box_body" style="padding: 10px 30px;">Fluent Support Pro Plugin needs to be updated. <a href="'.esc_url($updateUrl).'>">Click here to update the plugin</a></div></div>';
+        $html = '<div class="fs_alert_notification fs_alert_warning" style="border-radius: 8px; margin-bottom: 24px; max-width: 1360px; margin-left: auto; margin-right: auto;">
+            <div style="display: flex; gap: 8px; align-items: center; padding: 8px 8px 8px 16px;">
+                <span style="font-size: 15px; line-height: 18px; flex-shrink: 0;">⚠️</span>
+                <p style="flex: 1; margin: 0; font-size: 14px; line-height: 20px; color: #0e121b; letter-spacing: -0.084px;">Fluent Support Pro Plugin needs to be updated for compatibility.</p>
+            </div>
+        </div>';
         $messages .= $html;
     }
     return $messages;

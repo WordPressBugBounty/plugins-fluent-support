@@ -3,60 +3,86 @@
 namespace FluentSupport\Framework\Foundation;
 
 use InvalidArgumentException;
+use FluentSupport\Framework\Support\Arr;
+use FluentSupport\Framework\Support\Env;
+use FluentSupport\Framework\Http\Client;
 use FluentSupport\Framework\Foundation\Config;
 use FluentSupport\Framework\Container\Container;
 use FluentSupport\Framework\Foundation\ComponentBinder;
-use FluentSupport\Framework\Foundation\FoundationTrait;
-use FluentSupport\Framework\Foundation\AsyncRequestTrait;
-use FluentSupport\Framework\Foundation\CronTaskSchedulerTrait;
+use FluentSupport\Framework\Foundation\Concerns\FoundationTrait;
 
+/**
+ * @property \FluentSupport\Framework\Foundation\Config $config
+ * @property \FluentSupport\Framework\Http\Router\Router $router
+ * @property \FluentSupport\Framework\Http\Request\Request $request
+ * @property \FluentSupport\Framework\Http\Response\Response $response
+ */
 class Application extends Container
 {
     use FoundationTrait;
-    use AsyncRequestTrait;
-    use CronTaskSchedulerTrait;
 
     /**
      * Main plugin file's absolute path
+     * 
      * @var string
      */
     protected $file = null;
 
     /**
      * Plugin's base url
+     * 
      * @var string
      */
     protected $baseUrl = null;
 
     /**
      * Plugin's base path
+     * 
      * @var string
      */
     protected $basePath = null;
 
     /**
      * Default namespace for hook's handlers
+     * 
      * @var string
      */
     protected $handlerNamespace = null;
 
     /**
      * Default namespace for controllers
+     * 
      * @var string
      */
     protected $controllerNamespace = null;
 
     /**
      * Default namespace for policy handlers
+     * 
      * @var string
      */
-    protected $permissionNamespace = null;
+    protected $policyNamespace = null;
 
     /**
      * Composer JSON
+     * 
      * @var null|array
      */
     protected static $composer = null;
+
+    /**
+     * Ready event handlers
+     * 
+     * @var array
+     */
+    protected $onReady = [];
+
+    /**
+     * Flag to check if components are bound.
+     * 
+     * @var boolean
+     */
+    protected $componentsBound = false;
 
     /**
      * Construct the application instance
@@ -67,8 +93,10 @@ class Application extends Container
     public function __construct($file = null)
     {
         $this->init($file);
+        $this->loadEnvironmentVars();
         $this->setAppLevelNamespace();
         $this->bootstrapApplication();
+        $this->callPluginReadyCallbacks();
     }
 
     /**
@@ -83,6 +111,19 @@ class Application extends Container
         $this['__pluginfile__'] = $this->file = $file;
         $this->basePath = plugin_dir_path($this->file);
         $this->baseUrl = plugin_dir_url($this->file);
+    }
+
+    /**
+     * Load the environment bariables from .env file.
+     * 
+     * @param  string $path
+     * @return void
+     */
+    protected function loadEnvironmentVars($path = null)
+    {
+        $path = $path ?: $this->basePath . '.env';
+
+        is_readable($path) && Env::load($path);
     }
 
     /**
@@ -121,7 +162,9 @@ class Application extends Container
             );
         }
 
-        return $section ? static::$composer[$section] : static::$composer;
+        return $section ? Arr::get(
+            static::$composer, $section
+        ) : static::$composer;
     }
 
     /**
@@ -137,7 +180,6 @@ class Application extends Container
         $this->registerTextdomain();
         $this->bindCoreComponents();
         $this->requireCommonFiles($this);
-        $this->registerAsyncActions();
         $this->addRestApiInitAction($this);
     }
 
@@ -151,6 +193,7 @@ class Application extends Container
         App::setInstance($this);
         $this->instance('app', $this);
         $this->instance(__CLASS__, $this);
+        $this->instance('endpoints', []);
     }
 
     /**
@@ -204,11 +247,33 @@ class Application extends Container
 
         if (is_dir($this['path.config'])) {
             foreach (glob($this['path.config'] . '*.php') as $file) {
-                $data[basename($file, '.php')] = require_once($file);
+                $data[basename($file, '.php')] = require($file);
             }
         }
 
         $this->instance('config', new Config($data));
+    }
+
+    /**
+     * Resolve the given type from the container.
+     * This method is required for unit testing.
+     *
+     * @param  string  $abstract
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function make($abstract, $parameters = [])
+    {
+        if (str_starts_with($abstract, '_NS')) {
+            
+            $namespace = $this->getComposer(
+                'extra.wpfluent.namespace.current'
+            );
+
+            $abstract = str_replace('_NS', $namespace, $abstract);
+        }
+        
+        return parent::make($abstract, $parameters);
     }
 
     /**
@@ -220,7 +285,9 @@ class Application extends Container
     {
         $this->addAction('init', function() {
             load_plugin_textdomain(
-                $this->config->get('app.text_domain'), false, $this->textDomainPath()
+                $this->config->get(
+                    'app.text_domain'
+                ), false, $this->textDomainPath()
             );
         });
     }
@@ -243,7 +310,10 @@ class Application extends Container
      */
     protected function bindCoreComponents()
     {
-        (new ComponentBinder($this))->bindComponents();
+        if (!$this->componentsBound) {
+            $this->componentsBound = true;
+            (new ComponentBinder($this))->bindComponents();
+        }
     }
 
     /**
@@ -255,12 +325,140 @@ class Application extends Container
      */
     protected function requireCommonFiles($app)
     {
+        $this->addFilter(
+            'rest_pre_serve_request', [$this, 'preServeRequest'], 10, 4
+        );
+
         require_once $this->basePath . 'app/Hooks/actions.php';
         require_once $this->basePath . 'app/Hooks/filters.php';
 
         if (file_exists($includes = $this->basePath . 'app/Hooks/includes.php')) {
             require_once $includes;
         }
+    }
+
+    /**
+     * Handler for rest_pre_serve_request filter.
+     * 
+     * @param  bool $served  (default: false)
+     * @param  \WP_REST_Response $result
+     * @param  \WP_REST_Request  $request
+     * @param  \WP_REST_Server   $server
+     * @return bool (false to intercept, otherwise true)
+     */
+    public function preServeRequest($served, $result, $request, $server)
+    {
+        if ($result->get_status() === 404) {
+            $route = $request->get_route();
+            $slug = $this->config->get('app.slug');
+            
+            if ($this->isRequestOfPlugin($route, $slug)) {
+                if ($this->isRequestForEndpoints($route)) {
+                    status_header(200);
+                    $result->set_status(200);
+                    // @phpstan-ignore-next-line
+                    $result->set_data($this->endpoints);
+                } else {
+                    $result->set_data(
+                        $this->customizeNotFoundResponse(
+                            $result, $request
+                        )
+                    );
+                }
+            }
+        }
+
+        return $served;
+    }
+
+    /**
+     * Determines whether the request is madse by plugin.
+     * 
+     * @param  string  $route (Rest route|Full URL)
+     * @param  string  $slug  (Plugin's slug)
+     * @return bool
+     */
+    public function isRequestOfPlugin($route = '', $slug = '')
+    {
+        $slug = $slug ?: $this->config->get('app.slug');
+
+        if (!$route) {
+            if (get_option('permalink_structure')) {
+                $route = $this->request->url();
+            } else {
+                $route = $this->request->query('rest_route');
+            }
+        }
+
+        // For web routing (If web-routing is installed)
+        if (!$route && !$this->request->isRest()) {
+            $route = $this->request->url();
+        }
+
+        $parsedUrl = parse_url($route ?? '');
+        
+        $path = str_replace('/wp-json', '', $parsedUrl['path'] ?? '');
+
+        if (is_admin()) {
+            $page = $this->request->query('page');
+            if ($slug === $page) {
+                $path = $page;
+            }
+        } 
+
+        return str_starts_with(ltrim($path, '/'), $slug);
+    }
+
+    /**
+     * Determines if the request is made for endpoints.
+     * 
+     * @param  string  $route (Rest route|Full URL)
+
+     * @return bool
+     */
+    protected function isRequestForEndpoints($route)
+    {
+        return str_ends_with($route, '__endpoints');
+    }
+
+    /**
+     * Prepare a custom not found response.
+     * 
+     * @param  \WP_REST_Response $result
+     * @param  \WP_REST_Request  $request
+     * 
+     * @return array
+     */
+    public function customizeNotFoundResponse($result, $request)
+    {
+        $response = $result->get_data();
+        
+        if ($this->env() === 'dev') {
+            $response['data']['wpfluent'] = [
+                'env' => $this->env(),
+                'method' => $request->get_method(),
+                'request_url' => $this->request->url(),
+                'route_params' => $request->get_url_params(),
+                'query_params' => $request->get_query_params(),
+                'body_params' => $request->get_body_params(),
+            ];
+        } else {
+            $response['data']['wpfluent'] = [
+                'env' => $this->env()
+            ];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Check if running unit test.
+     * 
+     * @return boolean
+     */
+    public function isUnitTesting()
+    {
+        return getenv('ENV') === 'testing';
     }
 
     /**
@@ -286,10 +484,11 @@ class Application extends Container
      * 
      * @param \FluentSupport\Framework\Http\Router $router
      * 
-     * @return null
+     * @return void
      */
     protected function registerRestRoutes($router)
     {
+        // @phpstan-ignore-next-line
         $router->registerRoutes(
             $this->requireRouteFile($router)
         );
@@ -304,5 +503,28 @@ class Application extends Container
     protected function requireRouteFile($router)
     {
         require_once $this['path.http'] . 'Routes/routes.php';
+    }
+
+    /**
+     * Register plugin ready (booted) callbacks.
+     * 
+     * @param  callable $callback
+     * @return void
+     */
+    public function ready(callable $callback)
+    {
+        $this->onReady[] = $callback;
+    }
+
+    /**
+     * Execute plugin booted callbacks.
+     * 
+     * @return void
+     */
+    protected function callPluginReadyCallbacks()
+    {
+        while ($callback = array_pop($this->onReady)) {
+            $callback($this);
+        }
     }
 }

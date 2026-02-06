@@ -22,7 +22,6 @@ class TicketRequest extends RequestGuard
             //If Create WP user checkbox is checked
             if($this->get('ticket.create_wp_user') == 'yes'){
                 $rules['newCustomer.username'] = 'required';
-                $rules['newCustomer.password'] = 'required';
             }
         }
 
@@ -39,7 +38,6 @@ class TicketRequest extends RequestGuard
             'ticket.content.required' => 'Ticket content is required',
             'newCustomer.email.required' => 'Customer email is required',
             'newCustomer.username.required' => 'Customer username is required wp user',
-            'newCustomer.password.required' => 'Customer password is required for wp user'
         ];
 
         return apply_filters('fluent_support/ticket_create_validation_messages', $messages);

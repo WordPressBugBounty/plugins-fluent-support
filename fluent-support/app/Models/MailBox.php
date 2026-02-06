@@ -4,6 +4,7 @@ namespace FluentSupport\App\Models;
 
 use Exception;
 use FluentSupport\App\Services\EmailNotification\Settings;
+use FluentSupport\App\Services\Helper;
 use FluentSupport\Framework\Support\Arr;
 
 class MailBox extends Model
@@ -50,7 +51,7 @@ class MailBox extends Model
     public function getSettingsAttribute($value)
     {
         if (array_key_exists('settings', $this->attributes)) {
-            return \maybe_unserialize($this->attributes['settings']);
+            return Helper::safeUnserialize($this->attributes['settings']);
         }
 
         return [];
@@ -94,7 +95,7 @@ class MailBox extends Model
             ->first();
 
         if($meta) {
-            return maybe_unserialize($meta->value);
+            return Helper::safeUnserialize($meta->value);
         }
 
         return $default;

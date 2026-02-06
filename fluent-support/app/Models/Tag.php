@@ -2,6 +2,8 @@
 
 namespace FluentSupport\App\Models;
 
+use FluentSupport\App\Services\Helper;
+
 class Tag extends Model
 {
     protected $table = 'fs_taggables';
@@ -17,7 +19,7 @@ class Tag extends Model
 
     public function getSettingsAttribute($value)
     {
-        return \maybe_unserialize($this->attributes['settings']);
+        return Helper::safeUnserialize($this->attributes['settings']);
     }
 
     /**

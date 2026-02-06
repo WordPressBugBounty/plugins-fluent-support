@@ -60,8 +60,9 @@ trait ActivityTrait
     public function updateSettings ($settings)
     {
         $defaults = [
-            'delete_days'  => 14,
-            'disable_logs' => 'no'
+            'delete_days'         => 14,
+            'disable_logs'        => 'no',
+            'open_link_in_new_tab' => 'no'
         ];
         $settings = wp_parse_args($settings, $defaults);
         $settings['delete_days'] = (int)$settings['delete_days'];
@@ -69,7 +70,7 @@ trait ActivityTrait
         Helper::updateOption('_activity_settings', $settings);
 
         return [
-            'message' => __('Activity settings has been updated', 'fluent-support')
+            'message' => __('Activity settings have been updated', 'fluent-support')
         ];
     }
 
@@ -79,8 +80,9 @@ trait ActivityTrait
         $settings = Helper::getOption('_activity_settings', []);
 
         $defaults = [
-            'delete_days'  => 14,
-            'disable_logs' => 'no'
+            'delete_days'         => 14,
+            'disable_logs'        => 'no',
+            'open_link_in_new_tab' => 'no'
         ];
 
         $settings = wp_parse_args($settings, $defaults);

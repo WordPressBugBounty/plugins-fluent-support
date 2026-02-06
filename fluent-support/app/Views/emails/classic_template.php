@@ -1,3 +1,4 @@
+<?php defined('ABSPATH') or die; ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>

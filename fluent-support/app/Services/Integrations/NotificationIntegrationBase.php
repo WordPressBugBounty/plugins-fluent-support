@@ -3,6 +3,7 @@
 namespace FluentSupport\App\Services\Integrations;
 
 use FluentSupport\App\Models\Meta;
+use FluentSupport\App\Services\Helper;
 
 abstract class NotificationIntegrationBase
 {
@@ -47,7 +48,7 @@ abstract class NotificationIntegrationBase
             ->first();
 
         if ($exist) {
-            return maybe_unserialize($exist->value);
+            return Helper::safeUnserialize($exist->value);
         }
 
         return false;

@@ -4,6 +4,7 @@ namespace FluentSupport\Framework\Support;
 
 use ArrayAccess;
 use JsonSerializable;
+use FluentSupport\Framework\Support\Helper;
 
 class Fluent implements ArrayableInterface, ArrayAccess, JsonableInterface, JsonSerializable
 {
@@ -22,7 +23,7 @@ class Fluent implements ArrayableInterface, ArrayAccess, JsonableInterface, Json
      */
     public function __construct($attributes = [])
     {
-        foreach ($attributes as $key => $value) {
+        foreach ((array) $attributes as $key => $value) {
             $this->attributes[$key] = $value;
         }
     }
@@ -40,7 +41,7 @@ class Fluent implements ArrayableInterface, ArrayAccess, JsonableInterface, Json
             return $this->attributes[$key];
         }
 
-        return value($default);
+        return Helper::value($default);
     }
 
     /**

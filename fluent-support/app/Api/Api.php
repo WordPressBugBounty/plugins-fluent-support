@@ -6,6 +6,9 @@ namespace FluentSupport\App\Api;
 
 final class Api
 {
+
+    private $app;
+
     public function __construct($app)
     {
         $this->app = $app;
@@ -23,7 +26,6 @@ final class Api
 
     private function getClasses()
     {
-
         return require_once(
             $this->app['path.app'].'Api/config.php'
         );

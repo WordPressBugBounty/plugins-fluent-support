@@ -5,7 +5,7 @@ namespace FluentSupport\App\Http\Controllers;
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\MailerInbox\MailBoxService;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 
 class MailBoxController extends Controller
 {
@@ -80,7 +80,7 @@ class MailBoxController extends Controller
             ];
         }catch (\Exception $e){
             return [
-                'message' => __( $e->getMessage(), 'fluent-support' ),
+                'message' => $e->getMessage(),
             ];
         }
     }
@@ -99,7 +99,7 @@ class MailBoxController extends Controller
             return $mailBoxService->deleteMailBox( $id, $request->getSafe('fallback_id', 'intval') );
         } catch (\Exception $e) {
             return [
-                'message' => __( $e->getMessage(), 'fluent-support' ),
+                'message' => $e->getMessage(),
             ];
         }
     }

@@ -30,14 +30,14 @@ class JoinClause extends Builder
     /**
      * The grammar of the parent query builder.
      *
-     * @var \FluentSupport\Framework\Database\Query\Grammar
+     * @var \FluentSupport\Framework\Database\Query\Grammars\Grammar
      */
     protected $parentGrammar;
 
     /**
      * The processor of the parent query builder.
      *
-     * @var \FluentSupport\Framework\Database\Query\Processor
+     * @var \FluentSupport\Framework\Database\Query\Processors\Processor
      */
     protected $parentProcessor;
 
@@ -141,6 +141,10 @@ class JoinClause extends Builder
     {
         $class = $this->parentClass;
 
-        return new $class($this->parentConnection, $this->parentGrammar, $this->parentProcessor);
+        return new $class(
+            $this->parentConnection,
+            $this->parentGrammar,
+            $this->parentProcessor
+        );
     }
 }

@@ -13,6 +13,10 @@ class IntegrationInit
         if (defined('FLUENTFORM') && class_exists('\FluentSupport\App\Services\Integrations\FluentForm\FeedIntegration')) {
             new \FluentSupport\App\Services\Integrations\FluentForm\FeedIntegration();
         }
+
+        if (defined('FLUENTCART_VERSION') && class_exists('\FluentSupport\App\Services\Integrations\FluentCart\FluentCart')) {
+            (new \FluentSupport\App\Services\Integrations\FluentCart\FluentCart())->boot();
+        }
     }
 
 }

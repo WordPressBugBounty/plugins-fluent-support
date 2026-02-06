@@ -28,9 +28,55 @@ class MailBoxMigrator
                 `created_by` BIGINT(20) UNSIGNED NULL,
                 `is_default` ENUM('yes', 'no') DEFAULT 'no',
                 `created_at` TIMESTAMP NULL,
-                `updated_at` TIMESTAMP NULL
+                `updated_at` TIMESTAMP NULL,
+                INDEX `idx_slug` (`slug`),
+                INDEX `idx_email` (`email`),
+                INDEX `idx_created_by` (`created_by`),
+                INDEX `idx_box_type` (`box_type`)
             ) $charsetCollate;";
-            dbDelta($sql);
+            $created = dbDelta($sql);
+            return $created;
+        } else {
+            static::alterTable($table);
+        }
+
+        return false;
+    }
+
+    public static function alterTable($table) 
+    {
+        static::addMissingIndexes($table);
+    }
+
+    public static function addMissingIndexes($table)
+    {
+        global $wpdb;
+
+        // Escape table name
+        $table = esc_sql($table);
+
+        // Get existing indexes
+        $existing_indexes = $wpdb->get_results("SHOW INDEX FROM `$table`");
+        $existing_index_names = [];
+
+        foreach ($existing_indexes as $index) {
+            $existing_index_names[] = $index->Key_name;
+        }
+
+        // Desired indexes
+        $indexes = [
+            'idx_slug' => 'slug',
+            'idx_email' => 'email',
+            'idx_created_by' => 'created_by',
+            'idx_box_type' => 'box_type',
+        ];
+
+        // Add missing indexes
+        foreach ($indexes as $index_name => $column_name) {
+            if (!in_array($index_name, $existing_index_names)) {
+                $sql = "ALTER TABLE `$table` ADD INDEX `$index_name` (`$column_name`)";
+                $wpdb->query($sql);
+            }
         }
     }
 }

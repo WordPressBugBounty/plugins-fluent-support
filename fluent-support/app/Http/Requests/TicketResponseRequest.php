@@ -22,7 +22,7 @@ class TicketResponseRequest extends RequestGuard
     public function messages()
     {
         return [
-            'content.required' => 'Reply content is required'
+            'content.required' => __('Reply content is required', 'fluent-support')
         ];
     }
 

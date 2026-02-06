@@ -7,6 +7,21 @@ use FluentSupport\Framework\Database\Orm\Collection;
 class HasMany extends HasOneOrMany
 {
     /**
+     * Convert the relationship to a "has one" relationship.
+     *
+     * @return \FluentSupport\Framework\Database\Orm\Relations\HasOne
+     */
+    public function one()
+    {
+        return HasOne::noConstraints(fn () => new HasOne(
+            $this->getQuery(),
+            $this->parent,
+            $this->foreignKey,
+            $this->localKey
+        ));
+    }
+    
+    /**
      * Get the results of the relationship.
      *
      * @return mixed

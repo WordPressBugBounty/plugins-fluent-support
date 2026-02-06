@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') or die;
+
 use FluentSupport\Framework\Foundation\Application;
 use FluentSupport\App\Hooks\Handlers\ActivationHandler;
 use FluentSupport\App\Hooks\Handlers\DeactivationHandler;
@@ -21,9 +23,9 @@ return function ($file) {
         do_action('fluent_support_loaded', $application);
         do_action('fluent_support_addons_loaded', $application);
 
-        add_action('init', function () {
-            load_plugin_textdomain('fluent-support', false, 'fluent-support/language/');
-        });
+        // add_action('init', function () {
+        //     load_plugin_textdomain('fluent-support', false, 'fluent-support/language/');
+        // });
 
         add_action('fluent_support/admin_app_loaded', function () {
             if (!wp_next_scheduled('fluent_support_hourly_tasks')) {

@@ -6,10 +6,10 @@ use Exception;
 use FluentSupport\App\Http\Requests\TicketResponseRequest;
 use FluentSupport\App\Models\Product;
 use FluentSupport\App\Models\Ticket;
-use FluentSupport\App\Models\Conversation;
 use FluentSupport\App\Services\CustomerPortalService;
 use FluentSupport\App\Services\Helper;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
+use FluentSupport\Framework\Support\Arr;
 
 /**
  * CustomerPortalController class for REST API
@@ -23,18 +23,14 @@ class CustomerPortalController extends Controller
     /**
      * getTickets will generate ticket information with customer and agents by customer
      * @param Request $request
-     * @param CustomerPortalService $customerPortalService
-     * @return array
-     * @throws Exception
+     * @return array|\WP_REST_Response
      */
-    public function getTickets(Request $request, CustomerPortalService $customerPortalService)
+    public function getTickets(Request $request)
     {
 
         $onBehalf = $request->getSafe('on_behalf', 'sanitize_text_field');
         $userIP = $request->getIp();
-
         $requestedStatus = $request->getSafe('filter_type', 'sanitize_text_field');
-
         $ticketOptions = $request->getSafe([
             'search'             => 'sanitize_text_field',
             'filters.product_id' => 'intval',
@@ -42,26 +38,75 @@ class CustomerPortalController extends Controller
             'sorting.sort_by'    => 'sanitize_sql_orderby'
         ]);
 
-        try {
-            $customer = $customerPortalService->resolveCustomer($onBehalf, $userIP);
+        $customer = (new CustomerPortalService)->resolveCustomer($onBehalf, $userIP);
+
+        if (!$customer) {
             return [
-                'tickets' => $customerPortalService->getTickets($customer, $requestedStatus, $ticketOptions)
+                'tickets' => [
+                    'data'         => [],
+                    'current_page' => $request->get('page', 1),
+                    'last_page'    => 1,
+                    'per_page'     => $request->get('per_page', 10),
+                    'total'        => 0,
+                    'from'         => null,
+                    'to'           => null
+                ]
             ];
-        } catch (Exception $e) {
-            return $this->sendError([
-                'message'    => $e->getMessage(),
-                'error_type' => $e->getCode()
-            ]);
         }
+
+        if ($customer->status !== 'active') {
+            return $this->sendError([
+                'message'    => __('Your account is not active. Please contact support.', 'fluent-support'),
+                'error_type' => '403'
+            ], 403);
+        }
+
+        $canAccess = apply_filters('fluent_support/can_customer_access_portal', true, $customer);
+
+        if (is_wp_error($canAccess)) {
+            return $this->sendError([
+                'message'    => $canAccess->get_error_message(),
+                'error_type' => $canAccess->get_error_code()
+            ], 403);
+        }
+
+        $statuses = [
+            'open'   => ['new', 'active', 'on-hold'],
+            'all'    => [],
+            'closed' => ['closed']
+        ];
+
+        $statusFilter = $statuses[$requestedStatus] ?? $statuses['all'];
+
+        $sortBy = Arr::get($ticketOptions, 'sorting.sort_by', 'created_at');
+        $sortType = Arr::get($ticketOptions, 'sorting.sort_type', 'desc');
+
+        $ticketsQuery = Ticket::where('customer_id', $customer->id)
+            ->filterByStatues($statusFilter)
+            ->searchBy(Arr::get($ticketOptions, 'search'))
+            ->filterByProductId(Arr::get($ticketOptions, 'filters.product_id'))
+            ->orderBy($sortBy, $sortType);
+
+        do_action_ref_array('fluent_support/customer_portal/tickets_query', [&$ticketsQuery, $customer, $request]);
+
+        $tickets = $ticketsQuery->paginate($request->getInt('per_page', 10));
+
+        foreach ($tickets as $ticket) {
+            $ticket->human_date = sprintf(__('%s ago', 'fluent-support'), human_time_diff(strtotime($ticket->created_at), current_time('timestamp')));
+            $ticket->preview_response = $ticket->getLastResponse();
+        }
+
+        return [
+            'tickets' => $tickets
+        ];
     }
 
     /**
      * createTicket method will create ticket submitted by customers
      * @param Request $request
-     * @return array
-     * @throws \FluentSupport\Framework\Validator\ValidationException
+     * @return array | \WP_REST_Response
      */
-    public function createTicket(Request $request, CustomerPortalService $customerPortalService)
+    public function createTicket(Request $request)
     {
         $dataRules = $this->app->applyCustomFilters('custom_field_required_before_ticket_create', [
             'required_fields' => [
@@ -85,16 +130,16 @@ class CustomerPortalController extends Controller
         }
 
         $defaultData = [
-            'ticket_title'   => $request->get('title'),
-            'ticket_content' => $request->get('content')
+            'ticket_title'   => $request->getSafe('title', 'sanitize_text_field'),
+            'ticket_content' => $request->getSafe('content', 'wp_kses_post')
         ];
 
         if ($request->has('product_id')) {
-            $defaultData['ticket_product_id'] = $request->get('product_id');
+            $defaultData['ticket_product_id'] = $request->getSafe('product_id', 'intval');
         }
 
         if ($request->has('client_priority')) {
-            $defaultData['ticket_client_priority'] = $request->get('client_priority');
+            $defaultData['ticket_client_priority'] = $request->getSafe('client_priority', 'sanitize_text_field');
         }
 
         $dataRules = $this->app->applyCustomFilters('custom_field_required_by_conditions_before_ticket_create', [
@@ -120,26 +165,36 @@ class CustomerPortalController extends Controller
         $userIP = $request->getIp();
 
         try {
-            $customer = $customerPortalService->resolveCustomer($onBehalf, $userIP, true);
+            $customer = (new CustomerPortalService())->resolveCustomer($onBehalf, $userIP, true);
+
+            if (!$customer) {
+                return $this->sendError([
+                    'message'    => __('Unable to identify. Please make sure you have provided correct information.', 'fluent-support'),
+                    'error_type' => '403'
+                ], 403);
+            }
 
             $canCreateTicket = apply_filters('fluent_support/can_customer_create_ticket', true, $customer, $data);
 
             if (!$canCreateTicket || is_wp_error($canCreateTicket)) {
                 $isWpError = is_wp_error($canCreateTicket);
 
-                $message = ($isWpError) ? $canCreateTicket->get_error_message() : __('Sorry you can not create ticket', 'fluent-support');
+                $message = ($isWpError) ? $canCreateTicket->get_error_message() : __('Sorry you cannot create ticket', 'fluent-support');
                 $errorCode = ($isWpError) ? $canCreateTicket->get_error_code() : 'general_error';
 
-
-                throw new \Exception($message, $errorCode);
+                return $this->sendError([
+                    'message'    => $message,
+                    'error_type' => $errorCode
+                ]);
             }
 
-            if ($customer && $messageId = Helper::generateMessageID($customer->email)) {
+            if ($messageId = Helper::generateMessageID($customer->email)) {
                 $data['message_id'] = $messageId;
             }
 
             $defaultMailbox = Helper::getDefaultMailBox();
-            $ticket = $customerPortalService->createTicket($customer, $data, $request->getSafe('mailbox_id', 'intval', $defaultMailbox->id));
+            $defaultMailboxId = $defaultMailbox ? $defaultMailbox->id : null;
+            $ticket = (new CustomerPortalService())->createTicket($customer, $data, $request->getSafe('mailbox_id', 'intval', $defaultMailboxId));
 
             return [
                 'message' => __('Ticket has been created successfully', 'fluent-support'),
@@ -157,15 +212,15 @@ class CustomerPortalController extends Controller
      * getTicket method will get the ticket information with customer and agent as well as response in a ticket by ticket id
      * @param Request $request
      * @param $ticket_id
-     * @return array
+     * @return array|\WP_REST_Response
      */
-    public function getTicket(Request $request, CustomerPortalService $customerPortalService, $ticket_id)
+    public function getTicket(Request $request, $ticket_id)
     {
         $customerAdditionalData = $this->getCustomerAdditionalData($request);
 
         try {
-            return $customerPortalService->getTicket($customerAdditionalData, $ticket_id);
-        } catch (Exception $e) {
+            return (new CustomerPortalService())->getTicket($customerAdditionalData, $ticket_id);
+        } catch (\Exception $e) {
             return $this->sendError([
                 'message'    => $e->getMessage(),
                 'error_type' => $e->getCode()
@@ -180,7 +235,7 @@ class CustomerPortalController extends Controller
      * @return array|\WP_REST_Response
      * @throws \FluentSupport\Framework\Validator\ValidationException
      */
-    public function createResponse(TicketResponseRequest $request, CustomerPortalService $customerPortalService, $ticket_id)
+    public function createResponse(TicketResponseRequest $request, $ticket_id)
     {
 
         $customerAdditionalData = $this->getCustomerAdditionalData($request);
@@ -194,13 +249,13 @@ class CustomerPortalController extends Controller
         if (!$canCreateResponse || is_wp_error($canCreateResponse)) {
             return [
                 'type'    => 'error',
-                'message' => (is_wp_error($canCreateResponse)) ? $canCreateResponse->get_error_message() : __('Sorry you can not create response', 'fluent-support')
+                'message' => (is_wp_error($canCreateResponse)) ? $canCreateResponse->get_error_message() : __('Sorry you cannot create response', 'fluent-support')
             ];
         }
 
         try {
-            return $customerPortalService->createResponse($customerAdditionalData, $ticket_id, $data);
-        } catch (Exception $e) {
+            return (new CustomerPortalService())->createResponse($customerAdditionalData, $ticket_id, $data);
+        } catch (\Exception $e) {
             return $this->sendError([
                 'message'    => $e->getMessage(),
                 'error_type' => $e->getCode()
@@ -214,12 +269,12 @@ class CustomerPortalController extends Controller
      * @param $ticket_id
      * @return array
      */
-    public function closeTicket(Request $request, CustomerPortalService $customerPortalService, $ticket_id)
+    public function closeTicket(Request $request, $ticket_id)
     {
         $customerAdditionalData = $this->getCustomerAdditionalData($request);
 
         try {
-            return $customerPortalService->closeTicket($customerAdditionalData, $ticket_id);
+            return (new CustomerPortalService())->closeTicket($customerAdditionalData, $ticket_id);
         } catch (Exception $e) {
             return $this->sendError([
                 'message'    => $e->getMessage(),
@@ -234,12 +289,12 @@ class CustomerPortalController extends Controller
      * @param $ticket_id
      * @return array
      */
-    public function reOpenTicket(Request $request, CustomerPortalService $customerPortalService, $ticket_id)
+    public function reOpenTicket(Request $request, $ticket_id)
     {
         $customerAdditionalData = $this->getCustomerAdditionalData($request);
 
         try {
-            return $customerPortalService->reOpenTicket($customerAdditionalData, $ticket_id);
+            return (new CustomerPortalService())->reOpenTicket($customerAdditionalData, $ticket_id);
         } catch (Exception $e) {
             return $this->sendError([
                 'message'    => $e->getMessage(),
@@ -248,8 +303,11 @@ class CustomerPortalController extends Controller
         }
     }
 
-    public function agentFeedbackRating(Request $request, CustomerPortalService $customerPortalService, $ticketId)
+    public function agentFeedbackRating(Request $request, $ticketId)
     {
+
+        $customerPortalService = new CustomerPortalService();
+
         // just for validation
         $ticket = Ticket::with(['customer'])->findOrFail($ticketId);
         $customerAdditionalData = $this->getCustomerAdditionalData($request);

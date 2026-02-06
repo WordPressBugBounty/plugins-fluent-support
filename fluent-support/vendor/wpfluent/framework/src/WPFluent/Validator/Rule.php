@@ -59,7 +59,7 @@ class Rule
     /**
      * Get an in constraint builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
+     * @param  \FluentSupport\Framework\Support\ArrayableInterface|array|string  $values
      * @return \FluentSupport\Framework\Validator\Rules\In
      */
     public static function in($values)
@@ -74,7 +74,7 @@ class Rule
     /**
      * Get a not_in constraint builder instance.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array|string  $values
+     * @param  \FluentSupport\Framework\Support\ArrayableInterface|array|string  $values
      * @return \FluentSupport\Framework\Validator\Rules\NotIn
      */
     public static function notIn($values)
@@ -142,7 +142,7 @@ class Rule
                 }
             }
 
-            ($msg && !$rule) && throw new InvalidArgumentException($msg, 500);
+            if($msg && !$rule) throw new InvalidArgumentException($msg, 500);
         }
         
         $classExists = false;

@@ -16,8 +16,4 @@ class AccountingRestrictions
 
     }
 
-    private function handleError($message)
-    {
-
-    }
 }

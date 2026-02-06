@@ -2,7 +2,7 @@
 
 namespace FluentSupport\Framework\Foundation;
 
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 
 abstract class Policy
 {

@@ -4,7 +4,7 @@ namespace FluentSupport\App\Http\Controllers;
 
 use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Includes\CountryNames;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 
 class OptionsController extends Controller
 {

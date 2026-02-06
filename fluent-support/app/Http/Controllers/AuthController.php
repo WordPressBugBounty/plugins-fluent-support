@@ -5,7 +5,7 @@ namespace FluentSupport\App\Http\Controllers;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\Framework\Support\Arr;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Hooks\Handlers\AuthHandler;
 use FluentSupport\App\Hooks\Handlers\ReCaptchaHandler;
 use FluentSupport\App\Hooks\Handlers\TwoFaHandler;
@@ -29,7 +29,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if (!wp_verify_nonce($request->get('_fsupport_signup_nonce'), 'fluent_support_signup_nonce')) {
+        if (!wp_verify_nonce($request->getSafe('_fsupport_signup_nonce', 'sanitize_text_field'), 'fluent_support_signup_nonce')) {
             return $this->sendError([
                 'message' => __('Security verification failed. Please try again', 'fluent-support')
             ]);
@@ -79,19 +79,27 @@ class AuthController extends Controller
             $token = $formData['_email_verification_token'];
             $verificationHash = $formData['_email_verification_hash'];
 
-            $logHash = Meta::where('object_type', 'fs_login_hashes',)
+            $logHashMeta = Meta::where('object_type', 'fs_login_hashes',)
                 ->where('key', $verificationHash)
                 ->first();
-            $logHash = maybe_unserialize($logHash->value);
+
+            if (!$logHashMeta) {
+                wp_send_json([
+                    'message' => __('Please provide a valid verification code that was sent to your email address', 'fluent-support')
+                ], 422);
+            }
+
+            $logHash = Helper::safeUnserialize($logHashMeta->value);
 
             if (!$logHash) {
                 wp_send_json([
-                    'message' => __('Please provide a valid verification code that sent to your email address', 'fluent-support')
+                    'message' => __('Please provide a valid verification code that was sent to your email address', 'fluent-support')
                 ], 422);
             }
 
             // check if it got expired or not
-            if ($logHash['used_count'] > 5 || strtotime($logHash['valid_till']) < current_time('timestamp')) {
+            $validTill = $logHash['valid_till'] ?? '';
+            if (($logHash['used_count'] ?? 0) > 5 || ($validTill && strtotime($validTill) < current_time('timestamp'))) {
                 wp_send_json([
                     'message' => __('Your verification code has been expired. Please try again', 'fluent-support')
                 ], 422);
@@ -105,7 +113,7 @@ class AuthController extends Controller
                 ]);
 
                 wp_send_json([
-                    'message' => __('Please provide a valid verification code that sent to your email address', 'fluent-support')
+                    'message' => __('Please provide a valid verification code that was sent to your email address', 'fluent-support')
                 ], 422);
             }
 
@@ -175,7 +183,7 @@ class AuthController extends Controller
             ]);
         }
 
-        if (!wp_verify_nonce($request->get('_support_login_nonce'), 'fsupport_login_nonce')) {
+        if (!wp_verify_nonce($request->getSafe('_support_login_nonce', 'sanitize_text_field'), 'fsupport_login_nonce')) {
             return $this->response([
                 'message' => __('Security verification failed', 'fluent-support')
             ], 403);
@@ -200,7 +208,7 @@ class AuthController extends Controller
             ], 403);
         }
         $redirectUrl = Helper::getPortalBaseUrl();
-        if ($redirect = $request->get('redirect_to')) {
+        if ($redirect = $request->getSafe('redirect_to', 'sanitize_text_field')) {
             if (filter_var($redirect, FILTER_VALIDATE_URL)) {
                 $redirectUrl = sanitize_url($redirect);
             }
@@ -213,7 +221,7 @@ class AuthController extends Controller
         }
 
         $email = sanitize_user($data['log']);
-        $password = trim($data['pwd']);
+        $password = trim($data['pwd'] ?? '');
 
         if (is_email($email)) {
             $user = get_user_by('email', $email);
@@ -268,7 +276,7 @@ class AuthController extends Controller
         if(!isset($reCaptchaSettingsData->value)){
             return false;
         }
-        $reCaptchaData = maybe_unserialize($reCaptchaSettingsData->value, []);
+        $reCaptchaData = Helper::safeUnserialize($reCaptchaSettingsData->value, []);
         if(!isset($reCaptchaData['is_enabled']) || !isset($reCaptchaData['formContainingReCaptcha'])){
             return false;
         }
@@ -306,9 +314,11 @@ class AuthController extends Controller
 
         $user_signon = wp_signon($info, $secure_cookie);
 
+        // Note: No sanitization needed here as we're only checking emptiness, not using the cookie value
         if (!is_wp_error($user_signon) && empty($_COOKIE[LOGGED_IN_COOKIE])) {
             if (headers_sent()) {
                 return $this->response([
+                    // translators: %1$s is the URL to WordPress cookies documentation, %2$s is the URL to WordPress support forums
                     'message' => sprintf(__('<strong>ERROR</strong>: Cookies are blocked due to unexpected output. For help, please see <a href="%1$s">this documentation</a> or try the <a href="%2$s">support forums</a>.', 'fluent-support'),
                         'https://codex.wordpress.org/Cookies', 'https://wordpress.org/support/')
                 ], 403);
@@ -387,13 +397,13 @@ class AuthController extends Controller
 
         $errors = new \WP_Error();
 
-        if (!wp_verify_nonce($request->get('_fsupport_reset_pass_nonce'), 'fluent_support_reset_pass_nonce')) {
+        if (!wp_verify_nonce($request->getSafe('_fsupport_reset_pass_nonce', 'sanitize_text_field'), 'fluent_support_reset_pass_nonce')) {
             return $this->sendError([
                 'message' => __('Security verification failed. Please try again', 'fluent-support')
             ]);
         }
 
-        $usernameOrEmail = trim(wp_unslash($request->get('user_login')));
+        $usernameOrEmail = trim(wp_unslash($request->getSafe('user_login', 'sanitize_text_field')));
 
         if (!$usernameOrEmail) {
             return $this->sendError([
@@ -464,6 +474,7 @@ class AuthController extends Controller
          * @since v1.5.7
          * @param string $linkText
          */
+        // translators: %s is the site name
         $linkText = apply_filters("fluent_support/reset_password_link", sprintf(__('Reset your password for %s', 'fluent-support'), get_bloginfo('name')));
 
         $resetUrl = add_query_arg([
@@ -480,13 +491,16 @@ class AuthController extends Controller
          * @since v1.5.7
          * @param string $mailSubject
          */
+        // translators: %s is the site name
         $mailSubject = apply_filters("fluent_support/reset_password_mail_subject", sprintf(__('Reset your password for %s support portal', 'fluent-support'), get_bloginfo('name')));
 
-        $message = sprintf(__('<p>Hi %s,</p>', 'fluent-support'), $user_data->first_name) .
-            __('<p>Someone has requested a new password for the following account on WordPress:</p>', 'fluent-support') .
-            sprintf(__('<p>Username: %s</p>', 'fluent-support'), $user_login) .
-            sprintf(__('<p>%s</p>', 'fluent-support'), $resetLink) .
-            sprintf(__('<p>If you did not request to reset your password, please ignore this email.</p>', 'fluent-support'));
+        // translators: %s is the user's first name
+        $message = '<p>' . sprintf(__('Hi %s,', 'fluent-support'), $user_data->first_name) . '</p>' .
+            '<p>' . __('Someone has requested a new password for the following account on WordPress:', 'fluent-support') . '</p>' .
+            // translators: %s is the username
+            '<p>' . sprintf(__('Username: %s', 'fluent-support'), $user_login) . '</p>' .
+            '<p>' . $resetLink . '</p>' .
+            '<p>' . __('If you did not request to reset your password, please ignore this email.', 'fluent-support') . '</p>';
 
         /*
          * Filter reset password email body text
@@ -588,14 +602,16 @@ class AuthController extends Controller
      */
     public function maybeUpdateUser($userId, $formData)
     {
-        $name = trim(Arr::get($formData, 'first_name') . ' ' . Arr::get($formData, 'last_name'));
+        $firstName = Arr::get($formData, 'first_name', '');
+        $lastName = Arr::get($formData, 'last_name', '');
+        $name = trim($firstName . ' ' . $lastName);
 
         $data = array_filter([
             'ID' => $userId,
             'user_nicename' => $name,
             'display_name' => $name,
-            'first_name' => Arr::get($formData, 'first_name'),
-            'last_name' => Arr::get($formData, 'last_name'),
+            'first_name' => $firstName,
+            'last_name' => $lastName,
         ]);
 
         if ($name) {

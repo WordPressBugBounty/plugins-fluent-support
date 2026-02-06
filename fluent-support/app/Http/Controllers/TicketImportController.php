@@ -2,7 +2,7 @@
 namespace FluentSupport\App\Http\Controllers;
 
 use FluentSupport\App\Services\Tickets\Importer\MigratorService;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Services\Tickets\Importer\BaseImporter;
 
 

@@ -249,7 +249,7 @@ class FileSystem
      */
     public function _renameFileName($file)
     {
-        $prefix = 'fluent_support-' . md5(uniqid(rand())) . '___';
+        $prefix = 'fluent_support-' . md5(uniqid(wp_rand())) . '___';
         $prefix = apply_filters('fluent_support/uploaded_file_name_prefix', $prefix);
         $file['name'] = $prefix . $file['name'];
         return $file;

@@ -5,8 +5,9 @@ namespace FluentSupport\App\Http\Controllers;
 use FluentSupport\App\Modules\Reporting\Reporting;
 use FluentSupport\App\Modules\StatModule;
 use FluentSupport\App\Services\Helper;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Models\Ticket;
+use FluentSupport\App\Models\Conversation;
 
 /**
  * ReportingController class for REST API
@@ -26,8 +27,7 @@ class ReportingController extends Controller
     public function getOverallReports(Request $request)
     {
         return [
-            'overall_reports' => StatModule::getOverAllStats(),
-            'today_reports' => StatModule::getTodayStats(),
+            'overall_reports' => StatModule::getOverAllStats()
         ];
     }
 
@@ -117,7 +117,7 @@ class ReportingController extends Controller
     public function getAgentsSummary(Request $request, Reporting $reporting)
     {
         return [
-          'summary' =>  $reporting->agentSummary($request->getSafe('from'), $request->getSafe('to'))
+          'summary' =>  $reporting->agentSummary($request->getSafe('from', 'sanitize_text_field'), $request->getSafe('to', 'sanitize_text_field'))
         ];
     }
 
@@ -184,7 +184,7 @@ class ReportingController extends Controller
     public static function getMailBoxesSummary(Request $request,Reporting $reporting): array
     {
         return [
-            'summary' =>  $reporting->getSummary('mailbox',$request->getSafe('from'), $request->getSafe('to'))
+            'summary' =>  $reporting->getSummary('mailbox',$request->getSafe('from', 'sanitize_text_field'), $request->getSafe('to', 'sanitize_text_field'))
         ];
     }
 
@@ -264,6 +264,130 @@ class ReportingController extends Controller
         ];
 
         return $reporting->getTicketResponseStats($from, $to, $filter);
+    }
+
+    /**
+     * getStats method will return statistics similar to getOverallReports but with filters
+     * Returns: New Tickets, Active Tickets, Closed Tickets, and Responses
+     * Filters: date_range, mailbox_id (business_box), product_id, agent_id, customer_id
+     * @param Request $request
+     * @return array
+     */
+    public function getStats(Request $request)
+    {
+        $dateRange = $request->get('date_range');
+        $from = $to = '';
+
+        if (is_array($dateRange) && count($dateRange) >= 2) {
+            $from = sanitize_text_field($dateRange[0] ?? '');
+            $to = sanitize_text_field($dateRange[1] ?? '');
+        } elseif (is_string($dateRange)) {
+            $parts = array_map('trim', explode(',', $dateRange));
+            $from = sanitize_text_field($parts[0] ?? '');
+            $to = sanitize_text_field($parts[1] ?? '');
+        }
+
+        $filters = [
+            'mailbox_id' => $request->getSafe('mailbox_id', 'intval') ?: $request->getSafe('business_box', 'intval'),
+            'product_id' => $request->getSafe('product_id', 'intval'),
+            'agent_id' => $request->getSafe('agent_id', 'intval'),
+            'customer_id' => $request->getSafe('customer_id', 'intval'),
+        ];
+
+        $baseQuery = Ticket::query();
+        foreach ($filters as $field => $value) {
+            if ($value) {
+                $baseQuery->where($field, $value);
+            }
+        }
+
+        $applyDateRange = function($query, $dateField = 'created_at') use ($from, $to) {
+            if ($from && $to) {
+                $query->whereBetween($dateField, ["$from 00:00:00", "$to 23:59:59"]);
+            } elseif ($from) {
+                $query->where($dateField, '>=', "$from 00:00:00");
+            } elseif ($to) {
+                $query->where($dateField, '<=', "$to 23:59:59");
+            }
+        };
+
+        $countTickets = function($status, $dateField = 'created_at') use ($baseQuery, $applyDateRange) {
+            $query = clone $baseQuery;
+            $query->where('status', $status);
+            $applyDateRange($query, $dateField);
+            return $query->count();
+        };
+
+        $newTickets = $countTickets('new');
+        $closedTickets = $countTickets('closed');
+
+        $openQuery = clone $baseQuery;
+        $openQuery->where('status', '!=', 'closed');
+        $applyDateRange($openQuery);
+        $openTickets = $openQuery->count();
+
+        $responsesQuery = Conversation::query()->where('conversation_type', 'response');
+
+        if (array_filter($filters)) {
+            $responsesQuery->whereHas('ticket', function ($q) use ($filters) {
+                foreach ($filters as $field => $value) {
+                    if ($value) {
+                        $q->where($field, $value);
+                    }
+                }
+            });
+        }
+
+        $applyDateRange($responsesQuery, 'created_at');
+        $responses = $responsesQuery->count();
+
+        $agentId = $filters['agent_id'];
+
+        if ($agentId) {
+            $repliesQuery = Conversation::query()
+                ->where('person_id', $agentId);
+
+            $applyDateRange($repliesQuery, 'created_at');
+            $totalReplies = $repliesQuery->count();
+
+            $stats = [
+                'total_replies' => $totalReplies,
+                'new_tickets' => $newTickets,
+                'closed_tickets' => $closedTickets,
+                'responses' => $responses,
+                'open_tickets' => $openTickets,
+            ];
+        } else {
+            $activeTickets = $countTickets('active');
+
+            $stats = [
+                'new_tickets' => $newTickets,
+                'active_tickets' => $activeTickets,
+                'closed_tickets' => $closedTickets,
+                'responses' => $responses,
+                'open_tickets' => $openTickets,
+            ];
+        }
+
+        $labels = [
+            'total_replies'  => __('Total Replies', 'fluent-support'),
+            'new_tickets'    => __('New Tickets', 'fluent-support'),
+            'active_tickets' => __('Active Tickets', 'fluent-support'),
+            'closed_tickets' => __('Closed Tickets', 'fluent-support'),
+            'responses'      => __('Responses', 'fluent-support'),
+            'open_tickets'   => __('Open Tickets', 'fluent-support'),
+        ];
+
+        $overallReports = [];
+        foreach ($stats as $key => $count) {
+            $overallReports[$key] = [
+                'title' => $labels[$key] ?? ucwords(str_replace('_', ' ', (string) $key)),
+                'key' => $key,
+                'count' => $count,
+            ];
+        }
+
+        return ['overall_reports' => $overallReports];
     }
 
 }

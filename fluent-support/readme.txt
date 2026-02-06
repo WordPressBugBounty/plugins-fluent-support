@@ -2,8 +2,8 @@
 Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
-Tested up to: 6.8
-Stable tag: 1.9.2
+Tested up to: 6.9
+Stable tag: 2.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ Fluent Support is a versatile and feature-rich help desk and support plugin desi
 
 Fluent Support can match the premium features of SaaS solutions like Zendesk, Help Scout or FreshDesk all within your WordPress site and witthout any growth-tax.
 
-[youtube https://www.youtube.com/watch?v=ZI7Rlp-uuZI&t=5s]
+[youtube https://www.youtube.com/watch?v=CqkgrF7JG5k]
 
 🔗 Official Website Link: [Official Website](https://fluentsupport.com/)
 🔗 Join Our FB Community: [FluentSupport Facebook Group](https://facebook.com/groups/fluentsupport)
@@ -198,6 +198,8 @@ For Support Candy plugin users it's also super easy to migrate to Fluent Support
 	<li><a href="https://wordpress.org/plugins/fluent-smtp/" target="_blank">FluentSMTP - WP SMTP Plugin with Amazon SES, SendGrid, MailGun, Postmark, Google and Any SMTP Provider</a></li>
 </ul>
 
+== Contribute ==
+Fluent Support is an open source project. You can view the full sources (unminified JS) and  contribute to the project on GitHub: https://github.com/WPManageNinja/fluent-support
 
 == Installation ==
 This section describes how to install the plugin and get it working.
@@ -233,17 +235,111 @@ Absolutely not! From the very first, we were careful about this. It stores all t
 
 Absolutely! Fluent Support offers a customizable support portal, allowing you to seamlessly integrate the helpdesk with your WordPress theme for a cohesive and professional look.
 
+=Where can I find the Full Vue Source Code?=
+The full Vue source code is available on our GitHub repository: https://github.com/WPManageNinja/fluent-support
+
+== External Services ==
+This plugin connects to several external services for various functionalities.
+
+= Spam Protection Services =
+**Google reCAPTCHA**
+This plugin connects to Google's reCAPTCHA service to protect support forms and login pages from spam and abuse. It analyzes user interaction patterns and form data to verify authenticity.
+It sends form submission data, interaction behavior, and IP address when reCAPTCHA is enabled.
+This service is provided by Google: [Terms of Service](https://policies.google.com/terms), [Privacy Policy](https://policies.google.com/privacy)
+
+= Migration Services =
+**Zendesk API (Migration Feature)**
+This plugin connects to Zendesk’s API when the migration feature is used to import tickets. It sends API credentials and retrieves ticket data, customer information, and attachments from Zendesk servers.
+Data exchanged includes Zendesk API credentials, ticket data, user details, and attachments.
+This service is provided by Zendesk: [Terms of Service](https://www.zendesk.com/company/customers-partners/terms-of-use/), [Privacy Policy](https://www.zendesk.com/company/agreements-and-terms/privacy-notice/)
+
+**Help Scout API**
+This plugin connects to Help Scout’s API when the migration feature is used to import conversations. It sends API credentials and retrieves customer information, ticket conversations, and attachments.
+Data exchanged includes Help Scout API access token, conversation data, customer details, and attachments.
+This service is provided by Help Scout: [Terms of Service](https://www.helpscout.com/company/legal/terms-of-service/), [Privacy Policy](https://www.helpscout.com/company/legal/privacy/)
+
+**Freshdesk API**
+This plugin connects to Freshdesk’s API when the migration feature is used to import tickets. It sends API credentials and retrieves ticket data, customer information, and attachments.
+Data exchanged includes Freshdesk API credentials, ticket data, customer details, and conversation history.
+This service is provided by Freshdesk: [Terms of Service](https://www.freshworks.com/terms/), [Privacy Policy](https://www.freshworks.com/privacy/)
+
+**JSHelpdesk Integration (Migration Feature)**
+This plugin connects to your local JSHelpdesk installation when the migration feature is used. It accesses local files and data to import tickets and attachments into this plugin.
+Data accessed includes local server files, ticket data, and customer information — all processed within your own server environment.
+No external service connection is made for this integration.
+
+= Local Migration Tools =
+**Awesome Support and SupportCandy**
+This plugin includes migration tools for Awesome Support and SupportCandy plugins.
+These tools access ticket and customer data directly from your WordPress database and perform all operations locally.
+No external connections are established, and all processing occurs within your own server.
+
 == Screenshots ==
-1. FluentSupport Tickets
-2. Single Ticket Overview
-3. Fluent Support Reports
-4. Customer Portal - Dashboard
-5. Customer Portal - Single Ticket
-6. Workflows (Pro)
-7. Settings
-8. FluentSupport Dashboard
+1. FluentSupport Dashboard
+2. FluentSupport Tickets
+3. Single Ticket Overview
+4. Business Inboxes
+5. Activity Reports (Pro)
+6. Agents Reports (Pro)
+7. Workflow Automation (Pro)
+8. Settings
+9. All Customers
 
 == Changelog ==
+
+= 2.0.0 (Date: February 05, 2026) =
+* Complete admin interface redesign with a modern layout.
+* Full RTL (Right-to-Left) language support across the interface.
+* Fully mobile-responsive experience across all modules.
+* Revamped menu structure with dropdowns for better organization.
+* Responsive hamburger menus for Main Menu, Settings, and Reports.
+* Drag & Drop Image Upload for tickets.
+* Ticket List Display Settings: manage layout and element visibility directly from the Display Settings icon.
+* Compact Ticket List Layout for faster scanning and higher information density.
+* Keyboard Shortcuts: Enable via Plugin Settings → Global Settings → Enable Keyboard Shortcuts. Click “Keyboard Shortcuts” to view all available commands.
+* Improved Frontend Support Portal responsiveness and theme compatibility.
+* Refactored Customer Portal SCSS variables for easier dark mode implementation.
+* Updated core PHP framework; resolved PHP 8.4 compatibility issues.
+* Improved input sanitization and validation.
+* Migrated components to Options API and refactored Vue components for better performance.
+* Prevented unnecessary API calls in Reports module.
+* Separated personal reports from agent performance reports.
+* Added Reports Stats API for product/business-specific insights.
+* Selected date range persists when switching report tabs.
+* Resolved issue where pressing Enter caused page reload instead of submitting forms.
+* Fixed Block Editor styles not applying correctly on Customer Portal.
+* Fixed WordPress 6.9 admin text editor toolbar compatibility issues.
+* Fixed database table error when Activity Log feature was disabled.
+* Fixed auto password generation issue for new users with empty password fields.
+
+= 1.10.5 (Date: November 28, 2025) =
+* Security: Fixed an access control bypass in the customer portal caused by improper validation of the intended_ticket_hash parameter.
+* Security: Added sanitize_sql_orderby() to prevent unsafe or invalid values in sorting queries.
+* Fix product_id filter to require array in whereIn, preventing potential errors when a non-array value is provided.
+
+
+= 1.10.4 (Date: November 21, 2025) =
+* Fixed: Issue with attachments not showing from third-party storage.
+
+= 1.10.3 (Date: Nov 17, 2025) =
+* Resolved issues affecting public ticket and attachment visibility.
+
+= 1.10.2 (Date: Nov 6, 2025) =
+* Fixed Guideline Issues
+
+= 1.10.1 (Date: Oct 31, 2025) =
+* Fixed Text Domain Issues
+* Updated Libraries
+* Prevent Direct Access to Plugin Files
+* Added GitHub Public repo link in the readme file
+
+= 1.10.0 (Date: October 23, 2025) =
+* Added: Fluent Cart product purchase widget in the ticket sidebar.
+* Added: Fluent Cart product and order options in custom fields.
+* Added: Workflow trigger based on Fluent Cart product and order from custom fields.
+* Added: Option to integrate the customer portal into the Fluent Cart customer dashboard.
+* Added: Multi-select option for product filtering in tickets.
+* Improved: Refined plugin performance for increased speed and efficiency.
 
 = 1.9.2 (Date: August 20, 2025) =
 * Added: Product assignment to tickets in Workflow Actions.
@@ -251,7 +347,7 @@ Absolutely! Fluent Support offers a customizable support portal, allowing you to
 * Improved: Click-to-copy shortcode functionality on the Global Settings page.
 * Improved: Smart code selection dropdown in Email Settings with click-to-insert functionality in WP Editor.
 * Improved: Dash icon updated.
-* Fixed: CSRF issue fixed on Report Export - nonce verification.
+* Fixed: CSRF issue fixed on Report Export – nonce verification.
 * Fixed: Error during AI activity log cleanup.
 
 = 1.9.1 (Date: July 15, 2025) =

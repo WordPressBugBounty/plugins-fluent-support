@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') or die;
+
 /**
  * @var $app FluentSupport\Framework\Foundation\Application
  */

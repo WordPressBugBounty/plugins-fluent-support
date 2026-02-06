@@ -6,7 +6,7 @@ use FluentSupport\App\Models\Agent;
 use FluentSupport\App\Modules\StatModule;
 use FluentSupport\App\Services\AvatarUploder;
 use FluentSupport\App\Services\Helper;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Http\Requests\AgentCreateRequest;
 
@@ -209,7 +209,7 @@ class AgentController extends Controller
     }
 
     public function getAgentInsights(Request $request, Agent $agent)
-    {        
+    {
         return [
             'agents' => $agent->agentInsights($request->getSafe('search','sanitize_text_field')),
         ];

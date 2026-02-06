@@ -17,13 +17,12 @@ class AIActivityLogger
      */
     public function init()
     {
+        // Check if AI activity logs are disabled - if so, don't register any hooks
+        if (Helper::areLogsDisabled('_ai_activity_settings')) {
+            return;
+        }
+
         add_action('fluent_support/ai_response_success', function ($ticketID, $prompt, $usedTokens, $model) {
-            $settings = Helper::getOption('_ai_activity_settings', []);
-
-            if (isset($settings['disable_logs']) && $settings['disable_logs'] === 'yes') {
-                return;
-            }
-
             $logData = [
                 'agent_id' => get_current_user_id(),
                 'ticket_id' => $ticketID,

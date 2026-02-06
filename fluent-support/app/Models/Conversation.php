@@ -367,7 +367,7 @@ class Conversation extends Model
             ->first();
 
         if ($exist) {
-            $value = maybe_unserialize($exist->value);
+            $value = Helper::safeUnserialize($exist->value);
             if ($valueKey) {
                 if (!is_array($value)) {
                     return $default;
@@ -388,7 +388,7 @@ class Conversation extends Model
             ->first();
 
         if ($exist) {
-            $existingValue = maybe_unserialize($exist->value);
+            $existingValue = Helper::safeUnserialize($exist->value);
 
             if (!is_array($existingValue)) {
                 $existingValue = [];
@@ -429,6 +429,7 @@ class Conversation extends Model
 
         if (!PermissionManager::currentUserCan($permissionKey) && $ticketAgentId !== $agentId) {
             throw new \Exception(
+                // translators: %s is the action being performed (e.g., "view", "edit", "delete")
                 esc_html(sprintf(__('Sorry, you do not have permission to %s this response.', 'fluent-support'), $task))
             );
         }

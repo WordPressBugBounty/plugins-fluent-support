@@ -26,7 +26,7 @@ class AvatarUploder
 
 
         if ( !$uploadedImage ) {
-            throw new Exception('Something went wrong while updating the profile picture', 403);
+            throw new Exception(esc_html__('Something went wrong while updating the profile picture', 'fluent-support'), 403);
         }
 
         $user->avatar = $uploadedImage[0]['url'];
@@ -59,6 +59,7 @@ class AvatarUploder
         if( !in_array($ext, $allowedExtension) ) {
             throw new Exception(
                 sprintf(
+                    // translators: %s is a comma-separated list of allowed file extensions (e.g., "jpg, png, gif")
                     esc_html__('Unsupported file submitted, allowed image file types are: %s', 'fluent-support'),
                     esc_html(implode(", ", $allowedExtension))
                 ), 403

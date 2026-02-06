@@ -3,7 +3,7 @@
 namespace FluentSupport\App\Http\Policies;
 
 use FluentSupport\App\Modules\PermissionManager;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\Framework\Foundation\Policy;
 
 class AgentTicketPolicy extends Policy
@@ -24,7 +24,7 @@ class AgentTicketPolicy extends Policy
 
     public function doBulkActions(Request $request)
     {
-        $action = $request->get('bulk_action');
+        $action = $request->getSafe('bulk_action', 'sanitize_text_field');
 
         if ($action == 'delete_tickets') {
             return PermissionManager::currentUserCan('fst_delete_tickets');

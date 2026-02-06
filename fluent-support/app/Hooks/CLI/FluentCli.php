@@ -30,7 +30,7 @@ class FluentCli
             return;
         }
 
-        $licenseKey = trim(sanitize_text_field($assoc_args['key']));
+        $licenseKey = trim(sanitize_text_field($assoc_args['key'] ?? ''));
 
         if (!class_exists('\FluentSupportPro\App\Services\PluginManager\LicenseManager')) {
             \WP_CLI::line('FluentSupport Pro is required');

@@ -112,8 +112,8 @@ trait ReportingHelperTrait
             ];
         }
         return [
-            $from->format('Y-m-d'),
-            $to->format('Y-m-d')
+            $from->format('Y-m-d')." 00:00:00",
+            $to->format('Y-m-d')." 23:59:59"
         ];
     }
 

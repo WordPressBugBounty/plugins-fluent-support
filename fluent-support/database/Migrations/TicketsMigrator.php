@@ -43,16 +43,78 @@ class TicketsMigrator
                 `resolved_at` TIMESTAMP NULL,
                 `closed_by` BIGINT(20) UNSIGNED NULL,
                 `created_at` TIMESTAMP NULL,
-                `updated_at` TIMESTAMP NULL
+                `updated_at` TIMESTAMP NULL,
+                INDEX `idx_customer_id` (`customer_id`),
+                INDEX `idx_agent_id` (`agent_id`),
+                INDEX `idx_mailbox_id` (`mailbox_id`),
+                INDEX `idx_product_id` (`product_id`),
+                INDEX `idx_priority` (`priority`),
+                INDEX `idx_status` (`status`),
+                INDEX `idx_created_at` (`created_at`)
             ) $charsetCollate;";
-            dbDelta($sql);
+            $created = dbDelta($sql);
+            return $created;
         } else {
-            // @todo: We will remove this on final release
-            // This is only for beta users
-            $existing_columns = $wpdb->get_col("DESC {$table}", 0);
-            if(!in_array('waiting_since', $existing_columns)) {
-                $query = 'ALTER TABLE '.$table.' ADD `waiting_since` timestamp NULL AFTER `last_customer_response`';
-                $wpdb->query($query);
+            static::alterTable($table);
+        }
+
+        return false;
+    }
+
+    public static function alterTable($table) 
+    {
+        static::addMissingColumns($table);
+        static::addMissingIndexes($table);
+    }
+
+    public static function addMissingColumns($table)
+    {
+        global $wpdb;
+
+        // Escape table name
+        $table = esc_sql($table);
+
+        // Get existing columns
+        $existing_columns = $wpdb->get_col("DESC `$table`", 0);
+        
+        // Add waiting_since column if missing (beta user migration)
+        if (!in_array('waiting_since', $existing_columns)) {
+            $query = 'ALTER TABLE `' . $table . '` ADD `waiting_since` TIMESTAMP NULL AFTER `last_customer_response`';
+            $wpdb->query($query);
+        }
+    }
+
+    public static function addMissingIndexes($table)
+    {
+        global $wpdb;
+
+        // Escape table name
+        $table = esc_sql($table);
+
+        // Get existing indexes
+        $existing_indexes = $wpdb->get_results("SHOW INDEX FROM `$table`");
+        $existing_index_names = [];
+
+        foreach ($existing_indexes as $index) {
+            $existing_index_names[] = $index->Key_name;
+        }
+
+        // Desired indexes
+        $indexes = [
+            'idx_customer_id' => 'customer_id',
+            'idx_agent_id' => 'agent_id',
+            'idx_mailbox_id' => 'mailbox_id',
+            'idx_product_id' => 'product_id',
+            'idx_priority' => 'priority',
+            'idx_status' => 'status',
+            'idx_created_at' => 'created_at',
+        ];
+
+        // Add missing indexes
+        foreach ($indexes as $index_name => $column_name) {
+            if (!in_array($index_name, $existing_index_names)) {
+                $sql = "ALTER TABLE `$table` ADD INDEX `$index_name` (`$column_name`)";
+                $wpdb->query($sql);
             }
         }
     }

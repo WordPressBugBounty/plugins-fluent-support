@@ -5,6 +5,7 @@ namespace FluentSupport\Framework\Pagination;
 use Closure;
 use Exception;
 use ArrayAccess;
+use FluentSupport\Framework\Foundation\App;
 use FluentSupport\Framework\Support\Arr;
 use FluentSupport\Framework\Support\Str;
 use FluentSupport\Framework\Support\Tappable;
@@ -12,14 +13,13 @@ use FluentSupport\Framework\Database\Orm\Model;
 use FluentSupport\Framework\Support\Collection;
 use FluentSupport\Framework\Support\ForwardsCalls;
 use FluentSupport\Framework\Database\Orm\Relations\Pivot;
-use FluentSupport\Framework\Database\Orm\ResourceAbleTrait;
 
 /**
  * @mixin \FluentSupport\Framework\Support\Collection
  */
 abstract class AbstractCursorPaginator
 {
-    use ForwardsCalls, Tappable, ResourceAbleTrait;
+    use ForwardsCalls, Tappable;
 
     /**
      * All of the items being paginated.
@@ -83,6 +83,13 @@ abstract class AbstractCursorPaginator
      * @var array
      */
     protected $options;
+
+    /**
+     * Indicates whether there are more items in the data source.
+     *
+     * @return bool
+     */
+    protected $hasMore;
 
     /**
      * The current cursor resolver callback.
@@ -227,7 +234,7 @@ abstract class AbstractCursorPaginator
     /**
      * Get the cursor parameter value from a pivot model if applicable.
      *
-     * @param  \ArrayAccess|\stdClass  $item
+     * @param  \FluentSupport\Framework\Database\Orm\Model  $item
      * @param  string  $parameterName
      * @return string|null
      */
@@ -464,6 +471,10 @@ abstract class AbstractCursorPaginator
      */
     public function setPath($path)
     {
+        if (!preg_match('/^https?:\/\//i', $path)) {
+            $path = App::make('request')->url() . '/' . trim($path, '/');
+        }
+
         $this->path = $path;
 
         return $this;
@@ -648,6 +659,10 @@ abstract class AbstractCursorPaginator
      */
     public function __toString()
     {
-        return (string) $this->toArray();
+        if (method_exists($this, 'render')) {
+            return $this->render();
+        }
+
+        return get_class($this);
     }
 }

@@ -3,7 +3,7 @@
 namespace FluentSupport\App\Http\Controllers;
 
 use FluentSupport\App\Services\Helper;
-use FluentSupport\Framework\Request\Request;
+use FluentSupport\Framework\Http\Request\Request;
 
 /**
  *  ActivityLoggerController class for REST API
@@ -37,10 +37,10 @@ class AIActivityLoggerController extends Controller
      */
     public function updateSettings (Request $request)
     {
-        $settings = $request->get('ai_activity_settings');
+        $settings = $request->getSafe('ai_activity_settings');
         $settings = [
-            'delete_days'  => intval($settings['delete_days']),
-            'disable_logs' => sanitize_text_field($settings['disable_logs'])
+            'delete_days'  => intval($settings['delete_days'] ?? 0),
+            'disable_logs' => sanitize_text_field($settings['disable_logs'] ?? '')
         ];
         try {
             return Helper::updateAISettings($settings);

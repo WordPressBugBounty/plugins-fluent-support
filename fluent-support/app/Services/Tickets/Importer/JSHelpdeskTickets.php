@@ -52,7 +52,7 @@ class JSHelpdeskTickets extends BaseImporter
         ];
 
         if (!$hasMore) {
-            $response['message'] = __('All tickets has been importer successfully', 'fluent-support');
+            $response['message'] = __('All tickets have been imported successfully', 'fluent-support');
             update_option('_fs_migrate_js_helpdesk', current_time('mysql'), 'no');
         }
 
@@ -240,7 +240,7 @@ class JSHelpdeskTickets extends BaseImporter
 
         return [
             'has_more' => false,
-            'message'  => __('All JS Helpdesk tickets and associated data has been deleted. You may now deactivate JS Helpdesk Plugin and start using Fluent Support', 'fluent-support')
+            'message'  => __('All JS Helpdesk tickets and associated data have been deleted. You may now deactivate JS Helpdesk Plugin and start using Fluent Support', 'fluent-support')
         ];
     }
 

@@ -4,8 +4,11 @@ namespace FluentSupport\Framework\Database\Orm\Concerns;
 
 use Closure;
 use BadMethodCallException;
+use InvalidArgumentException;
 use FluentSupport\Framework\Support\Str;
+use FluentSupport\Framework\Support\Helper;
 use FluentSupport\Framework\Database\Orm\Builder;
+use FluentSupport\Framework\Database\Orm\Collection;
 use FluentSupport\Framework\Database\Query\Expression;
 use FluentSupport\Framework\Database\Orm\Relations\MorphTo;
 use FluentSupport\Framework\Database\Orm\Relations\Relation;
@@ -27,10 +30,10 @@ trait QueriesRelationships
      *
      * @throws \RuntimeException
      */
-    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null)
     {
         if (is_string($relation)) {
-            if (strpos($relation, '.') !== false) {
+            if (str_contains($relation, '.')) {
                 return $this->hasNested($relation, $operator, $count, $boolean, $callback);
             }
 
@@ -120,7 +123,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
+    public function doesntHave($relation, $boolean = 'and', ?Closure $callback = null)
     {
         return $this->has($relation, '<', 1, $boolean, $callback);
     }
@@ -145,7 +148,7 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    public function whereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'and', $callback);
     }
@@ -161,7 +164,7 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function withWhereHas($relation, Closure $cb = null, $operator = '>=', $count = 1)
+    public function withWhereHas($relation, ?Closure $cb = null, $operator = '>=', $count = 1)
     {
         return $this->whereHas(Str::before($relation, ':'), $cb, $operator, $count)
             ->with($cb ? [$relation => function ($query) use ($cb) { $cb($query); }] : $relation);
@@ -176,7 +179,7 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function orWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    public function orWhereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'or', $callback);
     }
@@ -188,7 +191,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function whereDoesntHave($relation, Closure $callback = null)
+    public function whereDoesntHave($relation, ?Closure $callback = null)
     {
         return $this->doesntHave($relation, 'and', $callback);
     }
@@ -200,7 +203,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function orWhereDoesntHave($relation, Closure $callback = null)
+    public function orWhereDoesntHave($relation, ?Closure $callback = null)
     {
         return $this->doesntHave($relation, 'or', $callback);
     }
@@ -216,7 +219,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function hasMorph($relation, $types, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+    public function hasMorph($relation, $types, $operator = '>=', $count = 1, $boolean = 'and', ?Closure $callback = null)
     {
         if (is_string($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
@@ -226,6 +229,10 @@ trait QueriesRelationships
 
         if ($types === ['*']) {
             $types = $this->model->newModelQuery()->distinct()->pluck($relation->getMorphType())->filter()->all();
+        }
+
+        if (empty($types)) {
+            return $this->where(new Expression('0'), $operator, $count, $boolean);
         }
 
         foreach ($types as &$type) {
@@ -295,7 +302,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function doesntHaveMorph($relation, $types, $boolean = 'and', Closure $callback = null)
+    public function doesntHaveMorph($relation, $types, $boolean = 'and', ?Closure $callback = null)
     {
         return $this->hasMorph($relation, $types, '<', 1, $boolean, $callback);
     }
@@ -322,7 +329,7 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function whereHasMorph($relation, $types, Closure $callback = null, $operator = '>=', $count = 1)
+    public function whereHasMorph($relation, $types, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->hasMorph($relation, $types, $operator, $count, 'and', $callback);
     }
@@ -337,7 +344,7 @@ trait QueriesRelationships
      * @param  int  $count
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function orWhereHasMorph($relation, $types, Closure $callback = null, $operator = '>=', $count = 1)
+    public function orWhereHasMorph($relation, $types, ?Closure $callback = null, $operator = '>=', $count = 1)
     {
         return $this->hasMorph($relation, $types, $operator, $count, 'or', $callback);
     }
@@ -350,7 +357,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function whereDoesntHaveMorph($relation, $types, Closure $callback = null)
+    public function whereDoesntHaveMorph($relation, $types, ?Closure $callback = null)
     {
         return $this->doesntHaveMorph($relation, $types, 'and', $callback);
     }
@@ -363,7 +370,7 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @return \FluentSupport\Framework\Database\Orm\Builder|static
      */
-    public function orWhereDoesntHaveMorph($relation, $types, Closure $callback = null)
+    public function orWhereDoesntHaveMorph($relation, $types, ?Closure $callback = null)
     {
         return $this->doesntHaveMorph($relation, $types, 'or', $callback);
     }
@@ -380,7 +387,11 @@ trait QueriesRelationships
     public function whereRelation($relation, $column, $operator = null, $value = null)
     {
         return $this->whereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
         });
     }
 
@@ -396,7 +407,11 @@ trait QueriesRelationships
     public function orWhereRelation($relation, $column, $operator = null, $value = null)
     {
         return $this->orWhereHas($relation, function ($query) use ($column, $operator, $value) {
-            $query->where($column, $operator, $value);
+            if ($column instanceof Closure) {
+                $column($query);
+            } else {
+                $query->where($column, $operator, $value);
+            }
         });
     }
 
@@ -447,6 +462,10 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($relation);
         }
 
+        if (is_null($model)) {
+            return $this->whereNull($relation->qualifyColumn($relation->getMorphType()), $boolean);
+        }
+
         if (is_string($model)) {
             $morphMap = Relation::morphMap();
 
@@ -454,12 +473,41 @@ trait QueriesRelationships
                 $model = array_search($model, $morphMap, true);
             }
 
-            return $this->where($relation->getMorphType(), $model, null, $boolean);
+            return $this->where($relation->qualifyColumn($relation->getMorphType()), $model, null, $boolean);
         }
 
         return $this->where(function ($query) use ($relation, $model) {
-            $query->where($relation->getMorphType(), $model->getMorphClass())
-                ->where($relation->getForeignKeyName(), $model->getKey());
+            $query->where($relation->qualifyColumn($relation->getMorphType()), $model->getMorphClass())
+                ->where($relation->qualifyColumn($relation->getForeignKeyName()), $model->getKey());
+        }, null, null, $boolean);
+    }
+
+    /**
+     * Add a not morph-to relationship condition to the query.
+     *
+     * @param  \FluentSupport\Framework\Database\Orm\Relations\MorphTo<*, *>|string  $relation
+     * @param  \FluentSupport\Framework\Database\Orm\Model|string  $model
+     * @return $this
+     */
+    public function whereNotMorphedTo($relation, $model, $boolean = 'and')
+    {
+        if (is_string($relation)) {
+            $relation = $this->getRelationWithoutConstraints($relation);
+        }
+
+        if (is_string($model)) {
+            $morphMap = Relation::morphMap();
+
+            if (! empty($morphMap) && in_array($model, $morphMap)) {
+                $model = array_search($model, $morphMap, true);
+            }
+
+            return $this->whereNot($relation->qualifyColumn($relation->getMorphType()), '<=>', $model, $boolean);
+        }
+
+        return $this->whereNot(function ($query) use ($relation, $model) {
+            $query->where($relation->qualifyColumn($relation->getMorphType()), '<=>', $model->getMorphClass())
+                ->where($relation->qualifyColumn($relation->getForeignKeyName()), '<=>', $model->getKey());
         }, null, null, $boolean);
     }
 
@@ -476,10 +524,22 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a not morph-to relationship condition to the query with an "or where" clause.
+     *
+     * @param  \FluentSupport\Framework\Database\Orm\Relations\MorphTo<*, *>|string  $relation
+     * @param  \FluentSupport\Framework\Database\Orm\Model|string  $model
+     * @return $this
+     */
+    public function orWhereNotMorphedTo($relation, $model)
+    {
+        return $this->whereNotMorphedTo($relation, $model, 'or');
+    }
+
+    /**
      * Add a "belongs to" relationship where clause to the query.
      *
      * @param  \FluentSupport\Framework\Database\Orm\Model  $related
-     * @param  string  $relationship
+     * @param  string  $relationshipName
      * @param  string  $boolean
      * @return $this
      *
@@ -487,24 +547,41 @@ trait QueriesRelationships
      */
     public function whereBelongsTo($related, $relationshipName = null, $boolean = 'and')
     {
+        if (! $related instanceof Collection) {
+            $relatedCollection = $related->newCollection([$related]);
+        } else {
+            $relatedCollection = $related;
+
+            $related = $relatedCollection->first();
+        }
+
+        if ($relatedCollection->isEmpty()) {
+            throw new InvalidArgumentException('Collection given to whereBelongsTo method may not be empty.');
+        }
+
         if ($relationshipName === null) {
             $relationshipName = Str::camel(static::classBasename($related));
         }
 
         try {
             $relationship = $this->model->{$relationshipName}();
-        } catch (BadMethodCallException $exception) {
-            throw RelationNotFoundException::make($this->model, $relationshipName);
+        } catch (BadMethodCallException $e) {
+            throw RelationNotFoundException::make(
+                $this->model, $relationshipName
+            );
         }
 
         if (! $relationship instanceof BelongsTo) {
-            throw RelationNotFoundException::make($this->model, $relationshipName, BelongsTo::class);
+            throw RelationNotFoundException::make(
+                $this->model, $relationshipName, BelongsTo::class
+            );
         }
 
-        $this->where(
+        $this->whereIn(
             $relationship->getQualifiedForeignKeyName(),
-            '=',
-            $related->getAttributeValue($relationship->getOwnerKeyName()),
+            $relatedCollection->pluck(
+                $relationship->getOwnerKeyName()
+            )->toArray(),
             $boolean,
         );
 
@@ -515,7 +592,7 @@ trait QueriesRelationships
      * Add an "BelongsTo" relationship with an "or where" clause to the query.
      *
      * @param  \FluentSupport\Framework\Database\Orm\Model  $related
-     * @param  string  $relationship
+     * @param  string  $relationshipName
      * @return $this
      *
      * @throws \RuntimeException
@@ -560,17 +637,19 @@ trait QueriesRelationships
             $relation = $this->getRelationWithoutConstraints($name);
 
             if ($function) {
-                $hashedColumn = $this->getQuery()->from === $relation->getQuery()->getQuery()->from
-                                            ? "{$relation->getRelationCountHash(false)}.$column"
-                                            : $column;
+                if ($this->getQuery()->getGrammar()->isExpression($column)) {
+                    $aggregateColumn = $this->getQuery()->getGrammar()->getValue($column);
+                } else {
+                    $hashedColumn = $this->getRelationHashedColumn($column, $relation);
 
-                $wrappedColumn = $this->getQuery()->getGrammar()->wrap(
-                    $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
-                );
+                    $aggregateColumn = $this->getQuery()->getGrammar()->wrap(
+                        $column === '*' ? $column : $relation->getRelated()->qualifyColumn($hashedColumn)
+                    );
+                }
 
-                $expression = $function === 'exists' ? $wrappedColumn : sprintf('%s(%s)', $function, $wrappedColumn);
+                $expression = $function === 'exists' ? $aggregateColumn : sprintf('%s(%s)', $function, $aggregateColumn);
             } else {
-                $expression = $column;
+                $expression = $this->getQuery()->getGrammar()->getValue($column);
             }
 
             // Here, we will grab the relationship sub-query and prepare to add it to the main query
@@ -598,8 +677,8 @@ trait QueriesRelationships
             // Finally, we will make the proper column alias to the query and run this sub-select on
             // the query builder. Then, we will return the builder instance back to the developer
             // for further constraint chaining that needs to take place on the query as needed.
-            $alias = $alias ?? Str::snake(
-                preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function $column")
+            $alias ??= Str::snake(
+                preg_replace('/[^[:alnum:][:space:]_]/u', '', "$name $function {$this->getQuery()->getGrammar()->getValue($column)}")
             );
 
             if ($function === 'exists') {
@@ -616,6 +695,24 @@ trait QueriesRelationships
         }
 
         return $this;
+    }
+
+    /**
+     * Get the relation hashed column name for the given column and relation.
+     *
+     * @param  string  $column
+     * @param  \FluentSupport\Framework\Database\Orm\Relations\Relation<*, *, *>  $relation
+     * @return string
+     */
+    protected function getRelationHashedColumn($column, $relation)
+    {
+        if (str_contains($column, '.')) {
+            return $column;
+        }
+
+        return $this->getQuery()->from === $relation->getQuery()->getQuery()->from
+            ? "{$relation->getRelationCountHash(false)}.$column"
+            : $column;
     }
 
     /**
@@ -717,14 +814,40 @@ trait QueriesRelationships
     {
         $whereBindings = $from->getQuery()->getRawBindings()['where'] ?? [];
 
+        $wheres = $from->getQuery()->from !== $this->getQuery()->from
+            ? $this->requalifyWhereTables(
+                $from->getQuery()->wheres,
+                $from->getQuery()->grammar->getValue($from->getQuery()->from),
+                $this->getModel()->getTable()
+            ) : $from->getQuery()->wheres;
+
         // Here we have some other query that we want to merge the where constraints from. We will
         // copy over any where constraints on the query as well as remove any global scopes the
         // query might have removed. Then we will return ourselves with the finished merging.
         return $this->withoutGlobalScopes(
             $from->removedScopes()
         )->mergeWheres(
-            $from->getQuery()->wheres, $whereBindings
+            $wheres, $whereBindings
         );
+    }
+
+    /**
+     * Updates the table name for any columns with a new qualified name.
+     *
+     * @param  array  $wheres
+     * @param  string  $from
+     * @param  string  $to
+     * @return array
+     */
+    protected function requalifyWhereTables(array $wheres, string $from, string $to)
+    {
+        return Helper::collect($wheres)->map(function ($where) use ($from, $to) {
+            return Helper::collect($where)->map(function ($value) use ($from, $to) {
+                return is_string($value) && str_starts_with($value, $from.'.')
+                    ? $to.'.'.Str::afterLast($value, '.')
+                    : $value;
+            });
+        })->toArray();
     }
 
     /**

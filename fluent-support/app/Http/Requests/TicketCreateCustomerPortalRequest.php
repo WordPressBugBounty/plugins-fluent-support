@@ -23,8 +23,8 @@ class TicketCreateCustomerPortalRequest extends RequestGuard
     public function messages()
     {
         return [
-            'title.required' => 'Ticket title is required',
-            'content.required' => 'Ticket content is required'
+            'title.required' => __('Ticket title is required', 'fluent-support'),
+            'content.required' => __('Ticket content is required', 'fluent-support')
         ];
     }
 

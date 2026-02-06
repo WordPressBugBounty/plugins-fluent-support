@@ -43,6 +43,7 @@ class CustomerPortalService
     public function getTicket($customerAdditionalData, $ticketId)
     {
         $ticket = $this->getTicketByID($ticketId);
+        // translators: %s is the time duration (e.g., "2 hours", "3 days")
         $ticket->human_date = sprintf(__('%s ago', 'fluent-support'), human_time_diff(strtotime($ticket->created_at), current_time('timestamp')));
 
         $customer = $this->getCustomer($customerAdditionalData, $ticket);
@@ -160,8 +161,8 @@ class CustomerPortalService
     private function validateDisabledFields($data, $disabledFields)
     {
         if (!in_array('priority', $disabledFields)) {
-            $data['priority'] = sanitize_text_field($data['client_priority']);
-            $data['client_priority'] = sanitize_text_field($data['client_priority']);
+            $data['priority'] = sanitize_text_field($data['client_priority'] ?? '');
+            $data['client_priority'] = sanitize_text_field($data['client_priority'] ?? '');
         }
 
         if (in_array('product_services', $disabledFields)) {
@@ -237,11 +238,11 @@ class CustomerPortalService
     private function validateCustomer($customer)
     {
         if (!$customer) {
-            throw new \Exception('Customer not found');
+            throw new \Exception(esc_html__('Customer not found', 'fluent-support'));
         }
 
         if ($customer->status == 'inactive') {
-            throw new \Exception('Sorry, You do not have access to customer portal');
+            throw new \Exception(esc_html__('Sorry, You do not have access to customer portal', 'fluent-support'));
         }
     }
 
@@ -263,7 +264,7 @@ class CustomerPortalService
         }
 
         if (!$customer) {
-            throw new \Exception('Sorry! No customer found');
+            throw new \Exception(esc_html__('Sorry! No customer found', 'fluent-support'));
         }
 
         return $customer;
@@ -313,7 +314,7 @@ class CustomerPortalService
             }
         ])->where('customer_id', $customer->id)
             ->when(!empty($ticketOptions['sorting'] && !empty($ticketOptions['sorting']['sort_by'])), function ($query) use ($ticketOptions) {
-                return $query->orderBy($ticketOptions['sorting']['sort_by'], $ticketOptions['sorting']['sort_type']);
+                return $query->orderBy(sanitize_sql_orderby($ticketOptions['sorting']['sort_by']), sanitize_sql_orderby($ticketOptions['sorting']['sort_type']));
             })
             ->when(!empty($options['filters']['product_id']), function ($query) use ($ticketOptions) {
                 return $query->where('product_id', $ticketOptions['filters']['product_id']);
@@ -330,6 +331,7 @@ class CustomerPortalService
             ->paginate();
 
         foreach ($tickets as $ticket) {
+            // translators: %s is the time duration (e.g., "2 hours", "3 days")
             $ticket->human_date = sprintf(__('%s ago', 'fluent-support'), human_time_diff(strtotime($ticket->created_at), current_time('timestamp')));
             $ticket->preview_response = $ticket->getLastResponse();
         }
@@ -343,7 +345,7 @@ class CustomerPortalService
      * @param array $onBehalf
      * @param string $userIp // IP address of user
      * @param bool $forceCreate Default: false // If true, it will create a new customer
-     * @return Customer // Collection
+     * @return Customer | false //
      */
     public function resolveCustomer($onBehalf, $userIp, $forceCreate = false)
     {
@@ -352,6 +354,7 @@ class CustomerPortalService
             if (!$user) {
                 return false;
             }
+
             $onBehalf = [
                 'user_id'         => $user->ID,
                 'email'           => $user->user_email,
@@ -422,16 +425,17 @@ class CustomerPortalService
     public function checkCustomerTicketAccess($customer, $ticket, $action = false)
     {
         if (!$customer) {
-            throw new \Exception('Sorry, You do not have permission to this support ticket');
+            throw new \Exception(esc_html__('Sorry, You do not have permission to this support ticket', 'fluent-support'));
         }
 
         if ($customer->status == 'inactive') {
-            throw new \Exception('Sorry, You do not have access to customer portal');
+            throw new \Exception(esc_html__('Sorry, You do not have access to customer portal', 'fluent-support'));
         }
 
         if ($ticket->privacy == 'private' && $customer->id != $ticket->customer_id) {
             if ($action) {
                 throw new \Exception(sprintf(
+                    // translators: %s is the action being performed (e.g., "view", "edit", "delete")
                     esc_html__("Sorry! You cannot %s this ticket", 'fluent-support'),
                     esc_html($action)
                 ));
@@ -484,6 +488,7 @@ class CustomerPortalService
                     }
                 }
 
+                // translators: %s is the time duration (e.g., "2 hours", "3 days")
                 $response->human_date = sprintf(__('%s ago', 'fluent-support'), human_time_diff(strtotime($response->created_at), current_time('timestamp')));
                 $response->content = links_add_target(make_clickable($response->content));
                 if ($response->person) {

@@ -121,7 +121,7 @@ class FluentCRMServices
         $canAddTags = apply_filters('fluent_support/can_user_add_tags_to_customer', $canAddTags);
 
         if (!$canAddTags) {
-            throw new \Exception( 'Sorry you do not have permission to add contact tags' );
+            throw new \Exception(esc_html__('Sorry you do not have permission to add contact tags', 'fluent-support'));
         } else {
             return true;
         }
@@ -131,7 +131,7 @@ class FluentCRMServices
     private function isCrmEnabled ()
     {
         if ( !defined('FLUENTCRM') ) {
-           throw new \Exception('FluentCRM is not installed or Enabled');
+           throw new \Exception(esc_html__('FluentCRM is not installed or enabled', 'fluent-support'));
         } else {
             return true;
         }
@@ -141,7 +141,7 @@ class FluentCRMServices
     private function isContactAvailable ( $contactId )
     {
         if (!$contactId) {
-            throw new \Exception('Contact could not be found');
+            throw new \Exception(esc_html__('Contact could not be found', 'fluent-support'));
         } else {
             return true;
         }

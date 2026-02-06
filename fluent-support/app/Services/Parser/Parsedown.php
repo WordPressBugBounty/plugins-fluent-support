@@ -2,6 +2,16 @@
 
 namespace FluentSupport\App\Services\Parser;
 
+// Check if another version of Parsedown is already loaded
+if (class_exists('Parsedown')) {
+    // If the global Parsedown class exists, check version compatibility
+    if (version_compare(Parsedown::version, '1.8.0', '>=')) {
+        // Use the existing Parsedown class as an alias
+        class_alias('Parsedown', 'FluentSupport\App\Services\Parser\Parsedown');
+        return;
+    }
+}
+
 #
 #
 # Parsedown
@@ -19,7 +29,7 @@ class Parsedown
 {
     # ~
 
-    const version = '1.8.0-beta-7';
+    const version = '1.8.0';
 
     # ~
 
@@ -40,7 +50,6 @@ class Parsedown
     {
         # make sure no definitions are set
         $this->DefinitionData = array();
-
 
         # standardize line breaks
         $text = str_replace(array("\r\n", "\r"), "\n", $text);
@@ -574,7 +583,7 @@ class Parsedown
     #
     # List
 
-    protected function blockList($Line, array $CurrentBlock = null)
+    protected function blockList($Line, ?array $CurrentBlock = null)
     {
         list($name, $pattern) = $Line['text'][0] <= '-' ? array('ul', '[*+-]') : array('ol', '[0-9]{1,9}+[.\)]');
 
@@ -811,7 +820,7 @@ class Parsedown
     #
     # Setext
 
-    protected function blockSetextHeader($Line, array $Block = null)
+    protected function blockSetextHeader($Line, ?array $Block = null)
     {
         if ( ! isset($Block) or $Block['type'] !== 'Paragraph' or isset($Block['interrupted']))
         {
@@ -897,7 +906,7 @@ class Parsedown
     #
     # Table
 
-    protected function blockTable($Line, array $Block = null)
+    protected function blockTable($Line, ?array $Block = null)
     {
         if ( ! isset($Block) or $Block['type'] !== 'Paragraph' or isset($Block['interrupted']))
         {

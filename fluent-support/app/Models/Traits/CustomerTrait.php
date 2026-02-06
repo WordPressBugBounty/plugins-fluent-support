@@ -52,7 +52,7 @@ trait CustomerTrait
                 'data_type' => 'text',
                 'placeholder' => __('First Name', 'fluent-support'),
                 'type' => 'input-text',
-                'wrapper_class' => 'fs_half_field',
+                'wrapper_class' => 'fs_half_field required',
             ],
             'last_name' => [
                 'label' => __('Last Name', 'fluent-support'),
@@ -66,7 +66,7 @@ trait CustomerTrait
                 'data_type' => 'email',
                 'placeholder' => __('Email', 'fluent-support'),
                 'type' => 'input-text',
-                'wrapper_class' => 'fs_half_field',
+                'wrapper_class' => 'fs_half_field required',
                 'disabled' => !empty($customer_id),
             ],
             'title' => [
@@ -81,7 +81,6 @@ trait CustomerTrait
                 'data_type' => 'textarea',
                 'placeholder' => __('Note', 'fluent-support'),
                 'type' => 'input-text',
-                'wrapper_class' => 'fs_half_field',
             ],
             'status' => [
                 'label' => __('Status', 'fluent-support'),
@@ -91,7 +90,6 @@ trait CustomerTrait
                     'active' => ['id' => 'active', 'value' => 'active', 'label' => __('Active', 'fluent-support')],
                     'inactive' => ['id' => 'inactive', 'value' => 'inactive', 'label' => __('Blocked', 'fluent-support')],
                 ],
-                'wrapper_class' => 'fs_half_field',
             ],
             'status_html' => [
                 'dependency' => [
@@ -100,8 +98,8 @@ trait CustomerTrait
                     'value' => 'inactive',
                 ],
                 'type' => 'html-viewer',
-                'wrapper_class' => 'fs_warn',
-                'html' => __('block_instruction', 'fluent-support'),
+                'wrapper_class' => 'fs_warn_alert_wrapper',
+                'html' => __('If you select the <b>Blocked</b> status, this customer will not be able to submit a ticket or any response.', 'fluent-support'),
             ],
         ];
 
@@ -153,6 +151,10 @@ trait CustomerTrait
             $addressFields =  apply_filters('fluent_support/custom_registration_form_fields',$addressFields);
 
             foreach ($addressFields as $key => $field) {
+                if (isset($field['type']) && $field['type'] === 'country-selector') {
+                    continue; // Skip conversion for country-selector
+                }
+
                 //To create a custom field using _formBuilder.vue, the 'type' should be 'input-text', and the 'data_type' may vary, such as (text, number, date...).
                 $addressFields[$key]['data_type'] = $addressFields[$key]['type'];
                 $addressFields[$key]['type'] = 'input-text';
@@ -277,6 +279,10 @@ trait CustomerTrait
 
         $data = $this->takeValidKeysForUpdate($data);
 
+        if (isset($data['last_response_at']) && empty($data['last_response_at'])) {
+            unset($data['last_response_at']);
+        }
+
         $customer = static::findOrFail($customerId);
 
         if($this->customerExists($customerId, $data['email']))
@@ -325,6 +331,64 @@ trait CustomerTrait
         return [
             'message' => __('Customer Deleted Successfully', 'fluent-support')
         ];
+    }
+
+    /**
+     * bulkDeleteCustomers method will delete multiple customers and all their tickets
+     * @since 1.9.3
+     * @param array $customerIds
+     * @return array
+     */
+    public function bulkDeleteCustomers($customerIds)
+    {
+        if (empty($customerIds) || !is_array($customerIds)) {
+            return [
+                'message' => __('No customers selected for deletion', 'fluent-support')
+            ];
+        }
+
+        $deletedCount = 0;
+        $errors = [];
+
+        foreach ($customerIds as $customerId) {
+            try {
+                $customer = static::findOrFail($customerId);
+
+                $tickets = Ticket::where('customer_id', $customer->id)->get();
+
+                foreach ($tickets as $ticket) {
+                    $ticket->deleteTicket();
+                }
+
+                $customer->delete();
+                $deletedCount++;
+
+            } catch (\Exception $e) {
+                /* translators: %1$d: customer ID, %2$s: error message */
+                $errors[] = sprintf(__('Failed to delete customer ID %1$d: %2$s', 'fluent-support'), $customerId, $e->getMessage());
+            }
+        }
+
+        if ($deletedCount > 0) {
+            /* translators: %1$d: number of customers deleted */
+            $message = $deletedCount === 1
+                ? __('Customer deleted successfully', 'fluent-support')
+                : sprintf(__('%1$d customers deleted successfully', 'fluent-support'), $deletedCount);
+        } else {
+            $message = __('No customers were deleted', 'fluent-support');
+        }
+
+        $response = [
+            'message' => $message,
+            'deleted_count' => $deletedCount,
+            'total_requested' => count($customerIds)
+        ];
+
+        if (!empty($errors)) {
+            $response['errors'] = $errors;
+        }
+
+        return $response;
     }
 
     /**

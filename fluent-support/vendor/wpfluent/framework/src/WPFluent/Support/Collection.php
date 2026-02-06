@@ -8,12 +8,21 @@ use ArrayIterator;
 use FluentSupport\Framework\Support\Helper;
 use FluentSupport\Framework\Support\MacroableTrait;
 use FluentSupport\Framework\Support\EnumeratesValues;
-use FluentSupport\Framework\Database\Orm\ResourceAbleTrait;
 use FluentSupport\Framework\Support\CanBeEscapedWhenCastToString;
 
 class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerable
 {
-    use EnumeratesValues, MacroableTrait, ResourceAbleTrait;
+    use EnumeratesValues, MacroableTrait;
+
+    /**
+     * Pass only key to any callback.
+     */
+    const USE_KEY = 1;
+
+    /**
+     * Pass both key/value to any callback.
+     */
+    const USE_BOTH = 2;
 
     /**
      * The items contained in the collection.
@@ -31,6 +40,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function __construct($items = [])
     {
         $this->items = $this->getArrayableItems($items);
+    }
+
+    /**
+     * Create a new collection instance.
+     * 
+     * @param  array $items
+     * @return static
+     */
+    public static function of($items)
+    {
+        return new static($items);
     }
 
     /**
@@ -349,12 +369,29 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Filter the collection using SQL like where.
+     * 
+     * @param  string $key
+     * @param  string|null $operator
+     * @param  mixed $value
+     * @return static
+     */
+    public function where($key, $operator = null, $value = null)
+    {
+        return $this->filter(
+            is_callable($key) ? $key : $this->operatorForWhere(
+                ...func_get_args()
+            )
+        );
+    }
+
+    /**
      * Run a filter over each of the items.
      *
      * @param  callable|null  $callback
      * @return static
      */
-    public function filter(callable $callback = null)
+    public function filter(?callable $callback = null)
     {
         if ($callback) {
             return new static(Arr::where($this->items, $callback));
@@ -364,13 +401,27 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     }
 
     /**
+     * Pass the items through a series of callbacks.
+     * 
+     * @param  array   $callbacks
+     * @param  integer $mode
+     * @return self
+     */
+    public function passThrough(array $callbacks, $mode = 0)
+    {
+        return new static(
+            Arr::passThrough($this->items, $callbacks, $mode)
+        );
+    }
+
+    /**
      * Get the first item from the collection passing the given truth test.
      *
      * @param  callable|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public function first(callable $callback = null, $default = null)
+    public function first(?callable $callback = null, $default = null)
     {
         return Arr::first($this->items, $callback, $default);
     }
@@ -378,7 +429,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     /**
      * Get a flattened array of the items in the collection.
      *
-     * @param  int  $depth
+     * @param  int|float  $depth
      * @return static
      */
     public function flatten($depth = INF)
@@ -424,7 +475,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return $this->items[$key];
         }
 
-        return Helper::value($default); // @need_fix
+        return Helper::value($default);
     }
 
     /**
@@ -440,7 +491,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return $this->items[$key];
         }
 
-        $this->offsetSet($key, $value = Helper::value($value)); // @need_fix
+        $this->offsetSet($key, $value = Helper::value($value));
 
         return $value;
     }
@@ -573,6 +624,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
             return implode($glue ?? '', $this->pluck($value)->all());
         }
 
+        // @phpstan-ignore-next-line
         return implode($value ?? '', $this->items);
     }
 
@@ -585,6 +637,23 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
     public function intersect($items)
     {
         return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Intersect the collection with the given items,
+     * comparing both keys and values.
+     *
+     * @param  mixed  $items
+     * @return static
+     */
+    public function intersectAssoc($items)
+    {
+        return new static(
+            array_intersect_assoc(
+                $this->items,
+                $this->getArrayableItems($items)
+            )
+        );
     }
 
     /**
@@ -667,7 +736,7 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
      * @param  mixed  $default
      * @return mixed
      */
-    public function last(callable $callback = null, $default = null)
+    public function last(?callable $callback = null, $default = null)
     {
         return Arr::last($this->items, $callback, $default);
     }
@@ -1481,6 +1550,17 @@ class Collection implements ArrayAccess, CanBeEscapedWhenCastToString, Enumerabl
         $this->items = $this->map($callback)->all();
 
         return $this;
+    }
+
+    /**
+     * Flattens a multi-dimensional collection into
+     * a single level collection with dots.
+     *
+     * @return static
+     */
+    public function dot()
+    {
+        return new static(Arr::dot($this->all()));
     }
 
     /**
