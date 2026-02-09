@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,15 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.0.2 (Date: February 09, 2026) =
+* Fixed an issue where current ticket watchers were not displaying in the ticket list.
+* Fixed an issue where ticket merging could fail from the ticket view page.
+* Fixed an issue where reCAPTCHA settings were not saving properly.
+* Fixed a responsiveness issue with the bulk actions bar in the ticket list.
+* Fixed issues related to ticket migration.
+* Fixed a customer profile update issue by treating customer IP fields as strings.
+* Fixed a styling issue with the Ticket Merge dialog buttons.
 
 = 2.0.1 (Date: February 06, 2026) =
 * Improved onboarding completion UI and post-onboarding navigation

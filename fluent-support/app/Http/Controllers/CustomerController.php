@@ -109,8 +109,8 @@ class CustomerController extends Controller
             'zip' => 'nullable|string',
             'country' => 'nullable|string',
             'note' => 'nullable|string',
-            'ip_address' => 'nullable|ip',
-            'last_ip_address' => 'nullable|ip',
+            'ip_address' => 'nullable|string',
+            'last_ip_address' => 'nullable|string',
         ]);
 
         return [
@@ -173,8 +173,8 @@ class CustomerController extends Controller
             'zip' => 'nullable|string',
             'country' => 'nullable|string',
             'note' => 'nullable|string',
-            'ip_address' => 'nullable|ip',
-            'last_ip_address' => 'nullable|ip',
+            'ip_address' => 'nullable|string',
+            'last_ip_address' => 'nullable|string',
         ]);
 
         try {

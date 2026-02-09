@@ -274,7 +274,7 @@ class TicketController extends Controller
     public function doBulkActions(Request $request, Ticket $ticket)
     {
         $action = $request->getSafe('bulk_action', 'sanitize_text_field'); //get action
-        $ticket_ids = $request->getSafe('ticket_ids', null, []);
+        $ticket_ids = $request->get('ticket_ids', null, []);
         $sanitizedTicketIds = array_map('intval', $ticket_ids);
 
         try {
@@ -523,7 +523,7 @@ class TicketController extends Controller
     {
         $data = [
             'contact_id' => $request->getSafe('contact_id', 'intval'),
-            'tags'       => $request->getSafe('tags', null, [])
+            'tags'       => $request->get('tags', null)
         ];
 
         // Sanitize tags array if it's an array
@@ -550,7 +550,7 @@ class TicketController extends Controller
     {
         $data = [
             'contact_id' => $request->getSafe('contact_id', 'intval'),
-            'lists'      => $request->getSafe('lists', null, [])
+            'lists'      => $request->get('lists', null, [])
         ];
 
         // Sanitize lists array if it's an array
@@ -678,7 +678,7 @@ class TicketController extends Controller
     {
         try {
             $agent_id = get_current_user_id();
-            $searchData = $request->getSafe('query', null, []);
+            $searchData = $request->get('query', null, []);
             if (is_array($searchData)) {
                 $searchData = map_deep($searchData, 'sanitize_text_field');
             }

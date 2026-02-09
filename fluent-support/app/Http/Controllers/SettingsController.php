@@ -254,7 +254,7 @@ class SettingsController extends Controller
             $this->installFluentForm();
         }
 
-        $optinEmail = $request->getSafe('optin_email', 'sanitize_text_field', 'no');
+        $optinEmail = $request->getSafe('optin_email', 'sanitize_email', '');
         if ($optinEmail && is_email($optinEmail)) {
             $this->shareEmail($optinEmail);
         }
@@ -272,9 +272,9 @@ class SettingsController extends Controller
 
     public function saveReCaptchaSettings(Request $request)
     {
-        $data = $request->getSafe('reCaptcha', 'sanitize_text_field');
+        $data = $request->get('reCaptcha');
 
-        if ('clear-reCaptcha-settings' == $data) {
+        if (is_string($data) && 'clear-reCaptcha-settings' === sanitize_text_field($data)) {
             if (Meta::where('object_type', '_fs_recaptcha_settings')->delete()) {
                 return $this->sendSuccess([
                     'message' => __('Your reCAPTCHA settings deleted successfully.', 'fluent-support'),
@@ -286,12 +286,18 @@ class SettingsController extends Controller
             ]);
         }
 
+        if (!is_array($data)) {
+            return $this->sendError([
+                'message' => __('Invalid reCAPTCHA data.', 'fluent-support'),
+            ]);
+        }
+
         $reCaptchaData = [
-            'reCaptcha_version'       => sanitize_text_field($data['reCaptchaVersion']),
-            'siteKey'                 => sanitize_text_field($data['siteKey']),
-            'secretKey'               => sanitize_text_field($data['secretKey']),
-            'formContainingReCaptcha' => array_map('sanitize_text_field', $data['formContainingReCaptcha']),
-            'is_enabled'              => sanitize_text_field($data['reCaptchaEnabled'], 'no'),
+            'reCaptcha_version'       => sanitize_text_field($data['reCaptchaVersion'] ?? ''),
+            'siteKey'                 => sanitize_text_field($data['siteKey'] ?? ''),
+            'secretKey'               => sanitize_text_field($data['secretKey'] ?? ''),
+            'formContainingReCaptcha' => array_map('sanitize_text_field', (array) ($data['formContainingReCaptcha'] ?? [])),
+            'is_enabled'              => sanitize_text_field($data['reCaptchaEnabled'] ?? 'no'),
         ];
 
         $previousValue = Meta::where('object_type', '_fs_recaptcha_settings')->first();
@@ -302,11 +308,19 @@ class SettingsController extends Controller
             ]);
         }
 
-        $verifyReCaptcha = ReCaptchaHandler::validateRecaptcha($data['captchaResponse'], $data['secretKey'], $data['reCaptchaVersion']);
+        $captchaResponse = sanitize_text_field($data['captchaResponse'] ?? '');
 
-        if (!$verifyReCaptcha) {
+        if ($captchaResponse) {
+            $verifyReCaptcha = ReCaptchaHandler::validateRecaptcha($captchaResponse, $reCaptchaData['secretKey'], $reCaptchaData['reCaptcha_version']);
+
+            if (!$verifyReCaptcha) {
+                return $this->sendError([
+                    'message' => __('Your reCAPTCHA settings are not valid.', 'fluent-support'),
+                ]);
+            }
+        } elseif (!$previousValue) {
             return $this->sendError([
-                'message' => __('Your reCAPTCHA settings are not valid.', 'fluent-support'),
+                'message' => __('Please verify reCAPTCHA before saving.', 'fluent-support'),
             ]);
         }
 
