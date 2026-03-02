@@ -473,7 +473,8 @@ class CustomerPortalService
                 'attachments'
             ])
             ->filterByType(['response', 'ticket_merge_activity', 'ticket_split_activity'])
-            ->latest('id')
+            ->orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
             foreach ($responses as $response) {

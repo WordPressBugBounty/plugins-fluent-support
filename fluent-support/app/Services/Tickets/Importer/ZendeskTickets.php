@@ -16,6 +16,9 @@ class ZendeskTickets extends BaseImporter
     private $responseCount;
     private $totalPage;
     private $errorMessage;
+    private $afterCursor = null;
+    private $skippedTickets = [];
+    private static $personCache = [];
 
     public function stats()
     {
@@ -27,22 +30,37 @@ class ZendeskTickets extends BaseImporter
         ];
     }
 
+    public function setCursor($cursor)
+    {
+        $this->afterCursor = $cursor;
+    }
+
     public function doMigration($page, $handler)
     {
 
         $this->currentPage = $page;
         $this->handler = $handler;
         $this->errorMessage = null;
+        $this->skippedTickets = [];
+
+        // Cache total ticket count: fetch from API on first page, read from wp_options after
+        if ($page == 1) {
+            $this->totalTickets = $this->countTotalTickets();
+            update_option('_fs_zendesk_total_tickets', $this->totalTickets, false);
+        } else {
+            $this->totalTickets = (int) get_option('_fs_zendesk_total_tickets', 0);
+        }
+
         $tickets = $this->ticketsWithReply();
         $results = $this->migrateTickets($tickets);
 
         $this->totalPage = $this->limit > 0 ? ceil($this->totalTickets / $this->limit) : 0;
-        
-        $this->hasMore = $this->currentPage < $this->totalPage;
+
+        $this->hasMore = !empty($this->afterCursor);
         $completedNow = isset($results['inserts']) ? count($results['inserts']) : 0;
         $completedTickets = $completedNow + (($this->currentPage - 1) * $this->limit);
         $remainingTickets = $this->totalTickets - $completedTickets;
-        
+
         $completed = $this->totalTickets > 0 ? intval(($completedTickets / $this->totalTickets) * 100) : 0;
 
         $response = [
@@ -55,8 +73,13 @@ class ZendeskTickets extends BaseImporter
             'total_pages' => $this->totalPage,
             'next_page' => $page + 1,
             'total_tickets' => $this->totalTickets,
-            'remaining' => $remainingTickets
+            'remaining' => $remainingTickets,
+            'cursor' => $this->afterCursor,
         ];
+
+        if ($this->skippedTickets) {
+            $response['skipped_ticket_ids'] = $this->skippedTickets;
+        }
 
         // Handle errors or success
         if ($this->errorMessage) {
@@ -65,6 +88,7 @@ class ZendeskTickets extends BaseImporter
         } elseif (!$this->hasMore && ($this->totalTickets > 0 || $completedNow > 0)) {
             $response['message'] = __('All tickets have been imported successfully', 'fluent-support');
             update_option('_fs_migrate_zendesk', current_time('mysql'), 'no');
+            delete_option('_fs_zendesk_total_tickets');
         }
 
         return $response;
@@ -73,45 +97,61 @@ class ZendeskTickets extends BaseImporter
     private function ticketsWithReply()
     {
         try {
-            // Initialize totalTickets to prevent undefined
-            $this->totalTickets = 0;
-            
-            $this->totalTickets = $this->countTotalTickets();
-            $url = "{$this->domain}/api/v2/tickets?per_page={$this->limit}&page={$this->currentPage}";
+            $this->totalTickets = $this->totalTickets ?: 0;
+
+            $url = "{$this->domain}/api/v2/tickets?page[size]={$this->limit}";
+            if ($this->afterCursor) {
+                $url .= '&page[after]=' . urlencode($this->afterCursor);
+            }
+
             $tickets = $this->makeRequest($url);
 
             $formattedTickets = [];
-            if (empty($tickets)) {
+            if (empty($tickets) || empty($tickets->tickets)) {
                 $this->hasMore = false;
+                $this->afterCursor = null;
                 return [];
             }
 
-            $this->hasMore = true;
-            foreach ($tickets->tickets as $ticket) {
-                $singleTicketUrl = $this->domain . '/api/v2/tickets/' . $ticket->id . '/comments.json?include=attachments,users';
-                $singleTicket = $this->makeRequest($singleTicketUrl);
-                $this->originId = $ticket->id;
-                $ticketAttacments  = [];
-                if (!empty($singleTicket->comments[0]->attachments)) {
-                    $ticketAttacments = $this->getAttachments($singleTicket->comments[0]->attachments);
-                }
+            // Read cursor pagination metadata
+            if (isset($tickets->meta->has_more) && $tickets->meta->has_more && !empty($tickets->meta->after_cursor)) {
+                $this->afterCursor = $tickets->meta->after_cursor;
+            } else {
+                $this->afterCursor = null;
+            }
 
-                $formattedTickets[] = [
-                    'title' => sanitize_text_field($ticket->subject),
-                    'content' => wp_kses_post($ticket->description),
-                    'origin_id' => intval($ticket->id),
-                    'source' => sanitize_text_field($this->handler),
-                    'customer' => $this->fetchPerson($ticket->requester_id),
-                    'replies' => $this->getReplies($singleTicket),
-                    'status' => $this->getStatus($ticket->status),
-                    'client_priority' => $this->getPriority($ticket->priority),
-                    'priority' => $this->getPriority($ticket->priority),
-                    'created_at' => $ticket->created_at ? gmdate('Y-m-d h:i:s', strtotime($ticket->created_at)) : null,
-                    'updated_at' => $ticket->updated_at ? gmdate('Y-m-d h:i:s', strtotime($ticket->updated_at)) : null,
-                    'last_customer_response' => NULL,
-                    'last_agent_response' => NULL,
-                    'attachments' => $ticketAttacments
-                ];
+            $this->hasMore = !empty($this->afterCursor);
+
+            foreach ($tickets->tickets as $ticket) {
+                try {
+                    $singleTicketUrl = $this->domain . '/api/v2/tickets/' . $ticket->id . '/comments.json?include=attachments,users';
+                    $singleTicket = $this->makeRequest($singleTicketUrl);
+                    $this->originId = $ticket->id;
+                    $ticketAttacments  = [];
+                    if (!empty($singleTicket->comments[0]->attachments)) {
+                        $ticketAttacments = $this->getAttachments($singleTicket->comments[0]->attachments);
+                    }
+
+                    $formattedTickets[] = [
+                        'title' => sanitize_text_field($ticket->subject),
+                        'content' => wp_kses_post($ticket->description),
+                        'origin_id' => intval($ticket->id),
+                        'source' => sanitize_text_field($this->handler),
+                        'customer' => $this->fetchPerson($ticket->requester_id),
+                        'replies' => $this->getReplies($singleTicket),
+                        'status' => $this->getStatus($ticket->status),
+                        'client_priority' => $this->getPriority($ticket->priority),
+                        'priority' => $this->getPriority($ticket->priority),
+                        'created_at' => $ticket->created_at ? gmdate('Y-m-d h:i:s', strtotime($ticket->created_at)) : null,
+                        'updated_at' => $ticket->updated_at ? gmdate('Y-m-d h:i:s', strtotime($ticket->updated_at)) : null,
+                        'last_customer_response' => NULL,
+                        'last_agent_response' => NULL,
+                        'attachments' => $ticketAttacments
+                    ];
+                } catch (\Exception $e) {
+                    // Skip this ticket and continue with the rest
+                    $this->skippedTickets[] = $ticket->id;
+                }
             }
 
             return $formattedTickets;
@@ -119,17 +159,13 @@ class ZendeskTickets extends BaseImporter
         } catch (\Exception $e) {
             // Store error message for authentication errors
             $errorMsg = $e->getMessage();
-            if (strpos($errorMsg, 'authenticate') !== false || 
+            if (strpos($errorMsg, 'authenticate') !== false ||
                 strpos($errorMsg, 'Couldn\'t authenticate') !== false ||
                 strpos($errorMsg, '401') !== false) {
                 $this->errorMessage = __('Authentication failed. Please check your Zendesk credentials.', 'fluent-support');
             } else {
                 // Store any other error message
                 $this->errorMessage = $errorMsg;
-            }
-            // Ensure totalTickets is set to 0 on error
-            if (!isset($this->totalTickets)) {
-                $this->totalTickets = 0;
             }
             return [];
         }
@@ -175,7 +211,7 @@ class ZendeskTickets extends BaseImporter
         return $ticketReply;
     }
 
-    private function makeRequest($url)
+    private function makeRequest($url, $retryCount = 0)
     {
         $token = base64_encode($this->email . '/token:' . $this->accessToken);
 
@@ -183,7 +219,8 @@ class ZendeskTickets extends BaseImporter
             'headers' => [
                 'Authorization' => "Basic {$token}",
                 'Content-Type' => 'application/json'
-            ]
+            ],
+            'timeout' => 30
         ]);
 
         if (is_wp_error($request)) {
@@ -193,6 +230,14 @@ class ZendeskTickets extends BaseImporter
         $response_code = wp_remote_retrieve_response_code($request);
         $response_body = wp_remote_retrieve_body($request);
         $response = json_decode($response_body);
+
+        // Handle rate limiting with retry
+        if ($response_code === 429 && $retryCount < 2) {
+            $retryAfter = (int) wp_remote_retrieve_header($request, 'retry-after');
+            $retryAfter = $retryAfter > 0 ? min($retryAfter, 60) : 10;
+            sleep($retryAfter);
+            return $this->makeRequest($url, $retryCount + 1);
+        }
 
         // If status code is 200, don't throw error - check response body for errors instead
         if ($response_code === 200) {
@@ -225,6 +270,11 @@ class ZendeskTickets extends BaseImporter
 
     private function fetchPerson($requesterId)
     {
+        // Return from cache if already fetched
+        if (isset(self::$personCache[$requesterId])) {
+            return self::$personCache[$requesterId];
+        }
+
         $userUrl = $this->domain . '/api/v2/users/' . $requesterId . '.json';
         $fetchUser = $this->makeRequest($userUrl);
 
@@ -234,7 +284,11 @@ class ZendeskTickets extends BaseImporter
         ];
 
         $personArray = Common::formatPersonData($user, 'customer');
-        return Common::updateOrCreatePerson($personArray);
+        $person = Common::updateOrCreatePerson($personArray);
+
+        self::$personCache[$requesterId] = $person;
+
+        return $person;
     }
 
     private function countTotalTickets()

@@ -15,9 +15,6 @@ class ReportPolicy extends Policy
      */
     public function verifyRequest(Request $request)
     {
-        $permissions = PermissionManager::currentUserPermissions();
-        $acceptedPermissions = ['fst_view_all_reports'];
-
-        return !!array_intersect($permissions, $acceptedPermissions);
+        return PermissionManager::currentUserCan('fst_view_all_reports');
     }
 }

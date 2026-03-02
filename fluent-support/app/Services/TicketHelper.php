@@ -116,7 +116,7 @@ class TicketHelper
      */
     public static function getSuggestedTickets($agentId, $limit = 5)
     {
-        $restrictedBusinessBoxes = PermissionManager::currentUserRestrictedBusinessBoxes();
+        $restrictedBusinessBoxes = PermissionManager::getRestrictedMailboxIds();
 
         //Get lis of tickets which are waiting for reply
         $tickets = Ticket::where('agent_id', $agentId)
@@ -177,7 +177,7 @@ class TicketHelper
     public static function getTicketsToWatch()
     {
         $agent = Helper::getCurrentAgent();
-        $restrictedBusinessBoxes = PermissionManager::currentUserRestrictedBusinessBoxes();
+        $restrictedBusinessBoxes = PermissionManager::getRestrictedMailboxIds();
 
         $tickets = Ticket::with(
             [

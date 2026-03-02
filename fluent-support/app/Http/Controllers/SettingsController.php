@@ -60,7 +60,25 @@ class SettingsController extends Controller
     {
         $settingsKey = $request->getSafe('settings_key', 'sanitize_text_field');
         $settings = wp_unslash($request->get('settings', null));
+
+        // wp-editor fields: sanitize with wp_kses_post (same approach as Fluent Cart)
+        $htmlFields = ['login_message'];
+        $htmlValues = [];
+        if (is_array($settings)) {
+            foreach ($htmlFields as $field) {
+                if (isset($settings[$field])) {
+                    $htmlValues[$field] = wp_kses_post($settings[$field]);
+                }
+            }
+        }
+
         $settings = is_array($settings) ? map_deep($settings, 'sanitize_text_field') : [];
+
+        // Restore HTML fields
+        foreach ($htmlValues as $field => $value) {
+            $settings[$field] = $value;
+        }
+
         (new Settings)->save($settingsKey, $settings);
 
         return [
@@ -407,13 +425,62 @@ class SettingsController extends Controller
 
     public function getOpenAISettings()
     {
+        $modelOptions = $this->getOpenAIModelOptions();
+        $supportedModels = array_column($modelOptions, 'value');
+
+        $settings = [
+            'api_key' => '',
+            'model'   => 'gpt-5.2',
+        ];
+
         $chatGPTSettingsData = Meta::where('object_type', '_fs_openai_settings')->first();
         if ($chatGPTSettingsData) {
             $settings = Helper::safeUnserialize($chatGPTSettingsData->value);
-            return $this->sendSuccess($settings);
+
+            if (!empty($settings['model']) && !in_array($settings['model'], $supportedModels, true)) {
+                $previousModel = $settings['model'];
+                $settings['model'] = 'gpt-5.2';
+                Helper::saveOpenAIData('_fs_openai_settings', '_fs_openai_data', $settings);
+                $settings['previous_model'] = $previousModel;
+                $settings['model_migrated'] = true;
+            }
         }
 
-        return [];
+        $settings['model_options'] = $modelOptions;
+
+        return $this->sendSuccess($settings);
+    }
+
+    private function getOpenAIModelOptions()
+    {
+        $models = [
+            ['value' => 'gpt-5.2', 'label' => 'GPT-5.2'],
+            ['value' => 'gpt-5.2-chat-latest', 'label' => 'GPT-5.2 Chat'],
+            ['value' => 'gpt-4.1', 'label' => 'GPT-4.1'],
+            ['value' => 'gpt-4.1-mini', 'label' => 'GPT-4.1 Mini'],
+            ['value' => 'gpt-4.1-nano', 'label' => 'GPT-4.1 Nano'],
+            ['value' => 'gpt-4o', 'label' => 'GPT-4o'],
+            ['value' => 'gpt-4o-mini', 'label' => 'GPT-4o Mini'],
+            ['value' => 'gpt-4o-2024-08-06', 'label' => 'GPT-4o (2024-08-06)'],
+            ['value' => 'gpt-4o-2024-05-13', 'label' => 'GPT-4o (2024-05-13)'],
+            ['value' => 'gpt-4o-mini-2024-07-18', 'label' => 'GPT-4o Mini (2024-07-18)'],
+            ['value' => 'gpt-4-turbo', 'label' => 'GPT-4 Turbo'],
+            ['value' => 'gpt-4-turbo-2024-04-09', 'label' => 'GPT-4 Turbo (2024-04-09)'],
+            ['value' => 'gpt-4-turbo-preview', 'label' => 'GPT-4 Turbo Preview'],
+            ['value' => 'gpt-4', 'label' => 'GPT-4'],
+            ['value' => 'gpt-4-0613', 'label' => 'GPT-4 (0613)'],
+            ['value' => 'gpt-3.5-turbo', 'label' => 'GPT-3.5 Turbo'],
+            ['value' => 'gpt-3.5-turbo-0125', 'label' => 'GPT-3.5 Turbo (0125)'],
+            ['value' => 'o3', 'label' => 'o3'],
+            ['value' => 'o3-mini', 'label' => 'o3-mini'],
+            ['value' => 'o4-mini', 'label' => 'o4-mini'],
+            ['value' => 'o1', 'label' => 'o1'],
+            ['value' => 'gpt-4-0314', 'label' => 'GPT-4 (0314) - Deprecated soon'],
+            ['value' => 'gpt-4-1106-preview', 'label' => 'GPT-4 (1106 Preview) - Deprecated soon'],
+            ['value' => 'gpt-4-0125-preview', 'label' => 'GPT-4 (0125 Preview) - Deprecated soon'],
+        ];
+
+        return apply_filters('fluent_support/supported_openai_models', $models);
     }
 
     public function getReCaptchaSettings()

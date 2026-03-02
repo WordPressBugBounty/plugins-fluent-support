@@ -4,6 +4,7 @@ namespace FluentSupport\App\Modules;
 
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Services\Helper;
+use FluentSupport\Framework\Support\Arr;
 
 /**
  *  PermissionManager class is responsible for getting/settings data related to permission
@@ -14,6 +15,13 @@ use FluentSupport\App\Services\Helper;
 
 class PermissionManager
 {
+    const META_KEY = '_fluent_support_permissions';
+
+    // Ticket visibility levels returned by resolveTicketVisibility()
+    const VISIBILITY_ALL                    = 'all_tickets';
+    const VISIBILITY_ASSIGNED_AND_UNASSIGNED = 'assigned_and_unassigned';
+    const VISIBILITY_ASSIGNED_ONLY          = 'assigned_only';
+
     /**
      * pluginPermissions method will return the list of permissions support by Fluent Support Plugin
      * @return string[]
@@ -22,6 +30,7 @@ class PermissionManager
     {
         return [
             'fst_view_dashboard',
+            'fst_view_tickets',
             'fst_manage_own_tickets',
             'fst_manage_unassigned_tickets',
             'fst_manage_other_tickets',
@@ -43,7 +52,54 @@ class PermissionManager
     }
 
     /**
-     * attachPermissions method will add selected permission to the user
+     * Primary permission check. Accepts a single permission string or an array (any match).
+     *
+     * @param string|array $permissions
+     * @return bool
+     */
+    public static function userCan($permissions)
+    {
+        if (current_user_can('manage_options')) {
+            return true;
+        }
+
+        $userPermissions = self::currentUserPermissions();
+
+        if (!$userPermissions) {
+            return false;
+        }
+
+        if (is_string($permissions)) {
+            return in_array($permissions, $userPermissions);
+        }
+
+        if (is_array($permissions)) {
+            foreach ($permissions as $permission) {
+                if (in_array($permission, $userPermissions)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * currentUserCan method will return whether a user has the selected permission or not.
+     * Backward-compatible alias for userCan().
+     *
+     * @param $permission
+     * @return bool
+     */
+    public static function currentUserCan($permission)
+    {
+        return self::userCan($permission);
+    }
+
+    /**
+     * attachPermissions method will save selected permissions to user meta.
+     * Also cleans up any legacy fst_* WordPress capabilities.
+     *
      * @param $user
      * @param $permissions
      * @return false|mixed
@@ -63,32 +119,65 @@ class PermissionManager
         }
 
         $allPermissions = self::pluginPermissions();
-        foreach ($allPermissions as $permission) {
-            $user->remove_cap($permission);
+
+        $permissions = array_values(array_intersect($allPermissions, $permissions));
+
+        $exclusionRules = self::getExclusionRules();
+        $permissions = self::applyExclusionRules($permissions, $exclusionRules);
+
+        // Auto-grant fst_view_tickets when any manage or draft permission is present
+        $manageOrDraftPermissions = [
+            'fst_manage_own_tickets',
+            'fst_manage_unassigned_tickets',
+            'fst_manage_other_tickets',
+            'fst_draft_reply',
+        ];
+
+        if (!empty(array_intersect($permissions, $manageOrDraftPermissions))
+            && !in_array('fst_view_tickets', $permissions)) {
+            $permissions[] = 'fst_view_tickets';
         }
 
-        $permissions = array_intersect($allPermissions, $permissions);
+        // Store permissions in user meta
+        update_user_meta($user->ID, self::META_KEY, array_values($permissions));
 
-        $filterPermissionConditions = self::filterPermissionConditions();
-        $permissions = self::filterPermissionsByConditions($permissions, $filterPermissionConditions);
-
-        foreach ($permissions as $permission) {
-            $user->add_cap($permission);
+        // Clean up legacy WordPress capabilities
+        foreach ($allPermissions as $cap) {
+            $user->remove_cap($cap);
         }
 
         return $user;
     }
 
     /**
-     * Filters permissions based on specified conditions.
+     * Clean removal of all Fluent Support permissions for a user.
+     *
+     * @param int $userId
+     * @return void
+     */
+    public static function detachPermissions($userId)
+    {
+        delete_user_meta($userId, self::META_KEY);
+
+        // Clean up any legacy WordPress capabilities
+        $user = get_user_by('ID', $userId);
+        if ($user && !user_can($user, 'manage_options')) {
+            foreach (self::pluginPermissions() as $cap) {
+                $user->remove_cap($cap);
+            }
+        }
+    }
+
+    /**
+     * Remove conflicting permissions based on exclusion rules.
      *
      * @param array $permissions The array of permissions to filter.
-     * @param array $conditions  The conditions used for filtering.
+     * @param array $rules       Each key => value pair means: if key is present, remove value.
      * @return array The filtered array of permissions.
      */
-    public static function filterPermissionsByConditions($permissions, $conditions)
+    public static function applyExclusionRules($permissions, $rules)
     {
-        foreach ($conditions as $requiredKey => $removeKey) {
+        foreach ($rules as $requiredKey => $removeKey) {
             if (in_array($requiredKey, $permissions) && in_array($removeKey, $permissions)) {
                 unset($permissions[array_search($removeKey, $permissions)]);
             }
@@ -97,22 +186,50 @@ class PermissionManager
     }
 
     /**
-     * Retrieves the permission filter conditions.
+     * Get the mutual exclusion rules for permission assignment.
      *
-     * @return array The array of permission filter conditions.
+     * @return array Each key => value pair means: if key is present, remove value.
      */
-    public static function filterPermissionConditions()
+    public static function getExclusionRules()
     {
+        // Mutual exclusion rules applied when assigning permissions:
+        // - If agent has any manage_*_tickets permission, remove fst_draft_reply
+        //   (draft-only mode is for agents who CANNOT manage tickets)
+        // - If agent has fst_draft_reply, remove fst_approve_draft_reply
+        //   (draft-only agents should not approve their own drafts)
         return [
             'fst_manage_unassigned_tickets' => 'fst_draft_reply',
-            'fst_manage_other_tickets' => 'fst_draft_reply',
-            'fst_manage_own_tickets' => 'fst_draft_reply',
-            'fst_draft_reply' => 'fst_approve_draft_reply'
+            'fst_manage_other_tickets'      => 'fst_draft_reply',
+            'fst_manage_own_tickets'        => 'fst_draft_reply',
+            'fst_draft_reply'               => 'fst_approve_draft_reply'
         ];
     }
 
     /**
-     * getUserPermissions method will get all permissions for a user
+     * Get raw permissions from user meta.
+     *
+     * @param int|null $userId
+     * @return array
+     */
+    public static function getMetaPermissions($userId = null)
+    {
+        if ($userId === null) {
+            $userId = get_current_user_id();
+        }
+
+        if (!$userId) {
+            return [];
+        }
+
+        $permissions = get_user_meta($userId, self::META_KEY, true);
+
+        return is_array($permissions) ? $permissions : [];
+    }
+
+    /**
+     * getUserPermissions method will get all permissions for a user.
+     * Reads from user meta with legacy wp_capabilities fallback.
+     *
      * @param false $user
      * @return array|string[]
      */
@@ -130,11 +247,31 @@ class PermissionManager
 
         if ($user->has_cap('manage_options')) {
             $pluginPermission[] = 'administrator';
-            $pluginPermission = array_values(array_diff($pluginPermission, ['fst_draft_reply'])); //Remove draft reply permission from here
+            $pluginPermission = array_values(array_diff($pluginPermission, ['fst_draft_reply']));
             return $pluginPermission;
         }
 
-        return array_values(array_intersect(array_keys($user->allcaps), $pluginPermission));
+        // Read from meta first
+        $permissions = self::getMetaPermissions($user->ID);
+
+        if (!empty($permissions)) {
+            return array_values(array_intersect($permissions, $pluginPermission));
+        }
+
+        // Legacy fallback: read from wp_capabilities and migrate
+        $legacyPermissions = array_values(array_intersect(array_keys($user->allcaps), $pluginPermission));
+
+        if (!empty($legacyPermissions)) {
+            // Migrate to meta
+            update_user_meta($user->ID, self::META_KEY, $legacyPermissions);
+
+            // Clean up legacy caps
+            foreach ($legacyPermissions as $cap) {
+                $user->remove_cap($cap);
+            }
+        }
+
+        return $legacyPermissions;
     }
 
     /**
@@ -156,90 +293,157 @@ class PermissionManager
     }
 
     /**
-     * Retrieve the list of restricted business boxes for the current user.
+     * Determine the WordPress capability string for menu registration.
+     * Returns 'manage_options' for admins, the user's WP role for agents
+     * with permissions, or empty string to hide the menu.
      *
-     * This method fetches the list of restricted business boxes from the metadata of the current user's agent profile.
-     * If business box restrictions are enabled for the user, it returns the list of restricted business boxes; otherwise,
-     * it returns an empty array.
-     *
-     * @return array The list of restricted business boxes for the current user.
+     * @return string
      */
-    public static function currentUserRestrictedBusinessBoxes()
+    public static function getMenuPermission()
+    {
+        if (current_user_can('manage_options')) {
+            return 'manage_options';
+        }
+
+        $userId = get_current_user_id();
+
+        if (!$userId) {
+            return '';
+        }
+
+        $metaPermissions = self::getMetaPermissions($userId);
+
+        // Legacy fallback: check wp_capabilities for fst_* caps
+        if (empty($metaPermissions)) {
+            $user = get_user_by('ID', $userId);
+            if ($user) {
+                $legacyPermissions = array_intersect(array_keys($user->allcaps), self::pluginPermissions());
+                if (empty($legacyPermissions)) {
+                    return '';
+                }
+            } else {
+                return '';
+            }
+        }
+
+        $user = wp_get_current_user();
+        $roles = array_values((array) $user->roles);
+
+        return Arr::get($roles, 0, '');
+    }
+
+    /**
+     * Get the mailbox IDs that the current agent is restricted from accessing.
+     *
+     * @return array Mailbox IDs the agent cannot access, or empty array if unrestricted.
+     */
+    public static function getRestrictedMailboxIds()
     {
         $agent = Helper::getAgentByUserId();
         $restrictions = $agent->getMeta('agent_restrictions');
 
-        return isset($restrictions['businessBoxRestrictions']) ? $restrictions['restrictedBusinessBoxes'] : [];
+        // Only enforce mailbox restrictions when the toggle is explicitly enabled
+        if (!empty($restrictions['businessBoxRestrictions']) && !empty($restrictions['restrictedBusinessBoxes'])) {
+            return $restrictions['restrictedBusinessBoxes'];
+        }
+
+        return [];
 
     }
 
     /**
-     * currentUserCan method will return whether a user has the selected permission or not
-     * @param $permission
+     * Whether the current user can perform mutating ticket actions (reply, close, reopen, assign, etc.).
+     * Draft-only agents return false here — they can view tickets and create drafts but cannot publish.
+     *
      * @return bool
      */
-    public static function currentUserCan($permission)
+    public static function canManageTickets()
     {
-        if (current_user_can('manage_options')) {
-            return true;
-        }
-
-        return current_user_can($permission);
+        return self::userCan([
+            'fst_manage_own_tickets',
+            'fst_manage_unassigned_tickets',
+            'fst_manage_other_tickets'
+        ]);
     }
 
     /**
-     * currentUserTicketsPermissionLevel method will return the permission level for a user in tickets
+     * Whether the current user can access ticket API routes at all (read or write).
+     * Includes manage, merge, draft-only, and view-only agents.
+     *
+     * @return bool
+     */
+    public static function canAccessTicketRoutes()
+    {
+        return self::userCan([
+            'fst_view_tickets',
+            'fst_manage_own_tickets',
+            'fst_manage_unassigned_tickets',
+            'fst_manage_other_tickets',
+            'fst_merge_tickets',
+            'fst_draft_reply'
+        ]);
+    }
+
+    /**
+     * Determine ticket visibility level from a permission set.
+     *
+     * Business rule: fst_view_tickets and fst_draft_reply get full visibility because
+     * read-only and draft agents need to view any ticket, even though they cannot publish.
+     *
+     * @param array $permissions
+     * @return string One of the VISIBILITY_* constants.
+     */
+    private static function resolveTicketVisibility(array $permissions)
+    {
+        if (in_array('fst_manage_other_tickets', $permissions)
+            || in_array('fst_draft_reply', $permissions)
+            || in_array('fst_view_tickets', $permissions)) {
+            return self::VISIBILITY_ALL;
+        }
+
+        if (in_array('fst_manage_unassigned_tickets', $permissions)) {
+            return self::VISIBILITY_ASSIGNED_AND_UNASSIGNED;
+        }
+
+        return self::VISIBILITY_ASSIGNED_ONLY;
+    }
+
+    /**
+     * currentTicketVisibility method will return the permission level for a user in tickets
      * @return string
      */
-    public static function currentUserTicketsPermissionLevel()
+    public static function currentTicketVisibility()
     {
         $permissions = self::currentUserPermissions();
-
-        if (in_array('fst_manage_other_tickets', $permissions)) {
-            return 'all';
-        }
-
-        if (in_array('fst_draft_reply', $permissions) || in_array('fst_manage_unassigned_tickets', $permissions)) {
-            return 'own_plus';
-        }
-
-        return 'own';
+        return self::resolveTicketVisibility($permissions);
     }
 
     /**
-     * agentTicketPermissionLevel method will return the access level of an agent in tickets
+     * getAgentTicketVisibility method will return the access level of an agent in tickets
      * @param false $userId
      * @return string
      */
-    public static function agentTicketPermissionLevel($userId = false)
+    public static function getAgentTicketVisibility($userId = false)
     {
-        if(!$userId) {
+        if (!$userId) {
             $userId = get_current_user_id();
         }
 
         $permissions = self::getUserPermissions($userId);
 
-        if (in_array('fst_manage_other_tickets', $permissions)) {
-            return 'all';
-        }
-
-        if (in_array('fst_draft_reply', $permissions) || in_array('fst_manage_unassigned_tickets', $permissions)) {
-            return 'own_plus';
-        }
-
-        return 'own';
+        return self::resolveTicketVisibility($permissions);
     }
 
     /**
-     * hasTicketPermission method will return whether the selected user has permission in selected ticket or not
+     * canAccessTicket method will return whether the selected user has permission in selected ticket or not
      * @param $ticket
      * @return bool
      */
-    public static function hasTicketPermission($ticket)
+    public static function canAccessTicket($ticket)
     {
-        $permissionLevel = self::currentUserTicketsPermissionLevel();
+        $permissionLevel = self::currentTicketVisibility();
 
-        if ($permissionLevel == 'all') {
+        if ($permissionLevel == self::VISIBILITY_ALL) {
             return true;
         }
 
@@ -249,7 +453,8 @@ class PermissionManager
             return true;
         }
 
-        return !$ticket->agent_id && $permissionLevel == 'own_plus';
+        // Allow access to unassigned tickets for agents with assigned_and_unassigned visibility
+        return !$ticket->agent_id && $permissionLevel == self::VISIBILITY_ASSIGNED_AND_UNASSIGNED;
     }
 
     /**
@@ -272,6 +477,7 @@ class PermissionManager
                     'fst_split_ticket'              => __('Split Ticket', 'fluent-support'),
                     'fst_draft_reply'               => __('Draft Reply', 'fluent-support'),
                     'fst_approve_draft_reply'       => __('Approve Draft Reply', 'fluent-support'),
+                    'fst_view_tickets'              => __('View Tickets (Read Only)', 'fluent-support'),
                 ]
             ],
             [
@@ -300,8 +506,63 @@ class PermissionManager
         ];
     }
 
-    public static function getBusinessBoxesForRestriction()
+    public static function getMailboxesForRestriction()
     {
         return MailBox::select(['id', 'name'])->get();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Deprecated Methods
+    |--------------------------------------------------------------------------
+    | These methods are kept for backward compatibility with third-party add-ons.
+    | They delegate to the renamed replacements and will be removed in a future release.
+    */
+
+    /**
+     * @deprecated Use currentTicketVisibility() instead.
+     */
+    public static function currentUserTicketsPermissionLevel()
+    {
+        _deprecated_function(__METHOD__, '2.0.5', 'PermissionManager::currentTicketVisibility()');
+
+        return self::mapVisibilityToLegacy(self::currentTicketVisibility());
+    }
+
+    /**
+     * @deprecated Use getAgentTicketVisibility() instead.
+     */
+    public static function agentTicketPermissionLevel($userId = false)
+    {
+        _deprecated_function(__METHOD__, '2.0.5', 'PermissionManager::getAgentTicketVisibility()');
+
+        return self::mapVisibilityToLegacy(self::getAgentTicketVisibility($userId));
+    }
+
+    /**
+     * @deprecated Use canAccessTicket() instead.
+     */
+    public static function hasTicketPermission($ticket)
+    {
+        _deprecated_function(__METHOD__, '2.0.5', 'PermissionManager::canAccessTicket()');
+
+        return self::canAccessTicket($ticket);
+    }
+
+    /**
+     * Map new VISIBILITY_* constants back to legacy string values.
+     *
+     * @param string $visibility
+     * @return string 'all', 'own_plus', or 'own'
+     */
+    private static function mapVisibilityToLegacy($visibility)
+    {
+        $map = [
+            self::VISIBILITY_ALL                    => 'all',
+            self::VISIBILITY_ASSIGNED_AND_UNASSIGNED => 'own_plus',
+            self::VISIBILITY_ASSIGNED_ONLY          => 'own',
+        ];
+
+        return $map[$visibility] ?? 'own';
     }
 }

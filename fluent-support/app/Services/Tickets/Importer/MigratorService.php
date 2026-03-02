@@ -45,6 +45,7 @@ class MigratorService
             isset($query['mailbox']) ? $class->setMailboxId($query['mailbox']) : '';
             isset($query['domain']) ? $class->setDomain($query['domain']) : '';
             isset($query['email']) ? $class->setEmail($query['email']) : '';
+            isset($query['cursor']) ? $class->setCursor($query['cursor']) : '';
 
             return $class->doMigration($page, $handler);
         }

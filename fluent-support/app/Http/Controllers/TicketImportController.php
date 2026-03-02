@@ -37,6 +37,9 @@ class TicketImportController extends Controller
                 if (isset($rawQuery['email'])) {
                     $query['email'] = sanitize_email($rawQuery['email']);
                 }
+                if (isset($rawQuery['cursor'])) {
+                    $query['cursor'] = sanitize_text_field($rawQuery['cursor']);
+                }
             }
 
             return $importService->handleImport( $request->getSafe('page', 'intval'), $handler, $query );

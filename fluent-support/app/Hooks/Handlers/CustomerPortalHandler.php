@@ -45,7 +45,7 @@ class CustomerPortalHandler
                 'fluent_support/customer_portal_agent_permission_error_message',
                 $msg
             );
-            return '<div style="text-align: center;"><h3>' . $agentPermissionErrMessage . '</h3><a href="' . $adminPortalUrl . '">' . esc_html__('Go to Support Admin Page', 'fluent-support') . '</a></div>';
+            return '<div style="text-align: center;"><h3>' . esc_html($agentPermissionErrMessage) . '</h3><a href="' . esc_url($adminPortalUrl) . '">' . esc_html__('Go to Support Admin Page', 'fluent-support') . '</a></div>';
         } else if ($this->hasCustomerPortalAccess()) {
 
             /*
@@ -62,7 +62,7 @@ class CustomerPortalHandler
 
             if (empty($canAccess['status'])) {
                 $invalidPermissionMessage = Arr::get($canAccess, 'message', $invalidPermissionMessage);
-                return '<div id="fluent_support_client_app" style="text-align: center;"><h3 class="fs_customer_restriction">' . $invalidPermissionMessage . '</h3></div>';
+                return '<div id="fluent_support_client_app" style="text-align: center;"><h3 class="fs_customer_restriction">' . esc_html($invalidPermissionMessage) . '</h3></div>';
             }
 
             if (!$person) {
@@ -81,6 +81,8 @@ class CustomerPortalHandler
             $loggedInMessage = Arr::get($businessSettings, 'login_message', '');
 
             $loggedInMessage = str_replace('[fluent_support_portal]', '', $loggedInMessage);
+
+            $loggedInMessage = wp_kses_post($loggedInMessage);
 
             return do_shortcode($loggedInMessage);
         }

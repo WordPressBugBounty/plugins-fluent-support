@@ -23,9 +23,9 @@ class AgentController extends Controller
     public function index(Request $request, Agent $agent)
     {
         return [
-            'agents' => $agent->getAgents($request->getSafe('search','sanitize_text_field')),
-            'permissions' => PermissionManager::getReadablePermissionGroups(),
-            'businessBoxes' => PermissionManager::getBusinessBoxesForRestriction(),
+            'agents'        => $agent->getAgents($request->getSafe('search', 'sanitize_text_field')),
+            'permissions'   => PermissionManager::getReadablePermissionGroups(),
+            'businessBoxes' => PermissionManager::getMailboxesForRestriction(),
         ];
     }
 
@@ -37,27 +37,13 @@ class AgentController extends Controller
      */
     public function addAgent(AgentCreateRequest $request, Agent $agent)
     {
-        $permissions = $request->get('permissions', null);
-        $permissions = is_array($permissions) ? array_map('sanitize_key', $permissions) : [];
-
-        $restrictions = $request->get('restrictions', null);
-        $restrictions = $this->sanitizeRestrictions($restrictions);
-
-        $data = [
-            'email' => $request->getSafe('email', 'sanitize_email'),
-            'first_name' => $request->getSafe('first_name', 'sanitize_text_field'),
-            'last_name' => $request->getSafe('last_name', 'sanitize_text_field'),
-            'title' => $request->getSafe('title', 'sanitize_text_field'),
-            'permissions' => $permissions,
-            'restrictions' => $restrictions,
-        ];
+        $data = $this->sanitizeAgentPayload($request, true);
 
         try {
             return [
                 'message' => __('Support Staff has been added', 'fluent-support'),
                 'agent'   => $agent->createAgent($data)
             ];
-
         } catch (\Exception $e) {
             return $this->sendError([
                 'message' => $e->getMessage()
@@ -76,41 +62,22 @@ class AgentController extends Controller
     public function updateAgent(AgentCreateRequest $request, Agent $agent, $agent_id)
     {
         $agent = $agent::findOrFail($agent_id);
-
-        $permissions = $request->get('permissions', null);
-        $permissions = is_array($permissions) ? array_map('sanitize_key', $permissions) : [];
-
-        $restrictions = $request->get('restrictions', null);
-        $restrictions = $this->sanitizeRestrictions($restrictions);
-
-        $data = [
-            'first_name' => $request->getSafe('first_name', 'sanitize_text_field'),
-            'last_name' => $request->getSafe('last_name', 'sanitize_text_field'),
-            'title' => $request->getSafe('title', 'sanitize_text_field'),
-            'permissions' => $permissions,
-            'telegram_chat_id' => $request->getSafe('telegram_chat_id', 'sanitize_text_field'),
-            'slack_user_id' => $request->getSafe('slack_user_id', 'sanitize_text_field'),
-            'whatsapp_number' => $request->getSafe('whatsapp_number', 'sanitize_text_field'),
-            'restrictions' => $restrictions,
-        ];
+        $data = $this->sanitizeAgentPayload($request);
 
         if (!$agent->user_id && ($user = get_user_by('email', $agent->email))) {
             $agent->user_id = $user->ID;
         }
 
-        if ($agent) {
-            try {
-                return [
-                    'message' => __('Support Staff has been updated', 'fluent-support'),
-                    'agent'   => $agent->updateAgent($data, $agent)
-                ];
-            } catch (\Exception $e) {
-                return $this->sendError([
-                    'message' => $e->getMessage()
-                ]);
-            }
+        try {
+            return [
+                'message' => __('Support Staff has been updated', 'fluent-support'),
+                'agent'   => $agent->updateAgent($data, $agent)
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => $e->getMessage()
+            ]);
         }
-
     }
 
     /**
@@ -129,13 +96,11 @@ class AgentController extends Controller
             return [
                 'message' => __('Support Staff has been deleted', 'fluent-support')
             ];
-
         } catch (\Exception $e) {
             return $this->sendError([
                 'message' => $e->getMessage()
             ]);
         }
-
     }
 
     /**
@@ -144,12 +109,12 @@ class AgentController extends Controller
      */
     public function myStats(Request $request)
     {
-
-        $agent = Helper::getAgentByUserId();//Get logged in agent information
+        // Get logged in agent information.
+        $agent = Helper::getAgentByUserId();
 
         try {
-            $stats = StatModule::getAgentStat($agent->id); //Get ticket statistics
-
+            // Get ticket statistics.
+            $stats = StatModule::getAgentStat($agent->id);
             $with = $request->get('with', []);
             $with = is_array($with) ? map_deep($with, 'sanitize_text_field') : [];
 
@@ -158,6 +123,7 @@ class AgentController extends Controller
             if (defined('FLUENTSUPPORTPRO')) {
                 $response['dashboard_notice'] = apply_filters('fluent_support/dashboard_notice', '', $agent);
             }
+
             return $response;
         } catch (\Exception $e) {
             return $this->sendError([
@@ -171,6 +137,7 @@ class AgentController extends Controller
         try {
             if (PermissionManager::currentUserCan('fst_agent_today_performance')) {
                 $agentTodayStats = StatModule::getAgentTodayStats();
+
                 return ['agent_today_stats' => $agentTodayStats];
             }
         } catch (\Exception $e) {
@@ -192,7 +159,7 @@ class AgentController extends Controller
     public function addOrUpdateProfileImage(Request $request, AvatarUploder $avatarUploder)
     {
         try {
-            return $avatarUploder->addOrUpdateProfileImage( $request->files(), $request->getSafe('agent_id', 'intval'), 'agent');
+            return $avatarUploder->addOrUpdateProfileImage($request->files(), $request->getSafe('agent_id', 'intval'), 'agent');
         } catch (\Exception $e) {
             return $this->sendError([
                 'message' => $e->getMessage()
@@ -207,32 +174,60 @@ class AgentController extends Controller
      * @param $agent_id
      * @return array
      */
-    public function resetAvatar(Agent $agent, $agent_id){
+    public function resetAvatar(Agent $agent, $agent_id)
+    {
         try {
             $agent->restoreAvatar($agent, $agent_id);
 
             return [
-                'message'  => __('Support Staff avatar reset to gravatar default', 'fluent-support')
+                'message' => __('Support Staff avatar reset to gravatar default', 'fluent-support')
             ];
         } catch (\Exception $e) {
-            return [
-                'message'  => $e->getMessage()
-            ];
+            return $this->sendError([
+                'message' => $e->getMessage()
+            ]);
         }
     }
 
     public function getAgentInsights(Request $request, Agent $agent)
     {
         return [
-            'agents' => $agent->agentInsights($request->getSafe('search','sanitize_text_field')),
+            'agents' => $agent->agentInsights($request->getSafe('search', 'sanitize_text_field')),
         ];
     }
 
     public function ping(Request $request)
     {
         return [
-            'ping' => 'pong'
+            'ping'          => 'pong',
         ];
+    }
+
+    /**
+     * Sanitize payload data for create/update operations.
+     *
+     * @param AgentCreateRequest $request
+     * @param bool $includeEmail
+     * @return array
+     */
+    private function sanitizeAgentPayload(AgentCreateRequest $request, $includeEmail = false)
+    {
+        $data = [
+            'first_name'       => $request->getSafe('first_name', 'sanitize_text_field'),
+            'last_name'        => $request->getSafe('last_name', 'sanitize_text_field'),
+            'title'            => $request->getSafe('title', 'sanitize_text_field'),
+            'permissions'      => is_array($request->get('permissions')) ? array_map('sanitize_key', $request->get('permissions')) : [],
+            'telegram_chat_id' => $request->getSafe('telegram_chat_id', 'sanitize_text_field'),
+            'slack_user_id'    => $request->getSafe('slack_user_id', 'sanitize_text_field'),
+            'whatsapp_number'  => $request->getSafe('whatsapp_number', 'sanitize_text_field'),
+            'restrictions'     => $this->sanitizeRestrictions($request->get('restrictions')),
+        ];
+
+        if ($includeEmail) {
+            $data['email'] = $request->getSafe('email', 'sanitize_email');
+        }
+
+        return $data;
     }
 
     /**
@@ -258,11 +253,9 @@ class AgentController extends Controller
             ? rest_sanitize_boolean($restrictions['businessBoxRestrictions'])
             : false;
 
-        $result = [
+        return [
             'restrictedBusinessBoxes' => $restrictedBusinessBoxes,
             'businessBoxRestrictions' => $businessBoxRestrictions,
         ];
-
-        return $result;
     }
 }

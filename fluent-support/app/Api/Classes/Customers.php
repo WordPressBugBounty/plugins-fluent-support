@@ -5,6 +5,7 @@ namespace FluentSupport\App\Api\Classes;
 use FluentSupport\App\Http\Controllers\AuthController;
 use FluentSupport\App\Models\Customer;
 use FluentSupport\App\Models\Ticket;
+use FluentSupport\App\Services\Tickets\TicketService;
 
 /**
  *  Customers class for PHP API
@@ -126,11 +127,11 @@ class Customers
 
         $customer = Customer::findOrFail($id);
         if ($withAssociatedData) {
-            $tickets = Ticket::where('customer_id', $id);
-            foreach ($tickets->get() as $ticket) {
-                (new \FluentSupport\App\Hooks\Handlers\CleanupHandler())->deleteTicketAttachments($ticket);
+            $ticketService = new TicketService();
+            $tickets = Ticket::where('customer_id', $id)->get();
+            foreach ($tickets as $ticket) {
+                $ticketService->deleteTicket($ticket);
             }
-            $tickets->delete();
         }
         $customer->delete();
     }

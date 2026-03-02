@@ -4,10 +4,9 @@ namespace FluentSupport\App\Api\Classes;
 
 use FluentSupport\App\Models\Agent;
 use FluentSupport\App\Models\Customer;
-use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Ticket;
-use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Tickets\ResponseService;
+use FluentSupport\App\Services\Tickets\TicketService;
 
 /**
  *  Tickets class for PHP API
@@ -108,43 +107,23 @@ class Tickets
 
     public function createTicket(array $data)
     {
-
         $customerId = $data['customer_id'] ?? null;
 
         if (!$customerId || !($customer = Customer::find($customerId))) {
             return false;
         }
 
-        if (!$data['title'] || !$data['content']) {
+        if (empty($data['title']) || empty($data['content'])) {
             return false;
         }
 
-        if(!$data['mailbox_id']){
-            $defaultMailbox = Helper::getDefaultMailBox();
-            if(!$defaultMailbox){
-                return false;
-            }
-            $data['mailbox_id'] = $defaultMailbox->id;
-        }else{
-            $mailbox = MailBox::find($data['mailbox_id']);
-            if (!$mailbox) {
-                return false;
-            }
-        }
+        $createdTicket = (new TicketService())->storeTicket($data, $customer);
 
-        do_action('fluent_support/before_ticket_create', $data, $customer);
-
-        $createdTicket = Ticket::create($data);
-
-        do_action('fluent_support/ticket_created', $createdTicket, $customer);
-
-        if (defined('FLUENTSUPPORTPRO') && !empty($data['custom_fields'])) {
-            $createdTicket->syncCustomFields($data['custom_fields']);
+        if (defined('FLUENTSUPPORTPRO')) {
             $createdTicket->custom_fields = $createdTicket->customData();
         }
 
         return $createdTicket;
-
     }
 
     public function getInstance()

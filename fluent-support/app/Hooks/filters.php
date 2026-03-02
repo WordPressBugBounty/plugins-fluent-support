@@ -15,7 +15,7 @@ add_filter('fluent_support/dashboard_notice', function ($messages) {
         $html = '<div class="fs_alert_notification fs_alert_warning" style="border-radius: 8px; margin-bottom: 24px; max-width: 1360px; margin-left: auto; margin-right: auto;">
             <div style="display: flex; gap: 8px; align-items: center; padding: 8px 8px 8px 16px;">
                 <span style="font-size: 15px; line-height: 18px; flex-shrink: 0;">⚠️</span>
-                <p style="flex: 1; margin: 0; font-size: 14px; line-height: 20px; color: #0e121b; letter-spacing: -0.084px;">Fluent Support Pro Plugin needs to be updated for compatibility.</p>
+                <p class="fs_alert_text">Fluent Support Pro Plugin needs to be updated for compatibility.</p>
             </div>
         </div>';
         $messages .= $html;

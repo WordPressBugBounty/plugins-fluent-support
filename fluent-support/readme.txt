@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.0.2
+Stable tag: 2.0.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,21 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.0.5 (Date: March 02, 2026) =
+* Added: Admin Dashboard Dark Mode
+* Added: Support for OpenAI GPT-5.2 & GPT-5.2 Chat models
+* Added: View Tickets (Read Only) permission
+* Improved: Faster ticket list loading
+* Improved: Optimized large-scale Zendesk migration
+* Fixed: Draft Reply permission issue
+* Fixed: Attachment links during ticket merge
+* Fixed: Ticket content unordered list formatting
+* Fixed: Integration settings save button visibility
+* Fixed: “Waiting Since” tooltip date display
+* Fixed: Saved Replies left menu link
+* Fixed: Login page styling issue
+* Fixed: Date range picker responsive layout
 
 = 2.0.2 (Date: February 09, 2026) =
 * Fixed an issue where current ticket watchers were not displaying in the ticket list.

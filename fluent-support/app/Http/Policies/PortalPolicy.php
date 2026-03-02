@@ -18,7 +18,7 @@ class PortalPolicy extends Policy
     public function verifyRequest(Request $request)
     {
         if ($request->get('on_behalf')) {
-            return PermissionManager::currentUserCan('fst_sensitive_data') || PermissionManager::currentUserCan('fst_manage_other_tickets');
+            return PermissionManager::userCan(['fst_sensitive_data', 'fst_manage_other_tickets']);
         }
 
         $hasAccess = !!get_current_user_id();

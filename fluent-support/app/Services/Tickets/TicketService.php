@@ -4,11 +4,10 @@ namespace FluentSupport\App\Services\Tickets;
 
 use FluentSupport\App\Models\Attachment;
 use FluentSupport\App\Models\Conversation;
-use FluentSupport\App\Modules\PermissionManager;
+use FluentSupport\App\Models\MailBox;
+use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Includes\UploadService;
-use FluentSupport\App\Services\TicketHelper;
-use FluentSupport\App\Services\TicketQueryService;
 use FluentSupport\Framework\Support\Arr;
 
 class TicketService
@@ -95,90 +94,6 @@ class TicketService
     }
 
     /**
-     * This `getTickets` method will return the all tickets
-     * @param array $data This is the data that will be used to filter the tickets
-     * @param string $filterType This is the type of filter that will be used to filter the tickets
-     * @return array $tickets
-     */
-    public function getTickets($data, $filterType)
-    {
-        $queryArgs = $this->prepareQuery($data, $filterType);
-        $tickets = $this->getTicketsByQuery($queryArgs);
-
-        foreach ($tickets as $ticket) {
-            if (Arr::get($data, 'per_page') < 15) {
-                if ($ticket->status != 'closed') {
-                    $ticket->live_activity = TicketHelper::getActivity($ticket->id);
-                } else {
-                    $ticket->live_activity = [];
-                }
-            }
-        }
-
-        return [
-            'tickets' => $tickets
-        ];
-    }
-
-    /**
-     * This is a supporting method for getTickets method
-     * it prepares the query arguments for tickets filtering
-     * @param array $data
-     * @param string $filterType
-     * @return array
-     */
-    private function prepareQuery($data, $filterType)
-    {
-        $queryArgs = [
-            'with'        => [],
-            'filter_type' => $filterType,
-            'sort_by'     => sanitize_sql_orderby(Arr::get($data, 'order_by', 'id')),
-            'sort_type'   => Arr::get($data, 'order_type', 'DESC') == 'DESC' ? 'DESC' : 'ASC',
-        ];
-
-        if ($filterType == 'advanced') {
-            //Get the selected query params for advanced filter
-            $queryArgs['filters_groups_raw'] = json_decode(Arr::get($data, 'advanced_filters', '[]'), true);
-        } else {
-            //Selected filter type is simple
-            $queryArgs['simple_filters'] = Arr::get($data, 'filters', []);
-            $queryArgs['search'] = trim(Arr::get($data, 'search', ''));
-            if ($customerId = Arr::get($data, 'customer_id')) {
-                $queryArgs['customer_id'] = intval($customerId);
-            }
-        }
-
-        return $queryArgs;
-    }
-
-    // This is a supporting method for getTickets method
-    // it returns the tickets by query arguments
-    private function getTicketsByQuery($queryArgs)
-    {
-        $ticketsModel = (new TicketQueryService($queryArgs))->getModel();
-
-        $ticketsModel = $ticketsModel->with([
-            'customer'         => function ($query) {
-                $query->select(['first_name', 'last_name', 'email', 'id', 'avatar']);
-            }, 'agent'         => function ($query) {
-                $query->select(['first_name', 'last_name', 'email', 'avatar', 'id']);
-            },
-            'mailbox',
-            'product',
-            'tags',
-            'preview_response' => function ($query) {
-                $query->latest('id');
-            }
-        ]);
-
-
-        // apply filters by access level
-        do_action_ref_array('fluent_support/tickets_query_by_permission_ref', [&$ticketsModel, false]);
-
-        return $ticketsModel->paginate();
-    }
-
-    /**
      * This `addTicketAttachments` method is responsible for adding attachments to ticket
      * @param array $data
      * @param array $disabledFields
@@ -230,40 +145,72 @@ class TicketService
     }
 
     /**
-     * This `delete` method is responsible for deleting the ticket by ticket id
-     * @param int $id
-     * @return array
+     * Sanitize ticket data, create the ticket, handle attachments & custom fields, fire hooks.
+     * Shared by TicketController::createTicket and ProTicketService::handleSplitTicket.
+     *
+     * @param array $ticketData
+     * @param \FluentSupport\App\Models\Customer $customer
+     * @return \FluentSupport\App\Models\Ticket
      */
-    public function delete($ticket)
+    public function storeTicket($ticketData, $customer)
     {
-        $deletePermission = PermissionManager::currentUserCan('fst_delete_tickets');
-        $agent = Helper::getAgentByUserId();
-        if (!$deletePermission && $ticket->agent_id != $agent->id) {
-            throw new \Exception(esc_html__('You are not allowed to delete this ticket', 'fluent-support'));
+        if (empty($ticketData['mailbox_id'])) {
+            $mailbox = Helper::getDefaultMailBox();
+            if ($mailbox) {
+                $ticketData['mailbox_id'] = $mailbox->id;
+            }
+        } else {
+            $mailbox = MailBox::findOrFail($ticketData['mailbox_id']);
+        }
+
+        if (!empty($ticketData['product_id'])) {
+            $ticketData['product_source'] = 'local';
+        }
+
+        $ticketData['title'] = sanitize_text_field(wp_unslash($ticketData['title']));
+        $ticketData['content'] = wp_specialchars_decode(wp_unslash(wp_kses_post($ticketData['content'])));
+
+        if (!empty($ticketData['priority'])) {
+            $ticketData['priority'] = sanitize_text_field($ticketData['priority']);
+        }
+
+        if (!empty($ticketData['client_priority'])) {
+            $ticketData['client_priority'] = sanitize_text_field($ticketData['client_priority']);
+        }
+
+        $ticketData = apply_filters('fluent_support/create_ticket_data', $ticketData, $customer);
+
+        do_action('fluent_support/before_ticket_create', $ticketData, $customer);
+
+        $createdTicket = Ticket::create($ticketData);
+
+        $disabledFields = apply_filters('fluent_support/disabled_ticket_fields', []);
+        self::addTicketAttachments($ticketData, $disabledFields, $createdTicket, $customer);
+
+        if (defined('FLUENTSUPPORTPRO') && !empty($ticketData['custom_fields'])) {
+            $createdTicket->syncCustomFields($ticketData['custom_fields']);
+        }
+
+        do_action('fluent_support/ticket_created', $createdTicket, $customer);
+        do_action('fluent_support/ticket_created_behalf_of_customer', $createdTicket, $customer, Helper::getAgentByUserId());
+
+        return $createdTicket;
+    }
+
+    public function deleteTicket($ticket, $agent = null)
+    {
+        if (!$agent) {
+            $agent = Helper::getAgentByUserId();
         }
 
         $ticketData = [
             'id'    => $ticket->id,
             'title' => $ticket->title
         ];
+
         do_action('fluent_support/deleting_ticket', $ticket);
         $ticket->delete();
         do_action('fluent_support/ticket_deleted', $agent, $ticketData);
-
-        return [
-            'message' => __('Ticket has been deleted successfully', 'fluent-support')
-        ];
     }
 
-    public function deleteTickets($tickets)
-    {
-        $tickets->each(function ($ticket) {
-            $this->delete($ticket);
-        });
-
-        return [
-            // translators: %d is the number of tickets that were deleted
-            'message' => sprintf(__('%d tickets have been deleted', 'fluent-support'), count($tickets))
-        ];
-    }
 }

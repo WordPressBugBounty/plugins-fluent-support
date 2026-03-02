@@ -15,24 +15,28 @@ class PermissionFilterManager
 
     public function filterAgentTickets($ticketsQuery, $userId = false)
     {
-        $permissionLevel = PermissionManager::agentTicketPermissionLevel($userId);
-        if ($permissionLevel != 'all') {
-            $agent = Helper::getAgentByUserId();
-            if ($permissionLevel == 'own') {
-                $ticketsQuery->where('agent_id', $agent->id);
-            } else {
-                $ticketsQuery->where(function ($q) use ($agent) {
-                    $q->where('agent_id', $agent->id);
-                    $q->orWhereNull('agent_id');
-                });
-            }
+        $permissionLevel = PermissionManager::getAgentTicketVisibility($userId);
+
+        if ($permissionLevel == PermissionManager::VISIBILITY_ALL) {
+            return;
         }
 
+        $agent = Helper::getAgentByUserId();
+
+        if ($permissionLevel == PermissionManager::VISIBILITY_ASSIGNED_ONLY) {
+            $ticketsQuery->where('agent_id', $agent->id);
+        } else {
+            // assigned_and_unassigned: own tickets + unassigned tickets
+            $ticketsQuery->where(function ($q) use ($agent) {
+                $q->where('agent_id', $agent->id);
+                $q->orWhereNull('agent_id');
+            });
+        }
     }
 
     public function filterAgentTicketsByMailboxes($ticketsQuery, $args = [] )
     {
-        $restrictedBusinessBoxes = PermissionManager::currentUserRestrictedBusinessBoxes();
+        $restrictedBusinessBoxes = PermissionManager::getRestrictedMailboxIds();
         if (!empty($restrictedBusinessBoxes)) {
             $ticketsQuery->whereNotIn('mailbox_id', $restrictedBusinessBoxes);
         }

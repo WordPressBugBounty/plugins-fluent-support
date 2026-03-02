@@ -112,7 +112,7 @@ trait AgentTrait
 
         $agent = static::findOrFail($agentId);
 
-        PermissionManager::attachPermissions($agent->user_id, []);
+        PermissionManager::detachPermissions($agent->user_id);
 
         try {
             $newAgent = static::findOrFail($fallBackAgentId);

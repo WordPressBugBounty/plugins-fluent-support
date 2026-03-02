@@ -19,7 +19,13 @@
  */
 
 /*!
- * vue-router v4.6.4
+ * pinia v3.0.4
+ * (c) 2025 Eduardo San Martin Morote
+ * @license MIT
+ */
+
+/*!
+ * vue-router v4.6.3
  * (c) 2025 Eduardo San Martin Morote
  * @license MIT
  */
@@ -46,7 +52,9 @@
 * BUILT: Mon Jul 01 2024 15:04:42 GMT+0200 (Central European Summer Time)
 */
 
-/*! @license DOMPurify 3.3.1 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.3.1/LICENSE */
+/*! #__NO_SIDE_EFFECTS__ */
+
+/*! @license DOMPurify 3.3.0 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.3.0/LICENSE */
 
 /*! Element Plus Icons Vue v2.3.2 */
 
@@ -68,37 +76,37 @@
  */
 
 /**
-* @vue/compiler-core v3.5.27
+* @vue/compiler-core v3.5.25
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/compiler-dom v3.5.27
+* @vue/compiler-dom v3.5.25
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/reactivity v3.5.27
+* @vue/reactivity v3.5.25
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/runtime-core v3.5.27
+* @vue/runtime-core v3.5.25
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/runtime-dom v3.5.27
+* @vue/runtime-dom v3.5.25
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
 
 /**
-* @vue/shared v3.5.27
+* @vue/shared v3.5.25
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
