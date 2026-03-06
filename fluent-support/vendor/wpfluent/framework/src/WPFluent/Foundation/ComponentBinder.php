@@ -6,6 +6,7 @@ use FluentSupport\Framework\Support\Arr;
 use FluentSupport\Framework\View\View;
 use FluentSupport\Framework\Cache\Cache;
 use FluentSupport\Framework\Http\URL;
+use FluentSupport\Framework\Http\UrlGenerator;
 use FluentSupport\Framework\Support\Mail;
 use FluentSupport\Framework\Support\Pipeline;
 use FluentSupport\Framework\Http\Router;
@@ -271,7 +272,7 @@ class ComponentBinder
     protected function bindUrl()
     {
         $this->app->bind(URL::class, function($app) {
-            return new URL($app->make(Encrypter::class));
+            return new URL('', new UrlGenerator($app));
         });
 
         $this->app->alias(URL::class, 'url');

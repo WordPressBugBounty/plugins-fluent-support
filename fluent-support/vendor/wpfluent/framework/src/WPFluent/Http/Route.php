@@ -171,6 +171,13 @@ class Route
     protected $endpointSignature = [];
 
     /**
+     * Response instance
+     * 
+     * @var \WP_REST_Response
+     */
+    protected $response = null;
+
+    /**
      * Construct the route instance
      *
      * @param \FluentSupport\Framework\Foundation\Application $app
@@ -186,18 +193,18 @@ class Route
         $this->uri = $uri;
         $this->handler = $handler;
         $this->method = $method;
-
-        $this->preparefrontendHandlers($handler);
     }
 
     /**
      * Map the route to be used in front-end.
      *
      * @param mixed $handler
-     * @return null
+     * @return self
      */
-    protected function preparefrontendHandlers($handler)
+    public function preparefrontendHandlers()
     {
+        $handler = $this->handler;
+
         $endpointsUrl = $this->app->config->get('app.slug') . '/__endpoints';
 
         if (get_option('permalink_structure')) {
@@ -210,16 +217,10 @@ class Route
             !str_contains($url ?? '', $endpointsUrl)
             || $handler instanceof Closure
         ) {
-            return;
+            return $this;
         }
 
-        $action = trim($this->app->parseRestHandler($handler), '\\');
-
-        if (!str_contains($action, '@')) {
-            $action .= '@__invoke';
-        }
-
-        [$controller, $cb] = Str::parseCallback($action);
+        [$controller, $cb] = Str::parseCallback($this->parseAction($handler));
 
         $this->endpointSignature = [$controller, "_{$cb}"];
 
@@ -235,6 +236,26 @@ class Route
 
         // @phpstan-ignore-next-line
         $this->app->endpoints = $endpoints;
+
+        return $this;
+    }
+
+    /**
+     * Parse the action from the handler.
+     * 
+     * @param  mixed $handler
+     * @return string
+     */
+    protected function parseAction($handler)
+    {
+        $action = $this->app->parseRestHandler($handler, $this->namespace);
+        $action = trim($action, '\\');
+
+        if (!str_contains($action, '@')) {
+            $action .= '@__invoke';
+        }
+
+        return $action;
     }
 
     /**
@@ -600,13 +621,18 @@ class Route
     }
 
     /**
-     * Set the namespace for controller/action
+     * Set the namespace for controller/action.
+     * 
      * @param string $ns
      * @return null
      */
     public function withNamespace($ns)
     {
-        $this->namespace = implode('\\', $ns);
+        if (is_array($ns)) {
+            $this->namespace = implode('\\', $ns);
+        } else {
+            $this->namespace = trim($ns, '\\');
+        }
     }
 
     /**
@@ -828,14 +854,17 @@ class Route
     /**
      * Route handler
      *
-     * @return mixed
+     * @return \WP_REST_Response
      */
     public function callback()
     {
         try {
-            return $this->handleAfterMiddleware(
+            $this->response = $this->handleAfterMiddleware(
                 $this->dispatchRouteAction()
             );
+
+            return $this->handleResponse($this->response);
+
         } catch (ValidationException $e) {
             return $this->app->response->sendError(
                 $e->errors(), $e->getCode()
@@ -845,17 +874,92 @@ class Route
                 'message' => $e->getMessage()
             ], 404);
         } catch (Throwable $e) {
-            $this->fireExceptionEvent($e);
-            return $this->app->response->sendError([
-                'message' => $e->getMessage()
-            ], $e->getCode() ?: 500);
+            return $this->handleUnknownException(
+                $e, $this->response ? $this->response->get_headers() : []
+            );
         }
+    }
+
+    /**
+     * Handle response from route.
+     * 
+     * @param  \WP_REST_Response $response
+     * @return \WP_REST_Response
+     * @throws \Exception
+     */
+    protected function handleResponse($response)
+    {
+        $data   = $response->get_data();
+        $status = $response->get_status();
+
+        if ($status >= 400) {
+            $message = 'Unknown error';
+            
+            if (is_string($data)) {
+                $message = $data;
+            } elseif (is_array($data) && isset($data['message'])) {
+                $message = $data['message'];
+            } elseif ($data instanceof WP_Error) {
+                $message = $data->get_error_message();
+            }
+
+            $this->throwException($message, $status);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Throw an exception based on the status code.
+     * 
+     * @param  string $message
+     * @param  int $status
+     * @return null
+     * @throws \Exception
+     */
+    protected function throwException($message, $status)
+    {
+        $class = sprintf(
+            'WpOrg\Requests\Exception\Http\Status%d', $status
+        );
+        
+        if (!class_exists($class)) {
+            $class = 'WpOrg\Requests\Exception\Http';
+        }
+
+        throw new $class($message, $status);
+    }
+
+    /**
+     * Handle exception and send error response.
+     * 
+     * @param  Throwable $e
+     * @return \WP_REST_Response
+     */
+    protected function handleUnknownException(Throwable $e, $headers = [])
+    {
+        $data = [];
+
+        $this->fireExceptionEvent($e);
+
+        if ($this->app->isDebugOn()) {
+            $data = [
+                'file'  => $e->getFile(),
+                'line'  => $e->getLine(),
+            ];
+        }
+
+        return $this->app->response->sendError([
+            'code'    => 'plugin_exception',
+            'data'    => $data,
+            'message' => $e->getMessage(),
+        ], $e->getCode() ?: 500, $headers);
     }
 
     /**
      * Dispatch the route action.
      *
-     * @return mixed
+     * @return \WP_REST_Response
      */
     protected function dispatchRouteAction()
     {

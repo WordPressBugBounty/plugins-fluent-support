@@ -269,6 +269,14 @@ class Request
             }
         }
 
+        if (!$isJson) {
+            $requestBody = file_get_contents('php://input');
+            if (!empty($requestBody)) {
+                json_decode($requestBody);
+                $isJson = json_last_error() === JSON_ERROR_NONE;
+            }
+        }
+
         return $isJson;
     }
 
@@ -345,12 +353,23 @@ class Request
      */
     public function json($key = null, $default = null)
     {
-        if (!$this->isJson()) return;
-        
-        if (!isset($this->json)) {
+        if (!$this->isJson()) {
+            return [];
+        }
+
+        if (empty($this->json)) {
             $json = $this->get_json_params() ?: $this->getContent();
             
-            $this->json = (array) json_decode($json, true);
+            if (!is_array($json)) {
+                $decoded = json_decode($json, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->json = [];
+                } else {
+                    $this->json = (array) $decoded;
+                }
+            } else {
+                $this->json = $json;
+            }
         }
 
         if (is_null($key)) {
@@ -483,7 +502,7 @@ class Request
      */
     public function getContent()
     {
-        if (null === $this->content || false === $this->content) {
+        if (!$this->content) {
             $this->content = file_get_contents('php://input');
         }
 
@@ -580,6 +599,11 @@ class Request
             }
         }
 
+        if (empty($this->json) && $json = $this->json()) {
+            $this->post = array_merge($this->post, $json);
+            $this->request = array_merge($this->request, $json);
+        }
+
         return $this->safe === true ? $this->validated : $this->request;
     }
 
@@ -598,20 +622,37 @@ class Request
     }
 
     /**
-     * Get user ip address
+     * Get user ip address.
+     * 
      * @return string
      */
     public function getIp()
     {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            $ip = $this->server('HTTP_CLIENT_IP');
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip = $this->server('HTTP_X_FORWARDED_FOR');
-        } else {
-            $ip = $this->server('REMOTE_ADDR');
+        if ($this->isProxyEnabled()) {
+            if (!empty($forwarded = $this->server('HTTP_X_FORWARDED_FOR'))) {
+                $ips = explode(',', $forwarded);
+
+                foreach ($ips as $ip) {
+                    $ip = trim($ip);
+
+                    if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                        return $ip;
+                    }
+                }
+            }
         }
 
-        return $ip;
+        return $this->server('REMOTE_ADDR');
+    }
+
+    /**
+     * Check if proxy support is enabled.
+     * 
+     * @return boolean
+     */
+    protected function isProxyEnabled()
+    {
+        return $this->app->applyCustomFilters('proxy_support', false);
     }
 
     /**

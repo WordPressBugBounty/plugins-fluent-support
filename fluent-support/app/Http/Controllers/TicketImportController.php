@@ -40,6 +40,9 @@ class TicketImportController extends Controller
                 if (isset($rawQuery['cursor'])) {
                     $query['cursor'] = sanitize_text_field($rawQuery['cursor']);
                 }
+                if (!empty($rawQuery['include_archived'])) {
+                    $query['include_archived'] = true;
+                }
             }
 
             return $importService->handleImport( $request->getSafe('page', 'intval'), $handler, $query );

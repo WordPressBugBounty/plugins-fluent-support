@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,17 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.0.6 (Date: March 05, 2026) =
+* Updated: Core PHP framework
+* Added: Zendesk migration improvement to collect archived tickets and resume previous migrations
+* Fixed: Onboarding dark mode design issue
+* Fixed: Bulk option checkbox now visible by default
+* Fixed: Ticket list not updating after bulk actions
+* Fixed: File upload limit validation issue after deleting previously uploaded files
+* Fixed: WordPress admin bar overlapping Fluent Support menu
+* Fixed: Agent reply count in reports incorrectly including internal notes
+* Fixed: Error when navigating directly to a ticket URL due to window.history.state being null
 
 = 2.0.5 (Date: March 02, 2026) =
 * Added: Admin Dashboard Dark Mode

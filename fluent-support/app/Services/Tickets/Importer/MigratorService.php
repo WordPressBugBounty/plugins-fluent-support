@@ -46,6 +46,8 @@ class MigratorService
             isset($query['domain']) ? $class->setDomain($query['domain']) : '';
             isset($query['email']) ? $class->setEmail($query['email']) : '';
             isset($query['cursor']) ? $class->setCursor($query['cursor']) : '';
+            !empty($query['next_page_url']) ? $class->setNextPageUrl($query['next_page_url']) : '';
+            !empty($query['include_archived']) ? $class->setIncludeArchived($query['include_archived']) : '';
 
             return $class->doMigration($page, $handler);
         }

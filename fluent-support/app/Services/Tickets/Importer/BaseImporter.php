@@ -302,7 +302,7 @@ abstract class BaseImporter
                 [
                     'first_name' => $personData['first_name'] ?? '',
                     'last_name'  => $personData['last_name'] ?? '',
-                    'email'      => $personData['email'],
+                    'email'      => $personData['email'] ?? '',
                     'type'       => $type
                 ]
             );

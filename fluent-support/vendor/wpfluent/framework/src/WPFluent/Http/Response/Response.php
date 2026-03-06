@@ -139,11 +139,10 @@ class Response
     public function withHeader($key, $value = null)
     {
         if (is_array($key) && !$value) {
-            $this->headers = $key;
+            $this->headers = array_merge($this->headers, (array) $key);
         } else {
-            $this->headers = [$key => $value];
+            $this->headers[$key] = $value;
         }
-
         return $this;
     }
 
@@ -316,8 +315,8 @@ class Response
             );
         }
 
-        return $this->maybeMergeCookies(
-            $this->maybeMergeHeaders($response)
+        return $this->maybeMergeHeaders(
+            $this->maybeMergeCookies($response)
         );
     }
 

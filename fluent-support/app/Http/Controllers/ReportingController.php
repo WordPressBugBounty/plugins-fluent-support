@@ -357,7 +357,8 @@ class ReportingController extends Controller
 
         if ($agentId) {
             $repliesQuery = Conversation::query()
-                ->where('person_id', $agentId);
+                ->where('person_id', $agentId)
+                ->where('conversation_type', 'response');
 
             $applyDateRange($repliesQuery, 'created_at');
             $totalReplies = $repliesQuery->count();
