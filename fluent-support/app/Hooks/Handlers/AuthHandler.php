@@ -6,6 +6,7 @@ use FluentSupport\App\App;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Includes\CountryNames;
+use FluentSupport\App\Vite;
 use FluentSupport\Framework\Support\Arr;
 use FluentSupport\App\Models\Meta;
 
@@ -220,15 +221,13 @@ class AuthHandler
             return '<p>' . sprintf(__('You are already logged in. <a href="%s">Go to support portal</a>', 'fluent-support'), Helper::getPortalBaseUrl()) . '</p>';
         }
 
-        $attributes = $this->getShortcodes($attributes);
+        $attributes = $this->getShortcodes($attributes, true);
 
         if ($this->authProvider() == 'fluent_auth') {
             return (new \FluentAuth\App\Hooks\Handlers\CustomAuthHandler())->authForm($attributes);
         }
 
-        $authForm = do_shortcode('[fluent_support_login show-signup=true show-reset-password=true]');
-
-        return $authForm;
+        return $this->loginForm($attributes);
     }
 
     /**
@@ -481,7 +480,7 @@ class AuthHandler
         return apply_filters('fluent_support/signup_loading_icon', $loadingIcon);
     }
 
-    protected function getShortcodes($attributes)
+    protected function getShortcodes($attributes, $isAuthForm = false)
     {
         /*
          * Filter shortcode behavior for agent
@@ -494,8 +493,8 @@ class AuthHandler
             'auto-redirect'       => false,
             'redirect-to'         => Helper::getPortalBaseUrl(),
             'hide'                => false,
-            'show-signup'         => false,
-            'show-reset-password' => false,
+            'show-signup'         => $isAuthForm ? 'true' : 'false',
+            'show-reset-password' => $isAuthForm ? 'true' : 'false',
         ]);
 
         $attributes = shortcode_atts($shortCodeDefaults, $attributes);
@@ -535,11 +534,13 @@ class AuthHandler
         $app = App::getInstance();
         $assets = $app['url.assets'];
 
-        $rtlSuffix = is_rtl() ? '-rtl' : '';
-        $rtlSuffixHandler = $rtlSuffix ? '_rtl' : '';
-        wp_enqueue_style('fluent_support_login_style' . $rtlSuffixHandler, $assets . 'admin/css/all_public' . $rtlSuffix . '.css', [], FLUENT_SUPPORT_VERSION);
+        if (is_rtl()) {
+            wp_enqueue_style('fluent_support_login_style_rtl', $assets . 'admin/css/all_public-rtl.css', [], FLUENT_SUPPORT_VERSION);
+        } else {
+            wp_enqueue_style('fluent_support_login_style', Vite::getEnqueuePath('admin/css/all_public.css'), [], FLUENT_SUPPORT_VERSION);
+        }
 
-        wp_enqueue_script('fluent_support_login_helper', $assets . 'portal/js/login_helper.js', [], FLUENT_SUPPORT_VERSION);
+        wp_enqueue_script('fluent_support_login_helper', Vite::getEnqueuePath('portal/js/login_helper.js'), [], FLUENT_SUPPORT_VERSION);
 
         //Get Recaptcha settings and enqueue recaptcha script
         $reCaptchaSettingsData = Meta::where('object_type', '_fs_recaptcha_settings')->first();

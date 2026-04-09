@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.0.6
+Stable tag: 2.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,24 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.1.0 (Date: April 09, 2026) =
+* Added Agent Groups to organize support teams and enable smart ticket distribution
+* Added Agent Signature option for support agents
+* Added Agent-Initiated Tickets (agents can create tickets on behalf of customers)
+* Added new email template for Agent-Initiated Tickets
+* Added file upload integration with Cloudflare R2 and Amazon S3 (Pro)
+* Added Dynamic Sidebar Widgets system (hook-based, supports PHP and Vue components)
+* Added fluent_support/should_send_notification filter to control notification delivery across channels
+* Improved overall security
+* Optimized database queries for better performance
+* Fixed Fluent Boards integration action availability in free version when plugin is active
+* Fixed portal signup visibility issue when using shortcode attribute
+* Fixed “Close Ticket Silently” not suppressing email notifications
+* Fixed incorrect syncing of customer status with FluentCRM
+* Fixed advanced filter deletion issue in tickets list
+* Fixed theme mode toggle visibility issue
+* Fixed untranslated strings in advanced filter options
 
 = 2.0.6 (Date: March 05, 2026) =
 * Updated: Core PHP framework

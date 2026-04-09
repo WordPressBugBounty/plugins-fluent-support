@@ -283,6 +283,7 @@ class Helper
         ]);
     }
 
+    /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function deleteOption($key)
     {
         return Meta::where('object_type', 'option')
@@ -553,6 +554,7 @@ class Helper
         return Customer::where('id', $customerid)->first();
     }
 
+    /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function sanitizeOrderValue($orderType = '')
     {
         $orderBys = ['ASC', 'DESC'];
@@ -652,7 +654,7 @@ class Helper
             Meta::where('object_type', 'fluent_bot_settings')->value('value')
         );
 
-        return !empty($settings['isEnabled']) && $settings['isEnabled'] === 'true';
+        return !empty($settings['isEnabled']) && filter_var($settings['isEnabled'], FILTER_VALIDATE_BOOLEAN);
     }
 
 
@@ -726,10 +728,13 @@ class Helper
         return 'fluent_support';
     }
 
+    /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function getDriversKey(){
         return [
             'dropbox_settings',
             'google_drive_settings',
+            'cloudflare_r2_settings',
+            'amazon_s3_settings',
             'local'
         ];
     }
@@ -775,6 +780,38 @@ class Helper
 
             if ($googleDriveEnabled) {
                 $driver = 'google_drive';
+                self::updateOption('file_upload_driver', $driver);
+                return $driver;
+            }
+        }
+
+        // check if cloudflare r2 is enabled
+        $cloudflareR2Settings = self::getIntegrationOption('cloudflare_r2_settings', null);
+
+        if ($cloudflareR2Settings) {
+            $cloudflareR2Enabled = Meta::where('object_type', 'enabled_upload_drivers')
+                ->where('key', 'cloudflare_r2_settings')
+                ->where('value', 'yes')
+                ->first();
+
+            if ($cloudflareR2Enabled) {
+                $driver = 'cloudflare_r2';
+                self::updateOption('file_upload_driver', $driver);
+                return $driver;
+            }
+        }
+
+        // check if amazon s3 is enabled
+        $amazonS3Settings = self::getIntegrationOption('amazon_s3_settings', null);
+
+        if ($amazonS3Settings) {
+            $amazonS3Enabled = Meta::where('object_type', 'enabled_upload_drivers')
+                ->where('key', 'amazon_s3_settings')
+                ->where('value', 'yes')
+                ->first();
+
+            if ($amazonS3Enabled) {
+                $driver = 'amazon_s3';
                 self::updateOption('file_upload_driver', $driver);
                 return $driver;
             }
@@ -1058,6 +1095,7 @@ class Helper
         return apply_filters('fluent_support/settings_menu_items', $menu);
     }
 
+    /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function getFSIntegrationStatus($connection_name)
     {
         $integrationMap = [
@@ -1273,6 +1311,7 @@ class Helper
         return $ipAddress;
     }
 
+    /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function isCfIp($ip = '')
     {
         if (!$ip) {
@@ -1380,6 +1419,7 @@ class Helper
         return Arr::get($settings, 'product_required_field') === 'yes';
     }
 
+    /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function getBusinessBox()
     {
         $businessEmailBoxes = MailBox::select(['id', 'name', 'email', 'mapped_email'])
@@ -1481,6 +1521,29 @@ class Helper
                 $conversation->save();
             }
         }
+    }
+
+    /**
+     * Throw a ValidationException with a safe error message.
+     * In debug mode the real exception message is used; in production a generic message is returned.
+     * Throwing instead of returning ensures the error bypasses the framework's HTTP exception
+     * wrapper (which would prepend a status-code prefix to the message).
+     *
+     * @param \Throwable $e The original exception.
+     * @throws \FluentSupport\Framework\Validator\ValidationException Always thrown.
+     */
+    public static function getSafeErrorMessage($e)
+    {
+        $message = $e->getMessage() ?: __('Something went wrong. Please try again later.', 'fluent-support');
+
+        // ValidationException carries the message through the framework's JSON error
+        // handler — it is never echoed directly. $e is the chained previous exception,
+        // not output. phpcs:disable covers the multi-line constructor call.
+        // phpcs:disable WordPress.Security.EscapeOutput.ExceptionNotEscaped
+        throw new \FluentSupport\Framework\Validator\ValidationException(
+            '', 422, ($e instanceof \Exception ? $e : null), ['message' => $message]
+        );
+        // phpcs:enable WordPress.Security.EscapeOutput.ExceptionNotEscaped
     }
 
     /**

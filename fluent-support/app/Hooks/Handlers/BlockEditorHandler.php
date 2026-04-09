@@ -51,6 +51,10 @@ class BlockEditorHandler
 
     public function renderBlock($attributes)
     {
+        if (defined('REST_REQUEST') && REST_REQUEST) {
+            return '';
+        }
+
         $param = '';
 
         if (Arr::get($attributes, 'showLogoutButton')) {

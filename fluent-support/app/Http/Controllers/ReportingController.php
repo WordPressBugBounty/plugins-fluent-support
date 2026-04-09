@@ -8,6 +8,7 @@ use FluentSupport\App\Services\Helper;
 use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Models\Conversation;
+use FluentSupport\App\Models\TagPivot;
 
 /**
  * ReportingController class for REST API
@@ -38,6 +39,19 @@ class ReportingController extends Controller
         }
 
         return ['', ''];
+    }
+
+    private static function getAgentIdsForGroup(Request $request)
+    {
+        $groupId = $request->getSafe('agent_group_id', 'intval');
+        if (!$groupId) {
+            return null;
+        }
+
+        return TagPivot::where('source_type', 'agent_group')
+            ->where('tag_id', $groupId)
+            ->pluck('source_id')
+            ->toArray();
     }
 
     /**
@@ -76,6 +90,11 @@ class ReportingController extends Controller
             'mailbox_id' => $request->getSafe('mailbox_id', 'intval') ?: null,
         ];
 
+        $agentIds = self::getAgentIdsForGroup($request);
+        if ($agentIds !== null) {
+            $filter['agent_ids'] = $agentIds;
+        }
+
         $stats = $reporting->getTicketsGrowth($from, $to, $filter);
 
         return [
@@ -89,7 +108,7 @@ class ReportingController extends Controller
      * @param Reporting $reporting
      * @return array
      */
-    public static function getResolveChart(Request $request, Reporting $reporting): array
+    public function getResolveChart(Request $request, Reporting $reporting): array
     {
         $type = $request->getSafe('type', 'sanitize_text_field');
         list($from, $to) = self::getSanitizedDateRange($request);
@@ -99,6 +118,11 @@ class ReportingController extends Controller
             'product_id' => $request->getSafe('product_id', 'intval') ?: null,
             'mailbox_id' => $request->getSafe('mailbox_id', 'intval') ?: null,
         ];
+
+        $agentIds = self::getAgentIdsForGroup($request);
+        if ($agentIds !== null) {
+            $filter['agent_ids'] = $agentIds;
+        }
 
         $stats = $reporting->getTicketResolveGrowth($from, $to, $filter,$type);
 
@@ -117,12 +141,17 @@ class ReportingController extends Controller
     {
         list($from, $to) = self::getSanitizedDateRange($request);
         $filter = [];
-        $stats = $reporting->getResponseGrowth($from, $to);
 
-        if($person_id = $request->getSafe('agent_id', 'intval')) {
+        if ($person_id = $request->getSafe('agent_id', 'intval')) {
             $filter['person_id'] = $person_id;
-            $stats = $reporting->getResponseGrowth($from, $to, $filter);
         }
+
+        $agentIds = self::getAgentIdsForGroup($request);
+        if ($agentIds !== null) {
+            $filter['person_ids'] = $agentIds;
+        }
+
+        $stats = $reporting->getResponseGrowth($from, $to, $filter);
 
         return [
             'stats' => $stats
@@ -148,6 +177,22 @@ class ReportingController extends Controller
      * @param Request $request
      * @return array
      */
+    /**
+     * getAgentGroupsSummary method will generate summary aggregated by agent group
+     * @param Request $request
+     * @param Reporting $reporting
+     * @return array
+     */
+    public function getAgentGroupsSummary(Request $request, Reporting $reporting)
+    {
+        return [
+            'summary' => $reporting->agentGroupSummary(
+                $request->getSafe('from', 'sanitize_text_field'),
+                $request->getSafe('to', 'sanitize_text_field')
+            )
+        ];
+    }
+
     public function getAgentOverallReports(Request $request): array
     {
         $agent =  Helper::getAgentByUserId(get_current_user_id());
@@ -164,7 +209,7 @@ class ReportingController extends Controller
      * @param Reporting $reporting
      * @return array
      */
-    public static function getResponseGrowthChart(Request $request,Reporting $reporting): array
+    public function getResponseGrowthChart(Request $request, Reporting $reporting): array
     {
         $type = $request->getSafe('type', 'sanitize_text_field');
         list($from, $to) = self::getSanitizedDateRange($request);
@@ -188,7 +233,7 @@ class ReportingController extends Controller
      * @param Reporting $reporting
      * @return array
      */
-    public static function getProductsSummary(Request $request,Reporting $reporting): array
+    public function getProductsSummary(Request $request, Reporting $reporting): array
     {
         return [
             'summary' =>  $reporting->getSummary('product',$request->getSafe('from', 'sanitize_text_field'), $request->getSafe('to', 'sanitize_text_field'))
@@ -203,7 +248,7 @@ class ReportingController extends Controller
      * @param Reporting $reporting
      * @return array
      */
-    public static function getMailBoxesSummary(Request $request,Reporting $reporting): array
+    public function getMailBoxesSummary(Request $request, Reporting $reporting): array
     {
         return [
             'summary' =>  $reporting->getSummary('mailbox',$request->getSafe('from', 'sanitize_text_field'), $request->getSafe('to', 'sanitize_text_field'))
@@ -306,11 +351,17 @@ class ReportingController extends Controller
             'customer_id' => $request->getSafe('customer_id', 'intval'),
         ];
 
+        $agentIds = self::getAgentIdsForGroup($request);
+
         $baseQuery = Ticket::query();
         foreach ($filters as $field => $value) {
             if ($value) {
                 $baseQuery->where($field, $value);
             }
+        }
+
+        if ($agentIds !== null) {
+            $baseQuery->whereIn('agent_id', $agentIds);
         }
 
         $applyDateRange = function($query, $dateField = 'created_at') use ($from, $to) {
@@ -340,12 +391,15 @@ class ReportingController extends Controller
 
         $responsesQuery = Conversation::query()->where('conversation_type', 'response');
 
-        if (array_filter($filters)) {
-            $responsesQuery->whereHas('ticket', function ($q) use ($filters) {
+        if (array_filter($filters) || $agentIds !== null) {
+            $responsesQuery->whereHas('ticket', function ($q) use ($filters, $agentIds) {
                 foreach ($filters as $field => $value) {
                     if ($value) {
                         $q->where($field, $value);
                     }
+                }
+                if ($agentIds !== null) {
+                    $q->whereIn('agent_id', $agentIds);
                 }
             });
         }

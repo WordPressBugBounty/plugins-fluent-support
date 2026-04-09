@@ -20,6 +20,13 @@ return function ($file) {
 
     add_action('plugins_loaded', function () use ($file) {
         $application = new Application($file);
+
+        $currentDbVersion = get_option('fluent_support_db_version');
+        if (!$currentDbVersion || version_compare($currentDbVersion, FLUENT_SUPPORT_DB_VERSION, '<')) {
+            \FluentSupport\Database\DBMigrator::run();
+            update_option('fluent_support_db_version', FLUENT_SUPPORT_DB_VERSION, 'no');
+        }
+
         do_action('fluent_support_loaded', $application);
         do_action('fluent_support_addons_loaded', $application);
 

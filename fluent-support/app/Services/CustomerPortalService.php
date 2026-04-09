@@ -528,6 +528,17 @@ class CustomerPortalService
             $ticket->custom_fields = $ticket->customData('public', true);
         }
 
+        // Load agent info if ticket was created on behalf of customer
+        if ($ticket->created_by) {
+            $ticket->load('created_by_person');
+            if ($ticket->created_by_person) {
+                $ticket->created_by_agent = [
+                    'full_name' => $ticket->created_by_person->full_name,
+                    'photo'     => $ticket->created_by_person->photo,
+                ];
+            }
+        }
+
         return $ticket;
     }
 

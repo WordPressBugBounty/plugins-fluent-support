@@ -6,6 +6,7 @@ namespace FluentSupport\App\Http\Controllers;
 use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Http\Controllers\Controller;
 use FluentSupport\App\Models\Ticket;
+use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Integrations\FluentBot\FluentBotService;
 
 class FluentBotController extends Controller
@@ -18,7 +19,7 @@ class FluentBotController extends Controller
             return (new FluentBotService())->getPresetPrompts($type);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -28,24 +29,27 @@ class FluentBotController extends Controller
         $ticketId = $request->getSafe('id', 'intval');
         $productId = $request->getSafe('product_id', 'intval');
         $prompt = $request->getSafe('content', 'sanitize_text_field');
-        $conversationId = $request->getSafe('conversation_id', 'sanitize_text_field', '');
+        $conversationId = $request->getSafe('chat_id', 'sanitize_text_field', '');
         $selectedText = $request->getSafe('selectedText', 'sanitize_text_field', '');
         $type = $request->getSafe('type', 'sanitize_text_field', 'response');
 
         try {
             $customAI = new FluentBotService();
 
+            $ticket = Ticket::findOrFail($ticketId);
+            $this->ensureCanAccessTicket($ticket);
+
             if ($type === 'modifyResponse') {
                 $result = $customAI->modifyResponse($prompt, $selectedText, $ticketId);
             } else {
-                $ticket = Ticket::with('responses')->findOrFail($ticketId);
+                $ticket->load('responses');
                 $result = $customAI->generateResponse($prompt, $ticket, $productId, $conversationId ?: null);
             }
 
             return $result;
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -55,18 +59,20 @@ class FluentBotController extends Controller
         $ticketId = $request->getSafe('id', 'intval');
         $productId = $request->getSafe('product_id', 'intval');
         $prompt = $request->getSafe('content', 'sanitize_text_field');
-        $conversationId = $request->getSafe('conversation_id', 'sanitize_text_field', '');
+        $conversationId = $request->getSafe('chat_id', 'sanitize_text_field', '');
         $selectedText = $request->getSafe('selectedText', 'sanitize_text_field', '');
         $type = $request->getSafe('type', 'sanitize_text_field', 'response');
 
         try {
             $customAI = new FluentBotService();
+            $ticket = Ticket::findOrFail($ticketId);
+            $this->ensureCanAccessTicket($ticket);
 
             if ($type === 'modifyResponse') {
                 $result = $customAI->modifyResponse($prompt, $selectedText, $ticketId);
                 return $result;
             } else {
-                $ticket = Ticket::with('responses')->findOrFail($ticketId);
+                $ticket->load('responses');
 
                 // Disable all output buffering (with safety limit)
                 $maxLevels = 10;
@@ -103,7 +109,7 @@ class FluentBotController extends Controller
         } catch (\Exception $e) {
             // Send error as SSE event
             echo "event: error\n";
-            echo "data: " . json_encode(['message' => esc_html($e->getMessage())]) . "\n\n";
+            echo "data: " . json_encode(['message' => esc_html(Helper::getSafeErrorMessage($e))]) . "\n\n";
             flush();
             exit;
         }
@@ -111,28 +117,30 @@ class FluentBotController extends Controller
 
     public function getTicketSummary(Request $request)
     {
-        $ticketId = $request->getSafe('id', 'intval');
-        $ticket = Ticket::with('responses')->findOrFail($ticketId);
-
         try {
+            $ticketId = $request->getSafe('id', 'intval');
+            $ticket = Ticket::with('responses')->findOrFail($ticketId);
+            $this->ensureCanAccessTicket($ticket);
+
             return (new FluentBotService())->getTicketSummary($ticket);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
 
     public function getTicketTone(Request $request)
     {
-        $ticketId = $request->getSafe('id', 'intval');
-        $ticket = Ticket::with('responses')->findOrFail($ticketId);
-
         try {
+            $ticketId = $request->getSafe('id', 'intval');
+            $ticket = Ticket::with('responses')->findOrFail($ticketId);
+            $this->ensureCanAccessTicket($ticket);
+
             return (new FluentBotService())->getTicketTone($ticket);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }

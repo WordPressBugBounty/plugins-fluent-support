@@ -57,4 +57,11 @@ class Agent extends Person
         );
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(
+            AgentGroup::class, 'fs_tag_pivot', 'source_id', 'tag_id'
+        )->wherePivot('source_type', 'agent_group');
+    }
+
 }

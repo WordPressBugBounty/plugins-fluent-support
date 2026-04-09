@@ -18,11 +18,17 @@ class AgentTicketPolicy extends Policy
     {
         if ($request->method() === 'GET') {
             $status = PermissionManager::userCan([
-                'fst_view_tickets', 'fst_draft_reply', 'fst_manage_own_tickets',
-                'fst_manage_unassigned_tickets', 'fst_manage_other_tickets'
+                'fst_view_tickets', 
+                'fst_draft_reply', 
+                'fst_manage_own_tickets',
+                'fst_manage_unassigned_tickets', 
+                'fst_manage_other_tickets'
             ]);
         } else {
-            $status = PermissionManager::canAccessTicketRoutes();
+            // Non-GET requests require manage permission by default.
+            // Routes safe for draft/view-only agents have dedicated policy methods
+            // (e.g. createResponse, createOrUpdatDraft, storeOrUpdateLabelSearch).
+            $status = PermissionManager::canManageTickets();
         }
 
         return apply_filters('fluent_support/agent_has_access', $status, $request);
@@ -51,20 +57,23 @@ class AgentTicketPolicy extends Policy
     }
 
     /**
-     * Creating a response: accessible to draft agents too.
-     * Fine-grained check (draft vs publish) is handled inside the controller.
+     * Creating a response: accessible to manage and draft agents.
+     * View-only agents cannot create responses or drafts.
      */
     public function createResponse(Request $request)
     {
-        return PermissionManager::canAccessTicketRoutes();
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
     }
 
     /**
-     * Auto-save draft: POST endpoint but accessible to any agent with ticket access.
+     * Auto-save draft: accessible to manage and draft agents.
+     * View-only agents cannot create drafts.
      */
     public function createOrUpdatDraft(Request $request)
     {
-        return PermissionManager::canAccessTicketRoutes();
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
     }
 
     /**
@@ -129,5 +138,46 @@ class AgentTicketPolicy extends Policy
     public function manualCommitTrack(Request $request)
     {
         return PermissionManager::canManageTickets();
+    }
+
+    /**
+     * Approve draft response: requires approve permission and ticket route access.
+     */
+    public function approveDraftResponse(Request $request)
+    {
+        return PermissionManager::currentUserCan('fst_approve_draft_reply')
+            && PermissionManager::canAccessTicketRoutes();
+    }
+
+    /**
+     * Delete draft: accessible to draft-capable agents (same as create/update draft).
+     */
+    public function deleteDraft(Request $request)
+    {
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
+    }
+
+    /**
+     * FluentBot AI-assist actions: accessible to any agent with ticket access.
+     */
+    public function generateResponse(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function generateStreamResponse(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function getTicketSummary(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function getTicketTone(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
     }
 }

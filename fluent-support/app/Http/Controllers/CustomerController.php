@@ -184,7 +184,7 @@ class CustomerController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage(),
+                'message' => Helper::getSafeErrorMessage($e),
                 'errors'  => [
                     'email' => [
                         'unique' => __('Email address has been assigned to other customer', 'fluent-support'),
@@ -243,7 +243,7 @@ class CustomerController extends Controller
             return $avatarUploder->addOrUpdateProfileImage($request->files(), $request->getSafe('customer_id', 'intval'), 'customer');
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage(),
+                'message' => Helper::getSafeErrorMessage($e),
             ],
             $e->getCode()
         );
@@ -257,17 +257,17 @@ class CustomerController extends Controller
      * @param $id
      * @return array
      */
-    public function resetAvatar(Customer $customer, $customer_id)
+    public function resetAvatar(Customer $customer)
     {
         try {
-            $customer->restoreAvatar($customer, $customer_id);
+            $customer->restoreAvatar();
 
             return [
                 'message' => __('Customer avatar reset to gravatar default', 'fluent-support'),
             ];
         } catch (\Exception $e) {
             return [
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ];
         }
     }

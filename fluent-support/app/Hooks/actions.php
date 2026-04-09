@@ -41,6 +41,9 @@ $app->addAction('fluent_support/response_added_by_customer', 'EmailNotificationH
 $app->addAction('fluent_support/ticket_closed_by_agent', 'EmailNotificationHandler@closedByAgent', 10, 2);
 $app->addAction('fluent_support/agent_assigned_to_ticket', 'EmailNotificationHandler@onAgentAssign', 10, 3);
 $app->addAction('fluent_support/ticket_created_behalf_of_customer', 'EmailNotificationHandler@ticketCreatedByAgent', 10, 3);
+$app->addAction('fluent_support/agent_initiated_ticket_response', 'EmailNotificationHandler@ticketCreatedByAgentOnBehalf', 10, 3);
+
+$app->addAction('fluent_support/async_agent_assigned_to_ticket', 'AsyncActionHandler@resolveAgentAssigned', 10, 3);
 
 // Cleanup
 $app->addAction('fluent_support_hourly_tasks', 'CleanupHandler@initHourlyTasks');

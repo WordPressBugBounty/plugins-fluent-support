@@ -1,6 +1,7 @@
 <?php
 namespace FluentSupport\App\Http\Controllers;
 
+use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Tickets\Importer\MigratorService;
 use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Services\Tickets\Importer\BaseImporter;
@@ -47,7 +48,7 @@ class TicketImportController extends Controller
 
             return $importService->handleImport( $request->getSafe('page', 'intval'), $handler, $query );
         } catch (\Exception $e) {
-            return $this->sendError($e->getMessage());
+            return $this->sendError(Helper::getSafeErrorMessage($e));
         }
     }
 

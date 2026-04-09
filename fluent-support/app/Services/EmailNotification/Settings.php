@@ -17,7 +17,8 @@ class Settings
             'ticket_created_email_to_admin',
             'ticket_replied_by_customer_email_to_admin',
             'ticket_agent_on_change',
-            'ticket_created_by_agent_email_to_customer'
+            'ticket_created_by_agent_email_to_customer',
+            'ticket_created_by_agent_on_behalf_email_to_customer'
         ]);
         return $key;
     }
@@ -384,6 +385,14 @@ class Settings
                 'email_subject' => 'Re: {{ticket.title}} #{{ticket.id}}',
                 'default_status' => 'no',
                 'send_attachments'=> 'no'
+            ],
+            'ticket_created_by_agent_on_behalf_email_to_customer' => [
+                'key' => 'ticket_created_by_agent_on_behalf_email_to_customer',
+                'title' => __('Agent Initiated Ticket (To Customer)', 'fluent-support'),
+                'description' => __('This email will be sent when an agent creates a ticket on behalf of a customer using the initiated by agent option', 'fluent-support'),
+                'email_subject' => 'Your ticket has been created (#{{ticket.id}})',
+                'default_status' => 'yes',
+                'send_attachments'=> 'no'
             ]
         ];
 
@@ -475,6 +484,12 @@ class Settings
             return '<p>Hi <strong><em>{{agent.full_name}}</em>,</strong></p><p>Ticket "<a href="{{ticket.admin_url}}">#{{ticket.id}}</a>" assigned to you.</p>';
         } else if($emailKey == 'ticket_created_by_agent_email_to_customer') {
             return '<p>Hi <strong><em>{{customer.full_name}}</em>,</strong></p><p>{{agent.full_name}} created a ticket on behalf of you, you can check it <a href="{{ticket.public_url}}">here</a></p>.';
+        } else if($emailKey == 'ticket_created_by_agent_on_behalf_email_to_customer') {
+            if ($type == 'web') {
+                return '<p>Hi <strong><em>{{customer.full_name}}</em>,</strong></p><p>A support agent has created a new ticket on your behalf titled "{{ticket.title}}" (#{{ticket.id}}).</p><p>You can review the details, track progress, or add additional comments by clicking the button below:</p><h4><a href="{{ticket.public_url}}">View Ticket</a></h4><p>Or follow this link: {{ticket.public_url}}</p><p>Best regards,<br />{{agent.full_name}}</p>';
+            } else {
+                return '{{response.full_content}}<p>Regards,<br />{{agent.full_name}}</p>';
+            }
         }
 
         return '';

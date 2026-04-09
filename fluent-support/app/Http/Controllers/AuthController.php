@@ -23,7 +23,7 @@ class AuthController extends Controller
     public function signup(Request $request)
     {
 
-        if(Helper::getAuthProvider() != 'fluent_support') {
+        if(Helper::getAuthProvider() !== 'fluent_support') {
             return $this->sendError([
                 'message' => __('You are not allowed to signup using this form', 'fluent-support')
             ]);
@@ -177,7 +177,7 @@ class AuthController extends Controller
      */
     public function handleLogin(Request $request)
     {
-        if(Helper::getAuthProvider() != 'fluent_support') {
+        if(Helper::getAuthProvider() !== 'fluent_support') {
             return $this->sendError([
                 'message' => __('You are not allowed to login using this form', 'fluent-support')
             ]);
@@ -209,9 +209,7 @@ class AuthController extends Controller
         }
         $redirectUrl = Helper::getPortalBaseUrl();
         if ($redirect = $request->getSafe('redirect_to', 'sanitize_text_field')) {
-            if (filter_var($redirect, FILTER_VALIDATE_URL)) {
-                $redirectUrl = sanitize_url($redirect);
-            }
+            $redirectUrl = wp_validate_redirect($redirect, $redirectUrl);
         }
 
         if (get_current_user_id()) { // user already registered
@@ -229,10 +227,30 @@ class AuthController extends Controller
             $user = get_user_by('login', $email);
         }
 
+        // Rate limiting: per-IP bucket (5 attempts) + per-account bucket (20 attempts)
+        $ip = Helper::getIp();
+        $ipKey = $user
+            ? 'fs_login_ip_' . wp_hash($user->ID . '|' . $ip)
+            : 'fs_login_ip_' . wp_hash(strtolower($email) . '|' . $ip);
+        $accountKey = $user
+            ? 'fs_login_act_' . wp_hash($user->ID)
+            : 'fs_login_act_' . wp_hash(strtolower($email));
+
+        $ipAttempts = get_transient($ipKey);
+        $accountAttempts = get_transient($accountKey);
+
+        if (($ipAttempts !== false && $ipAttempts >= 5) || ($accountAttempts !== false && $accountAttempts >= 20)) {
+            return $this->sendError([
+                'message' => __('Too many login attempts. Please try again after 15 minutes.', 'fluent-support')
+            ], 429);
+        }
+
         if (!$user) {
             $user = new \WP_Error('authentication_failed', __('<strong>Error</strong>: Invalid username, email address or incorrect password.', 'fluent-support'));
 
             do_action('wp_login_failed', $email, $user);
+            $this->incrementLoginAttempts($ipKey);
+            $this->incrementLoginAttempts($accountKey);
 
             return $this->response([
                 'message' => __('Email or Password is not valid. Please try again', 'fluent-support')
@@ -241,33 +259,55 @@ class AuthController extends Controller
         }
 
         $twoFactorEnabled = Helper::getBusinessSettings('enable_two_fa');
-        if ('yes' == $twoFactorEnabled) {
+        if ('yes' === $twoFactorEnabled) {
             (new TwoFaHandler)->maybe2FaRedirect($user);
         }
 
         if (apply_filters('fluent_support_use_native_login', true)) {
             $user = wp_signon();
             if (is_wp_error($user)) {
+                $this->incrementLoginAttempts($ipKey);
+                $this->incrementLoginAttempts($accountKey);
                 return $this->response([
                     'message' => $user->get_error_message()
                 ], 403);
             }
 
+            // Clear rate limits for the authenticated user
+            $authIpKey = 'fs_login_ip_' . wp_hash($user->ID . '|' . $ip);
+            $authAccountKey = 'fs_login_act_' . wp_hash($user->ID);
+            delete_transient($authIpKey);
+            delete_transient($authAccountKey);
             return $this->sendSuccess([
                 'redirect' => $redirectUrl
             ]);
         }
 
         if (wp_check_password($password, $user->user_pass, $user->ID)) {
+            delete_transient($ipKey);
+            delete_transient($accountKey);
             $this->login($user->ID);
             return $this->sendSuccess([
                 'redirect' => $redirectUrl
             ]);
         }
 
+        $this->incrementLoginAttempts($ipKey);
+        $this->incrementLoginAttempts($accountKey);
+
         return $this->response([
             'message' => __('<strong>Error</strong>: Invalid username, email address or incorrect password.', 'fluent-support')
         ], 403);
+    }
+
+    private function incrementLoginAttempts($rateLimitKey)
+    {
+        $attempts = get_transient($rateLimitKey);
+        if ($attempts === false) {
+            set_transient($rateLimitKey, 1, 15 * MINUTE_IN_SECONDS);
+        } else {
+            set_transient($rateLimitKey, $attempts + 1, 15 * MINUTE_IN_SECONDS);
+        }
     }
 
     public function isRecaptchaApplicable($formName)
@@ -389,7 +429,7 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
 
-        if(Helper::getAuthProvider() != 'fluent_support') {
+        if(Helper::getAuthProvider() !== 'fluent_support') {
             return $this->sendError([
                 'message' => __('You are not allowed to reset password using this form', 'fluent-support')
             ]);
@@ -562,7 +602,7 @@ class AuthController extends Controller
         $userName = apply_filters('fluent_support/signup_username', Arr::get($formData, 'username'));
 
         if (empty($formData['password'])) {
-            $password = wp_generate_password(8);
+            $password = wp_generate_password(16, true, true);
         } else {
             $password = $formData['password'];
         }

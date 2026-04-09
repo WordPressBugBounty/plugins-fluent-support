@@ -148,6 +148,8 @@ class CreateTicketAction extends BaseAction
         $customerData = Arr::only($subscriber->toArray(), (new Customer())->getFillable());
 
         $customerData['user_id'] = $subscriber->getWpUserId();
+        // Override status to 'active' — FluentCRM subscriber status (e.g. 'subscribed') should not carry over to fs_persons
+        $customerData['status'] = 'active';
         $customerData = array_filter($customerData);
 
         $customer = Customer::maybeCreateCustomer($customerData);

@@ -125,12 +125,13 @@ class PermissionManager
         $exclusionRules = self::getExclusionRules();
         $permissions = self::applyExclusionRules($permissions, $exclusionRules);
 
-        // Auto-grant fst_view_tickets when any manage or draft permission is present
+        // Auto-grant fst_view_tickets when any manage, draft, or approve permission is present
         $manageOrDraftPermissions = [
             'fst_manage_own_tickets',
             'fst_manage_unassigned_tickets',
             'fst_manage_other_tickets',
             'fst_draft_reply',
+            'fst_approve_draft_reply',
         ];
 
         if (!empty(array_intersect($permissions, $manageOrDraftPermissions))
@@ -395,14 +396,23 @@ class PermissionManager
      */
     private static function resolveTicketVisibility(array $permissions)
     {
-        if (in_array('fst_manage_other_tickets', $permissions)
-            || in_array('fst_draft_reply', $permissions)
-            || in_array('fst_view_tickets', $permissions)) {
+        // Manage-level permissions take priority for visibility
+        if (in_array('fst_manage_other_tickets', $permissions)) {
             return self::VISIBILITY_ALL;
         }
 
         if (in_array('fst_manage_unassigned_tickets', $permissions)) {
             return self::VISIBILITY_ASSIGNED_AND_UNASSIGNED;
+        }
+
+        if (in_array('fst_manage_own_tickets', $permissions)) {
+            return self::VISIBILITY_ASSIGNED_ONLY;
+        }
+
+        // Non-manage roles (draft, view-only) can see all tickets but cannot modify
+        if (in_array('fst_draft_reply', $permissions)
+            || in_array('fst_view_tickets', $permissions)) {
+            return self::VISIBILITY_ALL;
         }
 
         return self::VISIBILITY_ASSIGNED_ONLY;

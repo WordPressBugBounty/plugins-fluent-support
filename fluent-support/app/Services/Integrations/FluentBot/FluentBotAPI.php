@@ -6,12 +6,10 @@ use WP_Error;
 
 class FluentBotAPI
 {
-    protected $apiKey;
     protected $apiUrl;
 
-    public function __construct(?string $apiKey, string $apiUrl)
+    public function __construct(string $apiUrl)
     {
-        $this->apiKey = $apiKey;
         $this->apiUrl = $apiUrl;
     }
 
@@ -52,10 +50,10 @@ class FluentBotAPI
         $totalTokens = $responseBody['token_usage']['total_tokens'] ?? $responseBody['totalTokens'] ?? 0;
         do_action('fluent_support/ai_response_success', $ticketId, $prompt, $totalTokens, "Fluent Bot");
 
-        // Return both content and conversation_id if available
+        // Return both content and chat_id if available
         return [
             'content' => $content,
-            'conversation_id' => $responseBody['conversation_id'] ?? null
+            'chat_id' => $responseBody['chat_id'] ?? null
         ];
     }
 
@@ -78,7 +76,6 @@ class FluentBotAPI
         curl_setopt($ch, CURLOPT_POSTFIELDS, wp_json_encode($args));
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
-            !empty($this->apiKey) ? 'Authorization: Bearer ' . $this->apiKey : ''
         ]);
 
         $buffer = '';
@@ -128,8 +125,8 @@ class FluentBotAPI
 
                         echo "\n";
 
-                        // Store conversation_id for later use
-                        if ($eventType === 'conversation_id' && !empty($eventDataLines)) {
+                        // Store chat_id for later use
+                        if ($eventType === 'chat_id' && !empty($eventDataLines)) {
                             $conversationId = $eventDataLines[0];
                         }
 
@@ -171,12 +168,8 @@ class FluentBotAPI
     protected function sendRequest(array $payload)
     {
         $headers = [
-            'Content-Type'  => 'application/json',
+            'Content-Type' => 'application/json',
         ];
-        // Add Authorization header only if API key is provided
-        if (!empty($this->apiKey)) {
-            $headers['Authorization'] = 'Bearer ' . $this->apiKey;
-        }
 
         $timeout = apply_filters('fs_ai_request_timeout', 60);
 

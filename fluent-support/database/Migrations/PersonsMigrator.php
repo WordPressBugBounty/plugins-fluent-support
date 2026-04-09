@@ -13,7 +13,7 @@ class PersonsMigrator
 
         $table = $wpdb->prefix . static::$tableName;
 
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") != $table) {
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table)) != $table) {
             $sql = "CREATE TABLE $table (
                 `id` BIGINT(20) UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `first_name` VARCHAR(192) NULL,
@@ -52,7 +52,7 @@ class PersonsMigrator
         return false;
     }
 
-    public static function alterTable($table) 
+    public static function alterTable($table)
     {
         static::addMissingColumns($table);
         static::addMissingIndexes($table);
@@ -62,22 +62,24 @@ class PersonsMigrator
     {
         global $wpdb;
 
-        // Escape table name
+        // $table is always $wpdb->prefix . 'fs_persons' — not user input.
+        // esc_sql() is the correct escaping for SQL identifiers; $wpdb->prepare()
+        // cannot quote identifiers in WP < 6.2 (no %i placeholder available).
         $table = esc_sql($table);
 
         // Get existing columns
-        $existing_columns = $wpdb->get_col("DESC `$table`", 0);
+        $existing_columns = $wpdb->get_col("DESC `{$table}`", 0); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
         // @todo: We will remove this on final release
         // This is only for beta users
         if (!in_array('title', $existing_columns)) {
-            $query = 'ALTER TABLE `' . $table . '` ADD `title` VARCHAR(192) NULL AFTER `email`';
-            $wpdb->query($query);
+            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- $table is sanitized via esc_sql(); column name is a hardcoded literal.
+            $wpdb->query("ALTER TABLE `{$table}` ADD `title` VARCHAR(192) NULL AFTER `email`");
         }
 
         if (!in_array('description', $existing_columns)) {
-            $query = 'ALTER TABLE `' . $table . '` ADD `description` MEDIUMTEXT NULL AFTER `user_id`';
-            $wpdb->query($query);
+            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- $table is sanitized via esc_sql(); column name is a hardcoded literal.
+            $wpdb->query("ALTER TABLE `{$table}` ADD `description` MEDIUMTEXT NULL AFTER `user_id`");
         }
     }
 
@@ -85,29 +87,32 @@ class PersonsMigrator
     {
         global $wpdb;
 
-        // Escape table name
+        // $table is always $wpdb->prefix . 'fs_persons' — not user input.
+        // esc_sql() is the correct escaping for SQL identifiers; $wpdb->prepare()
+        // cannot quote identifiers in WP < 6.2 (no %i placeholder available).
         $table = esc_sql($table);
 
         // Get existing indexes
-        $existing_indexes = $wpdb->get_results("SHOW INDEX FROM `$table`");
+        $existing_indexes = $wpdb->get_results("SHOW INDEX FROM `{$table}`"); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $existing_index_names = [];
 
         foreach ($existing_indexes as $index) {
             $existing_index_names[] = $index->Key_name;
         }
 
-        // Desired indexes
+        // Desired indexes — keys and values are all hardcoded string literals.
         $indexes = [
-            'idx_email' => 'email',
-            'idx_user_id' => 'user_id',
+            'idx_email'      => 'email',
+            'idx_user_id'    => 'user_id',
             'idx_ip_address' => 'ip_address',
         ];
 
-        // Add missing indexes
+        // Add missing indexes. $table is esc_sql()'d above; $index_name and
+        // $column_name are hardcoded array literals — no user input reaches this query.
         foreach ($indexes as $index_name => $column_name) {
             if (!in_array($index_name, $existing_index_names)) {
-                $sql = "ALTER TABLE `$table` ADD INDEX `$index_name` (`$column_name`)";
-                $wpdb->query($sql);
+                // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- all identifiers are either esc_sql()'d or hardcoded literals.
+                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` (`{$column_name}`)");
             }
         }
     }

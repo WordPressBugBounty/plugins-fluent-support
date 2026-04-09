@@ -41,7 +41,7 @@ class UploaderController extends Controller
             $uploadedFiles = UploadService::handleTempFileUpload($request->files());
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage(),
+                'message' => Helper::getSafeErrorMessage($e),
             ]);
         }
 
@@ -165,31 +165,71 @@ class UploaderController extends Controller
     {
         $images = $request->files();
         $ticketId = $this->resolveTicketId($request);
-        $this->isValidImageType($images);
+
+        $validationError = $this->isValidImageType($images);
+        if ($validationError) {
+            return $validationError;
+        }
 
         try {
             $uploadedFiles = UploadService::handleUploadToLocal($ticketId, $images);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage(),
+                'message' => Helper::getSafeErrorMessage($e),
             ]);
         }
 
         return [
             'images' => $uploadedFiles,
         ];
-
     }
 
-    private function isValidImageType($image)
+    private function isValidImageType($images)
     {
-        $imageType = $image['image']->getClientOriginalExtension();
-        $supportedTypes = ['gif', 'ief', 'jpeg', 'webp', 'pjpeg', 'ktx', 'png'];
-
-        if (! in_array($imageType, $supportedTypes)) {
+        if (empty($images['image'])) {
             return $this->sendError([
-                'message' => 'Invalid image file.',
+                'message' => __('No image file provided.', 'fluent-support'),
             ]);
         }
+
+        $file = $images['image'];
+        $tempPath = $file->getPathname();
+        $extension = strtolower($file->getClientOriginalExtension());
+        $allowedExtensions = ['gif', 'ief', 'jpeg', 'jpg', 'webp', 'pjpeg', 'ktx', 'png'];
+
+        if (!in_array($extension, $allowedExtensions)) {
+            return $this->sendError([
+                'message' => __('Invalid image file type.', 'fluent-support'),
+            ]);
+        }
+
+        $allowedMimes = Helper::getMimeGroups()['images']['mimes'];
+        $realMime = $this->detectMimeType($tempPath);
+
+        if (!$realMime || !in_array($realMime, $allowedMimes)) {
+            return $this->sendError([
+                'message' => __('File content does not match the image type.', 'fluent-support'),
+            ]);
+        }
+
+        return null;
+    }
+
+    private function detectMimeType($filePath)
+    {
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $filePath);
+            finfo_close($finfo);
+            return $mime;
+        }
+
+        if (function_exists('mime_content_type')) {
+            return mime_content_type($filePath);
+        }
+
+        // getimagesize works for standard image formats as last resort
+        $imageInfo = @getimagesize($filePath);
+        return $imageInfo ? $imageInfo['mime'] : false;
     }
 }

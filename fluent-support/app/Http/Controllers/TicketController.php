@@ -12,7 +12,6 @@ use FluentSupport\App\Http\Requests\TicketRequest;
 use FluentSupport\App\Http\Requests\TicketResponseRequest;
 use FluentSupport\App\Models\Conversation;
 use FluentSupport\App\Models\Ticket;
-use FluentSupport\App\Services\FluentBoardsService;
 use FluentSupport\App\Services\FluentCRMServices;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\ProfileInfoService;
@@ -20,6 +19,7 @@ use FluentSupport\App\Services\TicketHelper;
 use FluentSupport\App\Services\TicketQueryService;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\Tickets\ResponseService;
+use FluentSupport\App\Models\AgentGroup;
 use FluentSupport\App\Services\Tickets\TicketService;
 
 /**
@@ -135,14 +135,9 @@ class TicketController extends Controller
 
         $perPage = $request->getSafe('per_page', 'intval', 15);
 
-        foreach ($tickets as $ticket) {
-            if ($perPage < 15) {
-                if ($ticket->status != 'closed') {
-                    $ticket->live_activity = TicketHelper::getActivity($ticket->id);
-                } else {
-                    $ticket->live_activity = [];
-                }
-            }
+        // Load live activity for small page sizes (board/kanban view)
+        if ($perPage < 15) {
+            TicketHelper::loadBatchLiveActivities($tickets);
         }
 
         return [
@@ -229,7 +224,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -258,6 +253,11 @@ class TicketController extends Controller
             //Get ticket by id
             $ticket = Ticket::with($ticketWith)->findOrFail($ticket_id);
 
+            //Eager load responses with their nested relations to avoid N+1 queries
+            $ticket->load(['responses' => function ($q) {
+                $q->with('person', 'attachments', 'ccinfo');
+            }]);
+
             //Check if ticket is in a restricted mailbox
             $restrictedBusinessBoxes = PermissionManager::getRestrictedMailboxIds();
 
@@ -274,10 +274,12 @@ class TicketController extends Controller
 
                 if ($ticket->customer->user_id) {
                     $customFieldKeysUsingHook = apply_filters('fluent_support/custom_registration_form_fields_key', []);
-                    foreach ($customFieldKeysUsingHook as $key) {
-                        $userMeta = get_user_meta($ticket->customer->user_id, $key, true);
-                        if ($userMeta) {
-                            $ticket->customer->$key = $userMeta;
+                    if (!empty($customFieldKeysUsingHook)) {
+                        $allUserMeta = get_user_meta($ticket->customer->user_id);
+                        foreach ($customFieldKeysUsingHook as $key) {
+                            if (isset($allUserMeta[$key][0]) && $allUserMeta[$key][0]) {
+                                $ticket->customer->$key = $allUserMeta[$key][0];
+                            }
                         }
                     }
                 }
@@ -292,14 +294,16 @@ class TicketController extends Controller
 
             //Load agent feedback ratings if pro is active and feature is enabled
             if (defined('FLUENTSUPPORTPRO_PLUGIN_VERSION') && Helper::isAgentFeedbackEnabled()) {
-                foreach ($ticket->responses as $response) {
-                    $agentFeedback = Meta::where('object_id', $response->id)
-                        ->where('object_type', 'conversation_meta')
-                        ->where('key', 'agent_feedback_ratings')
-                        ->first();
+                $responseIds = $ticket->responses->pluck('id')->toArray();
+                $feedbacks = Meta::where('object_type', 'conversation_meta')
+                    ->where('key', 'agent_feedback_ratings')
+                    ->whereIn('object_id', $responseIds)
+                    ->get()
+                    ->keyBy('object_id');
 
-                    if ($agentFeedback) {
-                        $response->agent_feedback = $agentFeedback->value;
+                foreach ($ticket->responses as $response) {
+                    if ($feedbacks->has($response->id)) {
+                        $response->agent_feedback = $feedbacks->get($response->id)->value;
                     }
                 }
             }
@@ -332,6 +336,19 @@ class TicketController extends Controller
                 $ticket->custom_fields = $ticket->customData('admin', true);
             }
 
+            // Load agent info if ticket was created on behalf of customer
+            if ($ticket->created_by) {
+                $ticket->load('created_by_person');
+                if ($ticket->created_by_person) {
+                    $isAgentInitiated = strpos($ticket->content, __(' initialized this ticket', 'fluent-support')) !== false;
+                    $ticket->created_by_agent = [
+                        'id'        => $ticket->created_by_person->id,
+                        'full_name' => $ticket->created_by_person->full_name,
+                        'agent_initiated' => $isAgentInitiated,
+                    ];
+                }
+            }
+
             $data = [
                 'ticket'    => $ticket,
                 'responses' => $ticket->responses,
@@ -352,7 +369,7 @@ class TicketController extends Controller
             return $data;
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -402,7 +419,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -460,7 +477,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -497,7 +514,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -507,14 +524,41 @@ class TicketController extends Controller
         $draft_id = intval($draft_id);
 
         try {
-            Meta::where('id', $draft_id)->delete();
+            $agent = Helper::getAgentByUserId();
+
+            if (!$agent) {
+                return $this->sendError([
+                    'message' => __('You do not have permission to perform this action', 'fluent-support'),
+                ]);
+            }
+
+            $draft = Meta::where('id', $draft_id)
+                ->where('object_type', '_fs_auto_draft')
+                ->first();
+
+            if (!$draft) {
+                return $this->sendError([
+                    'message' => __('Draft not found', 'fluent-support'),
+                ]);
+            }
+
+            // Verify ownership: draft key contains agent_id, only managers can delete others' drafts
+            $isOwnDraft = strpos($draft->key, '_agent_id_' . $agent->id . '_') !== false;
+
+            if (!$isOwnDraft && !PermissionManager::canManageTickets()) {
+                return $this->sendError([
+                    'message' => __('You do not have permission to delete this draft', 'fluent-support'),
+                ]);
+            }
+
+            $draft->delete();
 
             return [
                 'message' => __('Discard draft successfully', 'fluent-support'),
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -549,7 +593,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -621,7 +665,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -640,7 +684,7 @@ class TicketController extends Controller
 
             $this->ensureCanAccessTicket($ticket);
 
-            $closeSilently = $request->getSafe('close_ticket_silently', 'rest_sanitize_boolean');
+            $closeSilently = $request->getSafe('close_ticket_silently', 'sanitize_text_field');
 
             return [
                 'message' => __('Ticket has been closed', 'fluent-support'),
@@ -648,7 +692,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -673,7 +717,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -780,6 +824,51 @@ class TicketController extends Controller
                 return [
                     'message' => trim($assignedMessage . ' ' . $skippedMessage)
                 ];
+            } else if ($action == 'assign_agent_group') {
+                if (!$request->has('agent_group_id')) {
+                    throw new \Exception(esc_html__('agent_group_id param is required', 'fluent-support'));
+                }
+
+                $groupId = $request->getSafe('agent_group_id', 'intval');
+                $group = AgentGroup::findOrFail($groupId);
+
+                if ($group->agents()->count() === 0) {
+                    throw new \Exception(esc_html__('No agents found in this group', 'fluent-support'));
+                }
+
+                $tickets = $query->get();
+                $assignedCount = 0;
+                $skippedCount = 0;
+                $currentCounts = [];
+
+                foreach ($tickets as $ticket) {
+                    $selectedAgent = $group->getLeastLoadedAgent(
+                        $ticket->mailbox_id, $currentCounts
+                    );
+
+                    if (!$selectedAgent) {
+                        $skippedCount++;
+                        continue;
+                    }
+
+                    $ticket->agent_id = $selectedAgent->id;
+                    $ticket->save();
+                    $assignedCount++;
+                    $currentCounts[$selectedAgent->id]++;
+
+                    as_enqueue_async_action('fluent_support/async_agent_assigned_to_ticket', [
+                        $selectedAgent->id, $ticket->id, $agent->id
+                    ], 'fluent-support');
+                }
+
+                return [
+                    'message' => sprintf(
+                        /* translators: %1$d is tickets assigned, %2$d is tickets skipped. */
+                        __('%1$d tickets assigned via agent group. %2$d skipped.', 'fluent-support'),
+                        $assignedCount,
+                        $skippedCount
+                    )
+                ];
             } else if ($action == 'assign_tags') {
                 $tagIds = $request->get('tag_ids', null);
                 if (!is_array($tagIds)) {
@@ -799,7 +888,7 @@ class TicketController extends Controller
             throw new \Exception(esc_html__('Sorry no action found as available', 'fluent-support'));
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -821,7 +910,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -898,11 +987,23 @@ class TicketController extends Controller
             foreach ($tickets as $ticket) {
                 if ($attachments) {
                     $responseData['attachments'] = [];
+                    $attachmentRecords = [];
                     foreach ($attachments as $attachment) {
-                        $attachedFile = $attachment->replicate();
-                        $attachedFile->ticket_id = $ticket->id;
-                        $attachedFile->save();
-                        $responseData['attachments'][] = $attachedFile->file_hash;
+                        $fileHash = bin2hex(random_bytes(16));
+                        $attachmentRecords[] = [
+                            'ticket_id'  => $ticket->id,
+                            'file_path'  => $attachment->file_path,
+                            'full_url'   => $attachment->full_url,
+                            'title'      => $attachment->title,
+                            'driver'     => $attachment->driver,
+                            'file_size'  => $attachment->file_size,
+                            'status'     => $attachment->status,
+                            'file_hash'  => $fileHash,
+                        ];
+                        $responseData['attachments'][] = $fileHash;
+                    }
+                    if ($attachmentRecords) {
+                        Attachment::insert($attachmentRecords);
                     }
                 }
 
@@ -914,7 +1015,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -940,7 +1041,7 @@ class TicketController extends Controller
                 );
             }
 
-            Conversation::where('id', $response->id)->delete();
+            $response->delete();
             $response->ccinfo()->delete();
 
             return [
@@ -948,7 +1049,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -994,7 +1095,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1009,7 +1110,12 @@ class TicketController extends Controller
             }
 
             $ticket = Ticket::findOrFail($ticket_id);
-            $response = Conversation::findOrFail($response_id);
+
+            $response = Conversation::where('id', $response_id)
+                ->where('ticket_id', $ticket_id)
+                ->where('conversation_type', 'draft_response')
+                ->firstOrFail();
+
             $person = Helper::getAgentByUserId();
 
             $content = wp_unslash(wp_kses_post($request->getSafe('content', 'wp_kses_post')));
@@ -1044,7 +1150,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1098,7 +1204,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1121,7 +1227,7 @@ class TicketController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1152,7 +1258,7 @@ class TicketController extends Controller
 
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1203,7 +1309,7 @@ class TicketController extends Controller
             return $fluentCRMServices->syncCrmTags($data);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1232,95 +1338,7 @@ class TicketController extends Controller
             return $fluentCRMServices->syncCrmLists($data);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
-            ]);
-        }
-    }
-
-    /**
-     * Retrieve boards from Fluent Boards API.
-     *
-     * @return array Formatted array of boards.
-     */
-    public function getBoards()
-    {
-        $boards = FluentBoardsApi('boards')->getBoards();
-        $formattedBoards = [];
-
-        foreach ($boards as $board) {
-            $formattedBoard = [
-                'id'    => $board->id,
-                'title' => $board->title,
-                'tasks' => [],
-            ];
-
-            $formattedBoards[] = $formattedBoard;
-        }
-
-        return ['boards' => $formattedBoards];
-    }
-
-    /**
-     * Retrieve stages for a specific board from Fluent Boards API.
-     *
-     * @param Request $request Request object containing 'board_id'.
-     * @return array Formatted array of stages.
-     */
-    public function getStages(Request $request)
-    {
-        $boardId = $request->getSafe('board_id', 'intval');
-        $boardStages = FluentBoardsApi('boards')->getStagesByBoard($boardId);
-
-        $formattedStages = [];
-        if (!empty($boardStages)) {
-            foreach ($boardStages[0]->stages as $stage) {
-                $formattedStages[] = [
-                    'id'    => $stage->id,
-                    'title' => $stage->title,
-                ];
-            }
-        }
-
-        return ['stages' => $formattedStages];
-    }
-
-    /**
-     * Create a task using data provided in the request.
-     *
-     * @param Request $request Request object containing task data.
-     * @return array Response containing message and task data.
-     */
-    public function createTask(Request $request, FluentBoardsService $fluentBoardsService)
-    {
-        try {
-            $taskData = [
-                'source_id'      => $request->getSafe('source_id', 'intval'),
-                'board_id'       => $request->getSafe('board_id', 'intval'),
-                'stage_id'       => $request->getSafe('stage_id', 'intval'),
-                'crm_contact_id' => $request->getSafe('crm_contact_id', 'intval') ?: null,
-                'title'          => $request->getSafe('title', 'sanitize_text_field'),
-                'description'    => $request->getSafe('description', 'wp_kses_post'),
-                'source'         => $request->getSafe('source', 'sanitize_text_field'),
-                'started_at'     => $request->getSafe('started_at', 'sanitize_text_field'),
-                'due_at'         => $request->getSafe('due_at', 'sanitize_text_field'),
-            ];
-
-            $task = FluentBoardsApi('tasks')->create($taskData);
-
-            if (!$task) {
-                return $this->sendError(__('Failed to create task.', 'fluent-support'));
-            }
-
-            $fluentBoardsService->addInternalNote($task);
-            $fluentBoardsService->addComment($task);
-
-            return [
-                'message' => __('Task successfully added to Fluent Boards', 'fluent-support'),
-                'task'    => $task
-            ];
-        } catch (\Exception $e) {
-            return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1345,7 +1363,7 @@ class TicketController extends Controller
             return TicketHelper::getLabelSearch($agent_id);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1369,7 +1387,7 @@ class TicketController extends Controller
 
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -1381,7 +1399,7 @@ class TicketController extends Controller
             return TicketHelper::deleteSavedSearch($search_id);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }

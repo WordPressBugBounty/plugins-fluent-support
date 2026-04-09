@@ -221,7 +221,7 @@ class CustomerPortalController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message'    => $e->getMessage(),
+                'message'    => Helper::getSafeErrorMessage($e),
                 'error_type' => $e->getCode()
             ]);
         }
@@ -241,7 +241,7 @@ class CustomerPortalController extends Controller
             return (new CustomerPortalService())->getTicket($customerAdditionalData, $ticket_id);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message'    => $e->getMessage(),
+                'message'    => Helper::getSafeErrorMessage($e),
                 'error_type' => $e->getCode()
             ]);
         }
@@ -276,7 +276,7 @@ class CustomerPortalController extends Controller
             return (new CustomerPortalService())->createResponse($customerAdditionalData, $ticket_id, $data);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message'    => $e->getMessage(),
+                'message'    => Helper::getSafeErrorMessage($e),
                 'error_type' => $e->getCode()
             ]);
         }
@@ -296,7 +296,7 @@ class CustomerPortalController extends Controller
             return (new CustomerPortalService())->closeTicket($customerAdditionalData, $ticket_id);
         } catch (Exception $e) {
             return $this->sendError([
-                'message'    => $e->getMessage(),
+                'message'    => Helper::getSafeErrorMessage($e),
                 'error_type' => $e->getCode()
             ]);
         }
@@ -316,7 +316,7 @@ class CustomerPortalController extends Controller
             return (new CustomerPortalService())->reOpenTicket($customerAdditionalData, $ticket_id);
         } catch (Exception $e) {
             return $this->sendError([
-                'message'    => $e->getMessage(),
+                'message'    => Helper::getSafeErrorMessage($e),
                 'error_type' => $e->getCode()
             ]);
         }
@@ -340,7 +340,7 @@ class CustomerPortalController extends Controller
             return $customerPortalService->addUserFeedback($approvalStatus, $conversationID);
         } catch (Exception $e) {
             return $this->sendError([
-                'message'    => $e->getMessage(),
+                'message'    => Helper::getSafeErrorMessage($e),
                 'error_type' => $e->getCode()
             ]);
         }

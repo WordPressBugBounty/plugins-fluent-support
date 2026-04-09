@@ -299,8 +299,12 @@ class SupportCandyTickets extends BaseImporter
         ];
 
         global $wpdb;
+        $allowedTables = array_flip($tables);
         foreach ($tables as $table) {
-            $wpdb->query("TRUNCATE TABLE {$wpdb->prefix}{$table}");
+            if (!isset($allowedTables[$table])) {
+                continue;
+            }
+            $wpdb->query("TRUNCATE TABLE `{$wpdb->prefix}{$table}`");
         }
 
         return [

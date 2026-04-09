@@ -61,15 +61,80 @@ class TicketHelper
         return self::getAgentsInfoFromActivities($activities);
     }
 
-    public static function getAgentsInfoFromActivities($activities)
+    private static function getAgentsInfoFromActivities($activities)
     {
         if (!$activities) {
             return [];
         }
 
-        return Agent::select(['email', 'first_name', 'last_name'])
+        return Agent::select(['id', 'email', 'first_name', 'last_name'])
             ->whereIn('id', array_keys($activities))
             ->get();
+    }
+
+    /**
+     * Batch-load live activity for a collection of tickets.
+     * Uses 2 queries total: one for activity metas, one for all agents.
+     *
+     * @param \Iterable $tickets Collection of Ticket models
+     * @return void
+     */
+    public static function loadBatchLiveActivities($tickets)
+    {
+        $activeTicketIds = $tickets->where('status', '!=', 'closed')->pluck('id')->toArray();
+
+        if (!$activeTicketIds) {
+            foreach ($tickets as $ticket) {
+                $ticket->live_activity = [];
+            }
+            return;
+        }
+
+        $activityMetas = Meta::where('object_type', 'ticket_meta')
+            ->where('key', '_live_activity')
+            ->whereIn('object_id', $activeTicketIds)
+            ->get()
+            ->keyBy('object_id');
+
+        $allAgentIds = [];
+        $ticketActivities = [];
+
+        foreach ($activityMetas as $ticketId => $meta) {
+            $activities = Helper::safeUnserialize($meta->value);
+            if (!is_array($activities)) {
+                continue;
+            }
+
+            $activities = array_filter($activities, function ($time) {
+                return (time() - $time) <= 60;
+            });
+
+            $ticketActivities[$ticketId] = $activities;
+            $allAgentIds = array_merge($allAgentIds, array_keys($activities));
+        }
+
+        $allAgentIds = array_unique(array_filter($allAgentIds));
+        $agents = $allAgentIds
+            ? Agent::select(['id', 'email', 'first_name', 'last_name'])
+                ->whereIn('id', $allAgentIds)
+                ->get()
+                ->keyBy('id')
+            : [];
+
+        $activitiesByTicket = [];
+        foreach ($ticketActivities as $ticketId => $activities) {
+            $ticketAgents = [];
+            foreach (array_keys($activities) as $agentId) {
+                if (isset($agents[$agentId])) {
+                    $ticketAgents[] = $agents[$agentId];
+                }
+            }
+            $activitiesByTicket[$ticketId] = $ticketAgents;
+        }
+
+        foreach ($tickets as $ticket) {
+            $ticket->live_activity = $activitiesByTicket[$ticket->id] ?? [];
+        }
     }
 
     /**
@@ -209,6 +274,7 @@ class TicketHelper
         return $watcherAgents;
     }
 
+    /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function getCarbonCopyCustomerInfo($ticketId){
         $existing = Meta::where('object_type', 'beginning_cc_info')->where('object_id', $ticketId)->first();
         if($existing){

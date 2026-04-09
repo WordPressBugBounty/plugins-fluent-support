@@ -5,6 +5,8 @@ namespace FluentSupport\App\Models\Traits;
 use FluentSupport\App\Models\Attachment;
 use FluentSupport\App\Models\Conversation;
 use FluentSupport\App\Models\Product;
+use FluentSupport\App\Models\AgentGroup;
+use FluentSupport\App\Models\TagPivot;
 use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Models\Person;
@@ -40,6 +42,10 @@ trait AgentTrait
                 'businessBoxRestrictions' => false
             ]);
 
+            $agent->agent_signature = $agent->getMeta('agent_signature', '');
+            $agent->agent_signature_enabled = $agent->getMeta('agent_signature_enabled', 'no');
+
+            $agent->groups = $agent->groups()->select(['fs_taggables.id', 'title'])->get();
         }
 
         return $agents;
@@ -61,12 +67,21 @@ trait AgentTrait
         }
 
 
-        return $this->setAgentMeta(
-        	$user,
-        	$data,
-        	static::create($data)
-        );
+        $agent = $this->setAgentMeta($user, $data, static::create($data));
 
+        $defaultGroup = AgentGroup::whereNotNull('settings')->get()->first(function ($group) {
+            return !empty($group->settings['is_default']);
+        });
+
+        if ($defaultGroup) {
+            TagPivot::create([
+                'tag_id'      => $defaultGroup->id,
+                'source_id'   => $agent->id,
+                'source_type' => 'agent_group',
+            ]);
+        }
+
+        return $agent;
     }
 
     /**
@@ -121,6 +136,10 @@ trait AgentTrait
         }
 
         $this->assignDataToFallbackAgent($agent->id, $newAgent);
+
+        TagPivot::where('source_id', $agent->id)
+            ->where('source_type', 'agent_group')
+            ->delete();
 
         $agent->deleteAllMeta();
 
@@ -268,6 +287,16 @@ trait AgentTrait
 
             $agent->updateMeta('agent_restrictions', $restrictions);
             $agent->restrictions = $restrictions;
+        }
+
+        if (isset($data['agent_signature'])) {
+            $agent->updateMeta('agent_signature', $data['agent_signature']);
+            $agent->agent_signature = $data['agent_signature'];
+        }
+
+        if (isset($data['agent_signature_enabled'])) {
+            $agent->updateMeta('agent_signature_enabled', $data['agent_signature_enabled']);
+            $agent->agent_signature_enabled = $data['agent_signature_enabled'];
         }
 
         return $agent;

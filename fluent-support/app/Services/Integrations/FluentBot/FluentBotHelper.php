@@ -8,11 +8,11 @@ use FluentSupport\App\Services\Helper;
 use WP_Error;
 class FluentBotHelper
 {
-    const BASE_URL = 'https://beta.fluentbot.ai/ai';
+    const BASE_URL = 'https://dash.fluentbot.ai/api';
 
     const ENDPOINTS = [
         'default' => '/responses',
-        'ticket_reply' => '/chat/fs-completion',
+        'ticket_reply' => '/chat/fs',
     ];
 
     public function generateStreamResponse($prompt, $ticket, $productId, $conversationId = null)
@@ -23,7 +23,7 @@ class FluentBotHelper
             'source' => 'fluent_support',
             'prompt' => $prompt,
             'stream' => true,
-            'conversation_id' => $conversationId ?? null,
+            'chat_id' => $conversationId ?? null,
         ];
         return $this->makeStreamAPICall($payload, $prompt, $ticket->id, 'ticket_reply', $productId);
     }
@@ -90,10 +90,10 @@ class FluentBotHelper
         // Use bot_id instead of botId for the new API
         $payload['bot_id'] = $credentials['botId'];
 
-        $api = new FluentBotAPI($credentials['apiKey'], $apiUrl);
+        $api = new FluentBotAPI($apiUrl);
         $result = $api->makeRequest($ticketId, $prompt, $payload);
 
-        // For ticket_reply endpoint, return the full result with conversation_id
+        // For ticket_reply endpoint, return the full result with chat_id
         // For other endpoints, return just the content for backward compatibility
         if ($type === 'ticket_reply' && is_array($result) && isset($result['content'])) {
             return $result;
@@ -118,7 +118,7 @@ class FluentBotHelper
         // Use bot_id instead of botId for the new API
         $payload['bot_id'] = $credentials['botId'];
 
-        $api = new FluentBotAPI($credentials['apiKey'], $apiUrl);
+        $api = new FluentBotAPI($apiUrl);
         $api->makeStreamRequest($ticketId, $prompt, $payload);
     }
 
@@ -132,13 +132,11 @@ class FluentBotHelper
 
         $config = $meta ? Helper::safeUnserialize($meta->value) : [];
 
-        $apiKey = $config['generalApiKey'] ?? '';
         $botId = $config['generalBotId'] ?? '';
 
         if ($productId && !empty($config['productMappings']) && is_array($config['productMappings'])) {
             foreach ($config['productMappings'] as $mapping) {
                 if ((int)$mapping['productId'] === (int)$productId) {
-                    $apiKey = $mapping['apiKey'] ?? $apiKey;
                     $botId = $mapping['botId'] ?? $botId;
                     break;
                 }
@@ -153,8 +151,7 @@ class FluentBotHelper
         }
 
         return [
-            'apiKey' => $apiKey,
-            'botId'  => $botId
+            'botId' => $botId
         ];
     }
 
@@ -188,13 +185,13 @@ class FluentBotHelper
 
         if (!empty($ticketArray['content'])) {
             $messages[] = [
-                'role' => 'human',
+                'role' => 'visitor',
                 'message' => $this->cleanText($ticketArray['content']),
             ];
         }
 
         foreach (Arr::get($ticketArray, 'responses', []) as $response) {
-            $role = Arr::get($response, 'person.person_type') === 'customer' ? 'human' : 'ai';
+            $role = Arr::get($response, 'person.person_type') === 'customer' ? 'visitor' : 'ai';
             $messages[] = [
                 'role' => $role,
                 'message' => $this->cleanText(Arr::get($response, 'content', '')),

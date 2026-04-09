@@ -4,12 +4,15 @@ namespace FluentSupport\App\Hooks\Handlers;
 
 use FluentSupport\App\App;
 use FluentSupport\App\Models\Agent;
+use FluentSupport\App\Models\AgentGroup;
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Product;
+use FluentSupport\App\Models\TagPivot;
 use FluentSupport\App\Models\TicketTag;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\TranslationStrings;
+use FluentSupport\App\Vite;
 
 class Menu
 {
@@ -317,15 +320,18 @@ class Menu
 
         $assets = $app['url.assets'];
 
-//        add_filter('admin_footer_text', function ($text) {
-//            return '<span id="footer-thankyou">We value your feedback! If the plugin is helpful, please rate Fluent Support with <a target="_blank" rel="nofollow" href="https://wordpress.org/support/plugin/fluent-support/reviews/#new-post">★★★★★</a> on WordPress.org. For assistance, check out the <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/navigate-with-the-keyboard-shortcut">keyboard shortcuts</a> and <a target="_blank" rel="nofollow" href="https://fluentsupport.com/docs/">documentation</a>.</span>';
-//        });
+        // Inject Vite HMR client for dev mode
+        add_action('admin_head', function () {
+            Vite::injectViteClient();
+        }, 1);
 
         wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '2.4.3');
 
-        $rtlSuffix = is_rtl() ? '-rtl' : '';
-        $rtlSuffixHandler = $rtlSuffix ? '_rtl' : '';
-        wp_enqueue_style('fluent_support_admin_app' . $rtlSuffixHandler, $assets . 'admin/css/alpha-admin' . $rtlSuffix . '.css', [], FLUENT_SUPPORT_VERSION);
+        if (is_rtl()) {
+            wp_enqueue_style('fluent_support_admin_app_rtl', $assets . 'admin/css/alpha-admin-rtl.css', [], FLUENT_SUPPORT_VERSION);
+        } else {
+            wp_enqueue_style('fluent_support_admin_app', Vite::getEnqueuePath('admin/css/alpha-admin.css'), [], FLUENT_SUPPORT_VERSION);
+        }
 
         $agents = Agent::select(['id', 'first_name', 'last_name'])
             ->where('person_type', 'agent')
@@ -333,6 +339,16 @@ class Menu
 
         foreach ($agents as $index => $agent) {
             $agents[$index]['id'] = strval($agent['id']);
+        }
+
+        $agentGroups = AgentGroup::select(['id', 'title', 'settings'])->get();
+        $groupPivots = TagPivot::where('source_type', 'agent_group')->get();
+        foreach ($agentGroups as $group) {
+            $group->agent_ids = $groupPivots->where('tag_id', $group->id)
+                ->pluck('source_id')
+                ->map(function ($id) { return strval($id); })
+                ->values()
+                ->toArray();
         }
 
         $me = Helper::getAgentByUserId(get_current_user_id());
@@ -360,7 +376,7 @@ class Menu
 
         wp_enqueue_script(
             'fluent_support_admin_app_start',
-            $assets . 'admin/js/start.js',
+            Vite::getEnqueuePath('admin/js/start.js'),
             array('jquery'),
             FLUENT_SUPPORT_VERSION,
             true
@@ -368,7 +384,7 @@ class Menu
 
         wp_enqueue_script(
             'fluent_support_global_admin',
-            $assets . 'admin/js/global_admin.js',
+            Vite::getEnqueuePath('admin/js/global_admin.js'),
             array('jquery'),
             FLUENT_SUPPORT_VERSION,
             true
@@ -426,6 +442,7 @@ class Menu
             'lastEntry'                  => '',
             'asset_url'                  => $assets,
             'support_agents'             => $agents,
+            'agent_groups'               => $agentGroups,
             'support_products'           => Product::select(['id', 'title'])->get(),
             'client_priorities'          => Helper::customerTicketPriorities(),
             'ticket_statuses'            => Helper::ticketStatuses(),

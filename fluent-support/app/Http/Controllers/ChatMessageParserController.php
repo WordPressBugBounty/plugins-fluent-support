@@ -3,6 +3,7 @@
 namespace FluentSupport\App\Http\Controllers;
 
 use FluentSupport\Framework\Http\Request\Request;
+use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\ThirdParty\HandleSlackEvent;
 use FluentSupport\App\Services\ThirdParty\HandleTelegramEvent;
 
@@ -33,7 +34,7 @@ class ChatMessageParserController extends Controller
             ]);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage(),
+                'message' => Helper::getSafeErrorMessage($e),
                 'status'  => false
             ]);
         }
@@ -54,7 +55,7 @@ class ChatMessageParserController extends Controller
             ]);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage(),
+                'message' => Helper::getSafeErrorMessage($e),
                 'status'  => false
             ]);
         }

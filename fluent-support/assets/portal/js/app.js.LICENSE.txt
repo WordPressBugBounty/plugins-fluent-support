@@ -1,3 +1,51 @@
+/**
+* @vue/shared v3.5.30
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/reactivity v3.5.30
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/runtime-core v3.5.30
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/runtime-dom v3.5.30
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/compiler-core v3.5.30
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/compiler-dom v3.5.30
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* vue v3.5.30
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/*!
+ * vue-router v4.6.4
+ * (c) 2025 Eduardo San Martin Morote
+ * @license MIT
+ */
+
 /*! Element Plus Icons Vue v2.3.2 */
 
 /**
@@ -14,21 +62,3 @@
  * @internal
  * @license Modernizr 3.0.0pre (Custom Build) | MIT
  */
-
-/**
-* @vue/runtime-core v3.5.25
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-
-/**
-* @vue/runtime-dom v3.5.25
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/
-
-/**
-* @vue/shared v3.5.25
-* (c) 2018-present Yuxi (Evan) You and Vue contributors
-* @license MIT
-**/

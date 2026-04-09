@@ -39,6 +39,11 @@ class Conversation extends Model
         static::deleting(function ($model) {
             //Delete cc info
             Meta::where('object_type', 'response')->where('object_id', $model->id)->delete();
+            // Delete conversation-level attachments — files first, then DB records
+            $class = __NAMESPACE__ . '\Attachment';
+            $attachments = $class::where('conversation_id', $model->id)->get();
+            $class::purgeAttachments($attachments);
+            $class::where('conversation_id', $model->id)->delete();
         });
     }
 

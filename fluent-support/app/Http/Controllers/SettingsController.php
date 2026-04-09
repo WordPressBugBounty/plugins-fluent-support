@@ -11,6 +11,7 @@ use FluentSupport\App\Services\Helper;
 use FluentSupport\Database\Migrations\AIActivityLogsMigrator;
 use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Hooks\Handlers\ReCaptchaHandler;
+use FluentSupport\Framework\Support\Arr;
 
 /**
  *  SettingsController class is responsible for all settings
@@ -128,9 +129,7 @@ class SettingsController extends Controller
         $createPage = $settings['create_portal_page'] == 'yes';
 
         if (!$createPage && empty($settings['portal_page_id'])) {
-            return $this->sendError([
-                'message' => __('Please select a page or enable create page', 'fluent-support')
-            ]);
+            Helper::getSafeErrorMessage(new \Exception(__('Please select a page or enable create page', 'fluent-support')));
         }
 
         if ($createPage) {
@@ -396,7 +395,7 @@ class SettingsController extends Controller
         } catch (\Exception $e) {
             // translators: %s is the error message from the exception
             $translatedMessage = __('An error occurred while saving the settings: %s', 'fluent-support');
-            $errorMessage = sprintf($translatedMessage, $e->getMessage());
+            $errorMessage = sprintf($translatedMessage, Helper::getSafeErrorMessage($e));
 
             return $this->sendError([
                 'message' => $errorMessage,
@@ -731,6 +730,8 @@ class SettingsController extends Controller
     {
         $dropBoxConfigured = false;
         $googleDriveConfigured = false;
+        $cloudflareR2Configured = false;
+        $amazonS3Configured = false;
 
         if (defined('FLUENTSUPPORTPRO')) {
             $dropBoxSettings = Helper::getIntegrationOption('dropbox_settings');
@@ -738,6 +739,12 @@ class SettingsController extends Controller
 
             $googleDriveSettings = Helper::getIntegrationOption('google_drive_settings');
             $googleDriveConfigured = $googleDriveSettings && !empty($googleDriveSettings['access_token']);
+
+            $cloudflareR2Settings = Helper::getIntegrationOption('cloudflare_r2_settings');
+            $cloudflareR2Configured = $cloudflareR2Settings && !empty($cloudflareR2Settings['secret_access_key']) && Arr::get($cloudflareR2Settings, 'status') == 'yes';
+
+            $amazonS3Settings = Helper::getIntegrationOption('amazon_s3_settings');
+            $amazonS3Configured = $amazonS3Settings && !empty($amazonS3Settings['secret_access_key']) && Arr::get($amazonS3Settings, 'status') == 'yes';
         }
 
         $drivers = apply_filters('fluent_support/storage_drivers_info', [
@@ -766,6 +773,26 @@ class SettingsController extends Controller
                 'upgrade_url'   => 'https://fluentsupport.com/pricing',
                 'description'   => __('Upload and store the files to your Google Drive Storage.', 'fluent-support'),
                 'icon'          => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/drive.svg',
+            ],
+            'cloudflare_r2' => [
+                'meta_key'      => 'cloudflare_r2_settings',
+                'title'         => 'Cloudflare R2',
+                'has_config'    => true,
+                'is_configured' => $cloudflareR2Configured,
+                'require_pro'   => !defined('FLUENTSUPPORTPRO'),
+                'upgrade_url'   => 'https://fluentsupport.com/pricing',
+                'description'   => __('Upload and store the files to Cloudflare R2 Storage with zero egress fees.', 'fluent-support'),
+                'icon'          => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/cloudflare-r2.svg',
+            ],
+            'amazon_s3' => [
+                'meta_key'      => 'amazon_s3_settings',
+                'title'         => 'Amazon S3',
+                'has_config'    => true,
+                'is_configured' => $amazonS3Configured,
+                'require_pro'   => !defined('FLUENTSUPPORTPRO'),
+                'upgrade_url'   => 'https://fluentsupport.com/pricing',
+                'description'   => __('Upload and store the files to Amazon S3 cloud storage.', 'fluent-support'),
+                'icon'          => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/amazon-s3.svg',
             ]
         ]);
 
@@ -833,7 +860,6 @@ class SettingsController extends Controller
     public function saveFluentBotSettings(Request $request)
     {
         $data = [
-            'generalApiKey'    => $request->getSafe('generalApiKey', 'sanitize_text_field'),
             'generalBotId'     => $request->getSafe('generalBotId', 'sanitize_text_field'),
             'isEnabled'        => $request->getSafe('isEnabled', 'rest_sanitize_boolean'),
             'productMappings'  => []
@@ -849,7 +875,6 @@ class SettingsController extends Controller
             $data['productMappings'][] = [
                 'productId'    => intval($mapping['productId'] ?? 0),
                 'productTitle' => sanitize_text_field($mapping['productTitle'] ?? ''),
-                'apiKey'       => sanitize_text_field($mapping['apiKey'] ?? ''),
                 'botId'        => sanitize_text_field($mapping['botId'] ?? ''),
             ];
         }

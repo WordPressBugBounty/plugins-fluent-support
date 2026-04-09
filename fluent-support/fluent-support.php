@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Fluent Support
  * Description: The Ultimate Support Plugin For Your WordPress.
- * Version: 2.0.6
+ * Version: 2.1.0
  * Author: WPManageNinja LLC
  * Author URI: https://wpmanageninja.com
  * Plugin URI: https://fluentsupport.com
@@ -11,8 +11,9 @@
  * Domain Path: /language
 */
 
-define('FLUENT_SUPPORT_VERSION', '2.0.6');
-define('FLUENT_SUPPORT_PRO_MIN_VERSION', '2.0.6');
+define('FLUENT_SUPPORT_VERSION', '2.1.0');
+define('FLUENT_SUPPORT_DB_VERSION', '1.0.1');
+define('FLUENT_SUPPORT_PRO_MIN_VERSION', '2.1.0');
 define('FLUENT_SUPPORT_UPLOAD_DIR', 'fluent-support');
 define('FLUENT_SUPPORT_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('FLUENT_SUPPORT_PLUGIN_PATH', plugin_dir_path(__FILE__));

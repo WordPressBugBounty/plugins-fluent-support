@@ -209,7 +209,7 @@ class Person extends Model
             ->first();
         if ($meta) {
             $meta->value = maybe_serialize($metaValue);
-            $meta->update();
+            $meta->save();
         }
 
         if (!$meta) {
@@ -231,12 +231,11 @@ class Person extends Model
             ->delete();
     }
 
-    public function restoreAvatar($person, $id)
+    public function restoreAvatar()
     {
-        $person->where('id', $id)->update([
-            'avatar' => null
-        ]);
+        $this->avatar = null;
+        $this->save();
 
-        return $person;
+        return $this;
     }
 }

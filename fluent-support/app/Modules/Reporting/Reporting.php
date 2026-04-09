@@ -3,11 +3,13 @@
 namespace FluentSupport\App\Modules\Reporting;
 
 use FluentSupport\App\Models\Agent;
+use FluentSupport\App\Models\AgentGroup;
 use FluentSupport\App\Models\Conversation;
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Models\Person;
 use FluentSupport\App\Models\Product;
+use FluentSupport\App\Models\TagPivot;
 use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\Framework\Database\Orm\Builder;
@@ -67,6 +69,10 @@ class Reporting
             if (!empty($filters['mailbox_id'])) {
                 $query->where('mailbox_id', $filters['mailbox_id']);
             }
+
+            if (!empty($filters['agent_ids'])) {
+                $query->whereIn('agent_id', $filters['agent_ids']);
+            }
         }
 
         $items = $query->get();
@@ -115,6 +121,10 @@ class Reporting
             if (!empty($filters['mailbox_id'])) {
                 $query->where('mailbox_id', $filters['mailbox_id']);
             }
+
+            if (!empty($filters['agent_ids'])) {
+                $query->whereIn('agent_id', $filters['agent_ids']);
+            }
         }
 
         $items = $query->get();
@@ -152,6 +162,10 @@ class Reporting
         if ($filters) {
             if (!empty($filters['person_id'])) {
                 $query->where('person_id', $filters['person_id']);
+            }
+
+            if (!empty($filters['person_ids'])) {
+                $query->whereIn('person_id', $filters['person_ids']);
             }
 
             if (!empty($filters['product_id'])) {
@@ -460,6 +474,115 @@ class Reporting
     }
 
     /**
+     * agentGroupSummary method will prepare ticket summary aggregated by agent group
+     * @param false $from
+     * @param false $to
+     * @return mixed
+     */
+    public function agentGroupSummary($from = false, $to = false)
+    {
+        if (!$from) {
+            $from = current_time('Y-m-d');
+        }
+
+        if (!$to) {
+            $to = current_time('Y-m-d');
+        }
+
+        $from .= ' 00:00:00';
+        $to .= ' 23:59:59';
+
+        // Get per-agent stats using the same queries as agentSummary
+        $reports = [];
+
+        $resolves = $this->db()->table('fs_tickets')
+            ->select([
+                $this->db()->raw('COUNT(id) AS count'),
+                'agent_id',
+            ])
+            ->groupBy('agent_id')
+            ->where('status', 'closed')
+            ->whereBetween('resolved_at', [$from, $to])
+            ->get();
+
+        $reports = $this->pushReportData('closed', $resolves, $reports, 'agent_id');
+
+        $openTickets = $this->db()->table('fs_tickets')
+            ->select([
+                $this->db()->raw('COUNT(id) AS count'),
+                'agent_id'
+            ])
+            ->groupBy('agent_id')
+            ->where('status', '!=', 'closed')
+            ->get();
+
+        $reports = $this->pushReportData('opens', $openTickets, $reports, 'agent_id');
+
+        $responses = Conversation::select([
+            $this->db()->raw('COUNT(id) AS count'),
+            $this->db()->raw('person_id as agent_id'),
+        ])
+            ->whereHas('person', function ($q) {
+                $q->where('person_type', '=', 'agent');
+            })
+            ->whereBetween('created_at', [$from, $to])
+            ->where('conversation_type', 'response')
+            ->groupBy('agent_id')
+            ->get();
+
+        $reports = $this->pushReportData('responses', $responses, $reports, 'agent_id');
+
+        foreach ($responses as $response) {
+            $reports[$response->agent_id]['interactions'] = Conversation::where('person_id', $response->agent_id)
+                ->where('conversation_type', 'response')
+                ->whereBetween('created_at', [$from, $to])
+                ->groupBy('ticket_id')
+                ->get()
+                ->count();
+        }
+
+        // Get group -> agent_id mappings
+        $groupAgentMap = TagPivot::where('source_type', 'agent_group')
+            ->select(['tag_id', 'source_id'])
+            ->get()
+            ->groupBy('tag_id');
+
+        // Get all agent groups
+        $groups = AgentGroup::select(['id', 'title'])->get();
+
+        $defaultStats = [
+            'responses'    => 0,
+            'interactions' => 0,
+            'opens'        => 0,
+            'closed'       => 0,
+        ];
+
+        foreach ($groups as $group) {
+            $agentIds = isset($groupAgentMap[$group->id])
+                ? array_map('intval', $groupAgentMap[$group->id]->pluck('source_id')->toArray())
+                : [];
+
+            $group->agents_count = count($agentIds);
+
+            $groupStats = $defaultStats;
+
+            foreach ($agentIds as $agentId) {
+                if (isset($reports[$agentId])) {
+                    $agentStats = wp_parse_args($reports[$agentId], $defaultStats);
+                    $groupStats['responses']    += (int) $agentStats['responses'];
+                    $groupStats['interactions'] += (int) $agentStats['interactions'];
+                    $groupStats['opens']        += (int) $agentStats['opens'];
+                    $groupStats['closed']       += (int) $agentStats['closed'];
+                }
+            }
+
+            $group->stats = $groupStats;
+        }
+
+        return $groups;
+    }
+
+    /**
      * pushReportData method will format the ticket summary report
      * @param $type
      * @param $tickets
@@ -585,27 +708,34 @@ class Reporting
 
     public function getTicketStats($from, $to)
     {
-        $whereClause = '';
-        if ($from && $to) {
-            // Ensure the dates are in the correct format (Y-m-d H:i:s)
-            $start_date = gmdate('Y-m-d 00:00:00', strtotime($from));
-            $end_date = gmdate('Y-m-d 23:59:59', strtotime($to));
-            $escapedStartDate = esc_sql($start_date);
-            $escapedEndDate = esc_sql($end_date);
-            $whereClause = "WHERE created_at BETWEEN '$escapedStartDate' AND '$escapedEndDate'";
-        }
-
         global $wpdb;
 
-        // SQL query to count tickets by day of week and hour within the specified date range
+        $whereClause = '';
+        $queryParams = [];
+
+        if ($from && $to) {
+            $start_date = gmdate('Y-m-d 00:00:00', strtotime($from));
+            $end_date = gmdate('Y-m-d 23:59:59', strtotime($to));
+            $whereClause = 'WHERE created_at BETWEEN %s AND %s';
+            $queryParams[] = $start_date;
+            $queryParams[] = $end_date;
+        }
+
+        // SQL query to count tickets by day of week and hour within the specified date range.
+        // $wpdb->prefix is WordPress-internal; $whereClause is built from hardcoded literals
+        // only — user-supplied date values are bound via %s placeholders in prepare() below.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $query = "SELECT DAYNAME(created_at) AS weekday, HOUR(created_at) AS hour, COUNT(*) AS count
         FROM {$wpdb->prefix}fs_tickets
         {$whereClause}
         GROUP BY DAYNAME(created_at), HOUR(created_at)
         ORDER BY FIELD(DAYNAME(created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), HOUR(created_at)";
 
-        // Execute the query
-        $results = $wpdb->get_results($query);
+        // Execute the query — prepared when date params are present, plain otherwise.
+        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter -- $query structure is hardcoded; values are bound via $wpdb->prepare() when $queryParams is non-empty.
+        $results = $queryParams
+            ? $wpdb->get_results($wpdb->prepare($query, $queryParams)) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            : $wpdb->get_results($query); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
         $fillData = array_fill(0, 24, 0);
         // add :00 on the suffix
@@ -638,38 +768,38 @@ class Reporting
 
     public function getResponseStats($from, $to, $reportType, $agentId = null)
     {
-
         global $wpdb;
 
-        // Escape reportType
-        $escapedReportType = esc_sql($reportType);
-        $whereClause = " AND p.person_type = '" . $escapedReportType . "'";
+        $whereClause = ' AND p.person_type = %s';
+        $queryParams = [$reportType];
 
         if ($from && $to) {
-            // Ensure the dates are in the correct format (Y-m-d H:i:s)
             $start_date = gmdate('Y-m-d 00:00:00', strtotime($from));
             $end_date = gmdate('Y-m-d 23:59:59', strtotime($to));
-            $escapedStartDate = esc_sql($start_date);
-            $escapedEndDate = esc_sql($end_date);
-            $whereClause .= " AND c.created_at BETWEEN '$escapedStartDate' AND '$escapedEndDate'";
+            $whereClause .= ' AND c.created_at BETWEEN %s AND %s';
+            $queryParams[] = $start_date;
+            $queryParams[] = $end_date;
         }
 
         if ($agentId) {
-            // Use intval to ensure agentId is an integer and safe
-            $safeAgentId = intval($agentId);
-            $whereClause .= " AND c.person_id = $safeAgentId";
+            $whereClause .= ' AND c.person_id = %d';
+            $queryParams[] = intval($agentId);
         }
 
         // SQL query to count customer responses by day of week and hour within the specified date range
-        $query = "SELECT DAYNAME(c.created_at) AS weekday, HOUR(c.created_at) AS hour, COUNT(*) AS count
-        FROM {$wpdb->prefix}fs_conversations AS c
-        JOIN {$wpdb->prefix}fs_persons AS p ON c.person_id = p.id
-        WHERE c.conversation_type = 'response'
-          {$whereClause}
-        GROUP BY DAYNAME(c.created_at), HOUR(c.created_at)
-        ORDER BY FIELD(DAYNAME(c.created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), HOUR(c.created_at)";
+        $query = $wpdb->prepare(
+            "SELECT DAYNAME(c.created_at) AS weekday, HOUR(c.created_at) AS hour, COUNT(*) AS count
+            FROM {$wpdb->prefix}fs_conversations AS c
+            JOIN {$wpdb->prefix}fs_persons AS p ON c.person_id = p.id
+            WHERE c.conversation_type = 'response'
+              {$whereClause}
+            GROUP BY DAYNAME(c.created_at), HOUR(c.created_at)
+            ORDER BY FIELD(DAYNAME(c.created_at), 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'), HOUR(c.created_at)",
+            $queryParams
+        );
 
         // Execute the query
+        // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- $query is the output of $wpdb->prepare() above; checker incorrectly traces back through the prepared parameters.
         $results = $wpdb->get_results($query);
 
         $fillData = array_fill(0, 24, 0);

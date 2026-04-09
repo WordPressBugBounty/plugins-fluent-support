@@ -81,7 +81,7 @@ class CleanupHandler
     public function deleteTicketAttachments($ticket)
     {
         $uploadDir = wp_upload_dir();
-        $dir = $uploadDir['basedir'] . FLUENT_SUPPORT_UPLOAD_DIR;
+        $dir = $uploadDir['basedir'] . '/' . FLUENT_SUPPORT_UPLOAD_DIR;
 
         $attachments = Attachment::where('ticket_id', $ticket->id)->get();
 

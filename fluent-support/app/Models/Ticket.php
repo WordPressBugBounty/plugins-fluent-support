@@ -44,7 +44,8 @@ class Ticket extends Model
         'first_response_time',
         'total_close_time',
         'resolved_at',
-        'closed_by'
+        'closed_by',
+        'created_by'
     ];
 
     public static function boot()
@@ -56,7 +57,7 @@ class Ticket extends Model
                 $model->slug = static::slugify($model->title);
             }
 
-            $model->hash = substr(md5(time() . wp_generate_uuid4()), 0, 8) . wp_rand(1, 99);
+            $model->hash = bin2hex(random_bytes(16));
             $model->content_hash = md5($model->content);
 
             $model->last_customer_response = current_time('mysql');
@@ -73,8 +74,13 @@ class Ticket extends Model
             Meta::where('object_type', 'ticket')->where('object_id', $model->id)->delete();
             //Delete draft info
             Meta::where('object_type', '_fs_auto_draft')->where('object_id', $model->id)->delete();
-            //delete the responses first
+            //delete the responses first (their attachments are cleaned up by Conversation::deleting)
             Conversation::deleteAll($model->id);
+            // Delete ticket-level attachments (conversation_id IS NULL) and remove the ticket upload directory
+            $class = __NAMESPACE__ . '\Attachment';
+            $ticketAttachments = $class::where('ticket_id', $model->id)->whereNull('conversation_id')->get();
+            $class::purgeAttachments($ticketAttachments, $model->id);
+            $class::where('ticket_id', $model->id)->whereNull('conversation_id')->delete();
         });
     }
 
@@ -299,6 +305,20 @@ class Ticket extends Model
                         } else {
                             $query->where($filterKey, $filterValue);
                         }
+                    }
+                }
+            } else if ($filterKey == 'agent_group') {
+                $groupIds = is_array($filterValue) ? $filterValue : [$filterValue];
+                $groupIds = array_filter(array_map('intval', $groupIds));
+                if (!empty($groupIds)) {
+                    $agentIds = TagPivot::where('source_type', 'agent_group')
+                        ->whereIn('tag_id', $groupIds)
+                        ->pluck('source_id')
+                        ->toArray();
+                    if ($agentIds) {
+                        $query->whereIn('agent_id', $agentIds);
+                    } else {
+                        $query->whereRaw('1 = 0');
                     }
                 }
             } else if ($filterKey == 'ticket_tags') {
@@ -627,8 +647,7 @@ class Ticket extends Model
 
         return $this->hasMany(
             $class, 'ticket_id', 'id'
-        )->with('person', 'attachments', 'ccinfo')
-            ->orderBy('created_at', 'desc')
+        )->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc');
     }
 
@@ -691,6 +710,15 @@ class Ticket extends Model
 
         return $this->belongsTo(
             $class, 'closed_by', 'id'
+        );
+    }
+
+    public function created_by_person()
+    {
+        $class = __NAMESPACE__ . '\Agent';
+
+        return $this->belongsTo(
+            $class, 'created_by', 'id'
         );
     }
 

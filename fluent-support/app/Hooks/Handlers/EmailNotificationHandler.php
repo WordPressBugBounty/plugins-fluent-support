@@ -23,12 +23,14 @@ class EmailNotificationHandler
         // Let's send welcome email to customer if enabled
         $emailSettings = (new Settings())->getBoxEmailSettings($mailbox, 'ticket_created_email_to_customer');
 
-        if ($emailSettings && $emailSettings['status'] == 'yes') {
+        if ($this->shouldSendEmail($emailSettings, 'ticket_created_email_to_customer', $ticket, $customer)) {
             $subject = apply_filters('fluent_support/parse_smartcode_data', $emailSettings['email_subject'], [
                 'customer' => $customer,
                 'business' => $mailbox,
                 'ticket'   => $ticket
             ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_created_email_to_customer');
 
             $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
                 'customer'   => $customer,
@@ -64,7 +66,9 @@ class EmailNotificationHandler
 
         // let's send email to admin if enabled
         $emailSettings = (new Settings())->getBoxEmailSettings($mailbox, 'ticket_created_email_to_admin');
-        if ($emailSettings && $emailSettings['status'] == 'yes' && is_email($mailbox->settings['admin_email_address'])) {
+        if ($this->shouldSendEmail($emailSettings, 'ticket_created_email_to_admin', $ticket, $customer)
+            && is_email($mailbox->settings['admin_email_address'])
+        ) {
 
             $mailTo = Arr::get($mailbox->settings, 'admin_email_address');
 
@@ -77,6 +81,8 @@ class EmailNotificationHandler
                 'business' => $mailbox,
                 'ticket'   => $ticket
             ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_created_email_to_admin');
 
             $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
                 'customer'   => $customer,
@@ -130,6 +136,10 @@ class EmailNotificationHandler
                 return false;
             }
 
+            if (!$this->shouldSendEmail($emailSettings, 'ticket_replied_by_agent_email_to_customer', $ticket, $customer)) {
+                return false;
+            }
+
             $subject = apply_filters('fluent_support/parse_smartcode_data', $emailSettings['email_subject'], [
                 'customer' => $customer,
                 'business' => $mailbox,
@@ -137,6 +147,8 @@ class EmailNotificationHandler
                 'response' => $response,
                 'agent'    => $agent
             ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_replied_by_agent_email_to_customer');
 
             $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
                 'customer'   => $customer,
@@ -190,6 +202,9 @@ class EmailNotificationHandler
                 return false;
             }
 
+            if (!$this->shouldSendEmail($emailSettings, 'ticket_closed_by_agent_email_to_customer', $ticket, $customer)) {
+                return false;
+            }
 
             $subject = apply_filters('fluent_support/parse_smartcode_data', $emailSettings['email_subject'], [
                 'customer' => $customer,
@@ -197,6 +212,8 @@ class EmailNotificationHandler
                 'ticket'   => $ticket,
                 'agent'    => $agent,
             ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_closed_by_agent_email_to_customer');
 
             $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
                 'customer'   => $customer,
@@ -224,7 +241,7 @@ class EmailNotificationHandler
 
         // Let's send welcome email to customer if enabled
         $emailSettings = (new Settings())->getBoxEmailSettings($mailbox, 'ticket_replied_by_customer_email_to_admin');
-        if ($emailSettings && $emailSettings['status'] == 'yes') {
+        if ($this->shouldSendEmail($emailSettings, 'ticket_replied_by_customer_email_to_admin', $ticket, $customer)) {
 
             $ticket->load('agent');
             $agent = $ticket->agent;
@@ -245,6 +262,8 @@ class EmailNotificationHandler
                 'response' => $response,
                 'agent'    => $agent
             ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_replied_by_customer_email_to_admin');
 
             $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
                 'customer'   => $customer,
@@ -292,7 +311,7 @@ class EmailNotificationHandler
         // Let's send notification email to agent if enabled
         $emailSettings = (new Settings())->getBoxEmailSettings($mailbox, 'ticket_agent_on_change');
 
-        if ($emailSettings && $emailSettings['status'] == 'yes') {
+        if ($this->shouldSendEmail($emailSettings, 'ticket_agent_on_change', $ticket, $agent)) {
 
             if ($agent) {
                 $emailTo = $agent->email;
@@ -308,6 +327,8 @@ class EmailNotificationHandler
                 'agent'    => $agent,
                 'assigner' => $assigner
             ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_agent_on_change');
 
             $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
                 'business'   => $mailbox,
@@ -333,13 +354,15 @@ class EmailNotificationHandler
 
         // Let's send welcome email to customer if enabled
         $emailSettings = (new Settings())->getBoxEmailSettings($mailbox, 'ticket_created_by_agent_email_to_customer');
-        if ($emailSettings && $emailSettings['status'] == 'yes') {
+        if ($this->shouldSendEmail($emailSettings, 'ticket_created_by_agent_email_to_customer', $ticket, $customer)) {
             $subject = apply_filters('fluent_support/parse_smartcode_data', $emailSettings['email_subject'], [
                 'customer' => $customer,
                 'agent'    => $agent,
                 'business' => $mailbox,
                 'ticket'   => $ticket
             ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_created_by_agent_email_to_customer');
 
             $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
                 'customer'   => $customer,
@@ -354,6 +377,64 @@ class EmailNotificationHandler
             $attachments = [];
 
             if ($emailSettings['send_attachments'] == 'yes' && ($files = $ticket->attachments)) {
+                foreach ($files as $file) {
+                    if ($file->driver == 'local') {
+                        $filePath = $file->file_path;
+                    } else {
+                        $filePath = Arr::get($file->settings, 'local_temp_path');
+                    }
+                    if (file_exists($filePath)) {
+                        $attachments[] = $filePath;
+                    }
+                }
+            }
+
+            Mailer::send($customer->email, $subject, $emailBody, $headers, $attachments);
+        }
+    }
+
+    public function ticketCreatedByAgentOnBehalf($response, $ticket, $agent)
+    {
+        $mailbox = $ticket->mailbox;
+
+        if (!$mailbox) {
+            return;
+        }
+
+        $emailSettings = (new Settings())->getBoxEmailSettings($mailbox, 'ticket_created_by_agent_on_behalf_email_to_customer');
+        if ($this->shouldSendEmail($emailSettings, 'ticket_created_by_agent_on_behalf_email_to_customer', $ticket)) {
+
+            $ticket->load('customer');
+            $customer = $ticket->customer;
+
+            if ($customer->status == 'inactive') {
+                return false;
+            }
+
+            $subject = apply_filters('fluent_support/parse_smartcode_data', $emailSettings['email_subject'], [
+                'customer' => $customer,
+                'agent'    => $agent,
+                'business' => $mailbox,
+                'ticket'   => $ticket,
+                'response' => $response
+            ]);
+
+            $subject = apply_filters('fluent_support/ticket_email_subject', $subject, $ticket, 'ticket_created_by_agent_on_behalf_email_to_customer');
+
+            $emailBody = $this->parseEmailBody($emailSettings['email_body'], [
+                'customer'   => $customer,
+                'business'   => $mailbox,
+                'agent'      => $agent,
+                'ticket'     => $ticket,
+                'response'   => $response,
+                'email_type' => 'ticket_created_by_agent_on_behalf_email_to_customer'
+            ]);
+
+            $headers = $mailbox->getMailerHeader();
+
+            $attachments = [];
+
+            if ($emailSettings['send_attachments'] == 'yes' && ($files = $response->attachments)) {
                 foreach ($files as $file) {
                     if ($file->driver == 'local') {
                         $filePath = $file->file_path;
@@ -403,6 +484,15 @@ class EmailNotificationHandler
         $emogrifier = new Emogrifier($emailBody, $this->emailTemplateCss());
         $emogrifier->disableInvisibleNodeRemoval();
         return $emogrifier->emogrify();
+    }
+
+    protected function shouldSendEmail($emailSettings, $emailType, $ticket, $person = null)
+    {
+        if (!$emailSettings || $emailSettings['status'] != 'yes') {
+            return false;
+        }
+
+        return apply_filters('fluent_support/should_send_notification', true, 'email', $emailType, $ticket, $person);
     }
 
     public function getMailerHeaderWithCc($headers, $info)

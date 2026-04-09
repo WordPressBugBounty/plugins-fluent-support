@@ -24,7 +24,6 @@ class ExternalPages
 
         // Rate limiting check
         $this->checkRateLimit();
-
         // Validate required parameter exists and sanitize
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public endpoint uses hash validation instead of nonces
         if (!isset($_REQUEST['fs_view'])) {
@@ -110,11 +109,12 @@ class ExternalPages
             wp_die(esc_html($dieMessage), 'Forbidden', ['response' => 403]);
         }
 
-        //If external file
+        //If external file, redirect to the secure download URL
         if ('local' !== $attachment->driver) {
-            if(!empty($attachment->full_url)){
-                $this->redirectToExternalAttachment($attachment->full_url);
-            }else{
+            $fileUrl = apply_filters('fluent_support/external_attachment_url', $attachment->full_url, $attachment);
+            if (!empty($fileUrl)) {
+                $this->redirectToExternalAttachment($fileUrl);
+            } else {
                 die('File could not be found');
             }
         }
@@ -146,9 +146,9 @@ class ExternalPages
             return false;
         }
 
-        // Use gmdate() instead of date() to avoid timezone issues
-        $sign = md5($attachment->id . gmdate('YmdH'));
-        return $sign === $secureSign;
+        // Use HMAC-SHA256 for secure signature verification
+        $sign = hash_hmac('sha256', $attachment->id . '|' . gmdate('YmdH'), wp_salt('secure_auth'));
+        return hash_equals($sign, $secureSign);
     }
 
     private function handleInvalidTicket()
@@ -291,7 +291,7 @@ class ExternalPages
     private function checkRateLimit()
     {
         $ip = Helper::getIp();
-        $transient_key = 'fs_rate_limit_' . md5($ip);
+        $transient_key = 'fs_rate_limit_' . wp_hash($ip);
         $requests = get_transient($transient_key);
 
         if ($requests === false) {

@@ -34,6 +34,10 @@ class ResponseService
             ]);
         }
 
+        if ($person->person_type == 'agent' && Arr::get($data, 'conversation_type', 'response') == 'response') {
+            $data['content'] = $this->maybeAppendSignature($data['content'], $person);
+        }
+
         $convoType = Arr::get($data, 'conversation_type', 'response');
 
         $content = wp_unslash(wp_kses_post($data['content']));
@@ -229,5 +233,19 @@ class ResponseService
             'ticket'      => $ticket,
             'update_data' => $updateData
         ];
+    }
+
+    private function maybeAppendSignature($content, $person)
+    {
+        if ($person->getMeta('agent_signature_enabled', 'no') !== 'yes') {
+            return $content;
+        }
+
+        $signature = $person->getMeta('agent_signature', '');
+        if (empty(trim(strip_tags($signature)))) {
+            return $content;
+        }
+
+        return $content . '<div class="fs_agent_signature">' . $signature . '</div>';
     }
 }

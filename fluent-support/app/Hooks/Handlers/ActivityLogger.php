@@ -32,12 +32,27 @@ class ActivityLogger
             $customer->last_response_at = current_time('mysql');
             $customer->save();
 
-            $description = sprintf('%1$s created a %2$s via %3$s', $this->getPersonMarkup($customer), $this->getTicketMarkup($ticket), $ticket->source);
+            $agent = Helper::getAgentByUserId();
+
+            if ($agent) {
+                $description = sprintf(
+                    '%1$s created a %2$s on behalf of %3$s',
+                    $this->getPersonMarkup($agent),
+                    $this->getTicketMarkup($ticket),
+                    $this->getPersonMarkup($customer)
+                );
+                $personId = $agent->id;
+                $personType = $agent->person_type;
+            } else {
+                $description = sprintf('%1$s created a %2$s via %3$s', $this->getPersonMarkup($customer), $this->getTicketMarkup($ticket), $ticket->source);
+                $personId = $customer->id;
+                $personType = $customer->person_type;
+            }
 
             $log = [
                 'event_type' => 'fluent_support/ticket_created',
-                'person_id' => $customer->id,
-                'person_type' => $customer->person_type,
+                'person_id' => $personId,
+                'person_type' => $personType,
                 'object_id' => $ticket->id,
                 'object_type' => 'ticket',
                 'description' => $description

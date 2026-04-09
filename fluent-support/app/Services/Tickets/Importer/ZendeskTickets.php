@@ -23,7 +23,7 @@ class ZendeskTickets extends BaseImporter
     private $nextPageUrl = null;
     private $skippedTickets = [];
     private $includeArchived = false;
-    private $lastTicketCreatedAt = null;
+    private $importLimitReached = false;
     private static $personCache = [];
 
     public function stats()
@@ -81,6 +81,7 @@ class ZendeskTickets extends BaseImporter
         if ($page == 1) {
             $this->totalTickets = $this->countTotalTickets();
             update_option('_fs_zendesk_total_tickets', $this->totalTickets, false);
+            $this->cleanupOrphanedOriginIds();
         } else {
             $this->totalTickets = 0;
             // On resume, prefer total from saved migration info (consistent with the saved cursor/page)
@@ -97,9 +98,10 @@ class ZendeskTickets extends BaseImporter
         $tickets = $this->ticketsWithReply();
         $results = $this->migrateTickets($tickets);
 
-        $this->totalPage = $this->limit > 0 ? ceil($this->totalTickets / $this->limit) : 0;
+        $actualPageSize = $this->includeArchived ? 100 : $this->limit;
+        $this->totalPage = $actualPageSize > 0 ? ceil($this->totalTickets / $actualPageSize) : 0;
 
-        $this->hasMore = !empty($this->afterCursor);
+        $this->hasMore = !empty($this->afterCursor) || $this->importLimitReached;
         $progress = $this->getProgress($this->totalTickets);
 
         $response = [
@@ -146,7 +148,6 @@ class ZendeskTickets extends BaseImporter
             $response['message'] = __('All tickets have been imported successfully', 'fluent-support');
             update_option('_fs_migrate_zendesk', current_time('mysql'), 'no');
             delete_option('_fs_zendesk_total_tickets');
-            delete_option('_fs_zendesk_last_ticket_date');
         }
 
         return $response;
@@ -162,7 +163,7 @@ class ZendeskTickets extends BaseImporter
                 $url = $this->nextPageUrl;
             } elseif ($this->includeArchived) {
                 // Search Export API includes archived tickets
-                $url = "{$this->domain}/api/v2/search/export?query=" . urlencode('type:ticket') . "&filter[type]=ticket&page[size]={$this->limit}";
+                $url = $this->buildSearchExportUrl();
                 if ($this->afterCursor) {
                     $url .= '&page[after]=' . urlencode($this->afterCursor);
                 }
@@ -187,14 +188,7 @@ class ZendeskTickets extends BaseImporter
                     $this->afterCursor = null;
                     $this->nextPageUrl = null;
 
-                    // Restart search using date filter from last imported ticket to skip already-processed tickets
-                    $lastCreatedAt = $this->lastTicketCreatedAt ?: get_option('_fs_zendesk_last_ticket_date', '');
-
-                    $query = 'type:ticket';
-                    if ($lastCreatedAt) {
-                        $query .= ' created>=' . gmdate('Y-m-d', strtotime($lastCreatedAt));
-                    }
-                    $url = "{$this->domain}/api/v2/search/export?query=" . urlencode($query) . "&filter[type]=ticket&page[size]={$this->limit}";
+                    $url = $this->buildSearchExportUrl();
                     $tickets = $this->makeRequest($url);
                 } else {
                     throw $e;
@@ -212,6 +206,10 @@ class ZendeskTickets extends BaseImporter
                 $this->afterCursor = null;
                 return [];
             }
+
+            // Save current cursor before reading next page's cursor
+            $previousCursor = $this->afterCursor;
+            $previousNextPageUrl = $this->nextPageUrl;
 
             // Read cursor pagination metadata
             if (isset($tickets->meta->has_more) && $tickets->meta->has_more && !empty($tickets->meta->after_cursor)) {
@@ -231,15 +229,19 @@ class ZendeskTickets extends BaseImporter
 
             foreach ($ticketList as $ticket) {
                 try {
-                    // Track last ticket date for cursor expiration recovery
-                    if (!empty($ticket->created_at)) {
-                        $this->lastTicketCreatedAt = $ticket->created_at;
-                    }
-
                     // Skip already-migrated tickets before making expensive API calls
                     if (in_array(intval($ticket->id), $alreadyMigrated)) {
                         $this->skippedTickets[] = $ticket->id;
                         continue;
+                    }
+
+                    // Cap imports per batch to avoid PHP timeout (30s max_execution_time)
+                    // Remaining unimported tickets will be picked up when this page is re-fetched
+                    if (count($formattedTickets) >= $this->limit) {
+                        $this->afterCursor = $previousCursor;
+                        $this->nextPageUrl = $previousNextPageUrl;
+                        $this->importLimitReached = true;
+                        break;
                     }
 
                     $singleTicketUrl = $this->domain . '/api/v2/tickets/' . $ticket->id . '/comments.json?include=attachments,users';
@@ -273,11 +275,6 @@ class ZendeskTickets extends BaseImporter
                     // Skip this ticket and continue with the rest
                     $this->skippedTickets[] = $ticket->id;
                 }
-            }
-
-            // Save last ticket date once per batch instead of per ticket
-            if ($this->lastTicketCreatedAt) {
-                update_option('_fs_zendesk_last_ticket_date', $this->lastTicketCreatedAt, false);
             }
 
             return $formattedTickets;
@@ -426,6 +423,18 @@ class ZendeskTickets extends BaseImporter
         return $person;
     }
 
+    /**
+     * Build Search Export API URL
+     * Uses a larger page size (100) to reduce scanning overhead for already-imported batches
+     */
+    private function buildSearchExportUrl()
+    {
+        $query = 'type:ticket';
+        $pageSize = 100;
+
+        return "{$this->domain}/api/v2/search/export?query=" . urlencode($query) . "&filter[type]=ticket&page[size]={$pageSize}";
+    }
+
     private function countTotalTickets()
     {
         if ($this->includeArchived) {
@@ -528,6 +537,26 @@ class ZendeskTickets extends BaseImporter
             ->pluck('value');
 
         return array_map('intval', $results->toArray());
+    }
+
+    /**
+     * Remove orphaned origin IDs from fs_meta where the ticket no longer exists in fs_tickets.
+     * This allows re-importing tickets that were previously imported but later deleted.
+     */
+    private function cleanupOrphanedOriginIds()
+    {
+        global $wpdb;
+
+        $metaKey = '_' . $this->handler . '_origin_id';
+
+        $wpdb->query($wpdb->prepare(
+            "DELETE m FROM {$wpdb->prefix}fs_meta m
+             LEFT JOIN {$wpdb->prefix}fs_tickets t ON m.object_id = t.id
+             WHERE m.object_type = 'ticket_meta'
+             AND m.key = %s
+             AND t.id IS NULL",
+            $metaKey
+        ));
     }
 
     public function deleteTickets($page)

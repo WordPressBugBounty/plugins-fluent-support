@@ -46,7 +46,7 @@ class AgentController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -75,7 +75,7 @@ class AgentController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -98,7 +98,7 @@ class AgentController extends Controller
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -127,7 +127,7 @@ class AgentController extends Controller
             return $response;
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -142,7 +142,7 @@ class AgentController extends Controller
             }
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
 
@@ -162,7 +162,7 @@ class AgentController extends Controller
             return $avatarUploder->addOrUpdateProfileImage($request->files(), $request->getSafe('agent_id', 'intval'), 'agent');
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -174,17 +174,17 @@ class AgentController extends Controller
      * @param $agent_id
      * @return array
      */
-    public function resetAvatar(Agent $agent, $agent_id)
+    public function resetAvatar(Agent $agent)
     {
         try {
-            $agent->restoreAvatar($agent, $agent_id);
+            $agent->restoreAvatar();
 
             return [
                 'message' => __('Support Staff avatar reset to gravatar default', 'fluent-support')
             ];
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -222,6 +222,14 @@ class AgentController extends Controller
             'whatsapp_number'  => $request->getSafe('whatsapp_number', 'sanitize_text_field'),
             'restrictions'     => $this->sanitizeRestrictions($request->get('restrictions')),
         ];
+
+        if ($request->has('agent_signature')) {
+            $data['agent_signature'] = wp_kses_post(wp_unslash($request->get('agent_signature', '')));
+        }
+
+        if ($request->has('agent_signature_enabled')) {
+            $data['agent_signature_enabled'] = $request->get('agent_signature_enabled') === 'yes' ? 'yes' : 'no';
+        }
 
         if ($includeEmail) {
             $data['email'] = $request->getSafe('email', 'sanitize_email');

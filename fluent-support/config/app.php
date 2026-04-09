@@ -9,5 +9,5 @@ return [
     'ajax_prefix'    => 'fluent_support-',
     'rest_namespace' => 'fluent-support',
     'rest_version'   => 'v2',
-    'env'            => 'production'
+    'env' => 'production'
 ];

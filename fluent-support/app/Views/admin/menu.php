@@ -41,11 +41,11 @@
                     <?php endforeach; ?>
                 </ul>
 
-                <?php if($secondaryItems): ?>
                 <ul class="fs_nav_menu fs_secondary_menu">
                     <li class="fs_nav_item fs_item_color_mode">
                         <color-mode></color-mode>
                     </li>
+                    <?php if($secondaryItems): ?>
                     <?php foreach ($secondaryItems as $item): ?>
                         <li data-key="<?php echo esc_attr($item['key']); ?>" class="fs_nav_item fs_item_<?php echo esc_attr($item['key']); ?>">
                             <a data-key="<?php echo esc_attr($item['key']); ?>" class="fs_nav_right_item fs_item_<?php echo esc_attr($item['key']); ?>" href="<?php echo esc_url($item['permalink']); ?>">
@@ -59,15 +59,15 @@
                             </a>
                         </li>
                     <?php endforeach; ?>
+                    <?php endif; ?>
                 </ul>
-                <?php endif; ?>
             </div>
 
-            <?php if($secondaryItems): ?>
             <ul class="fs_nav_menu fs_secondary_menu fs_mobile_secondary_menu">
                 <li class="fs_nav_item fs_item_color_mode">
                     <color-mode></color-mode>
                 </li>
+                <?php if($secondaryItems): ?>
                 <?php foreach ($secondaryItems as $item): ?>
                     <li data-key="<?php echo esc_attr($item['key']); ?>" class="fs_nav_item fs_item_<?php echo esc_attr($item['key']); ?>">
                         <a data-key="<?php echo esc_attr($item['key']); ?>" class="fs_nav_right_item fs_item_<?php echo esc_attr($item['key']); ?>" href="<?php echo esc_url($item['permalink']); ?>">
@@ -82,8 +82,8 @@
                         </a>
                     </li>
                 <?php endforeach; ?>
+                <?php endif; ?>
             </ul>
-            <?php endif; ?>
 
             <div class="fs_mobile_menu_container">
                 <div class="fs_offcanvas_menu_overlay" data-fs-offcanvas-menu-overlay></div>

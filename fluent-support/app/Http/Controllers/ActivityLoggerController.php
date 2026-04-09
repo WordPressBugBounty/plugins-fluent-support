@@ -3,6 +3,7 @@
 namespace FluentSupport\App\Http\Controllers;
 
 use FluentSupport\App\Models\Activity;
+use FluentSupport\App\Services\Helper;
 use FluentSupport\Framework\Http\Request\Request;
 
 /**
@@ -34,7 +35,7 @@ class ActivityLoggerController extends Controller
             ] );
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -57,7 +58,7 @@ class ActivityLoggerController extends Controller
             return $activity->updateSettings($settings);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -72,7 +73,7 @@ class ActivityLoggerController extends Controller
             return $activity->getSettings();
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }

@@ -75,7 +75,7 @@ class TicketService
             ]);
         }
 
-        return $person;
+        return $ticket;
     }
 
     public function onAgentChange($ticket, $person)
@@ -191,8 +191,41 @@ class TicketService
             $createdTicket->syncCustomFields($ticketData['custom_fields']);
         }
 
+        $agent = Helper::getAgentByUserId();
+        if ($agent) {
+            $isAgentInitiated = Arr::get($ticketData, 'agent_initiated') === 'yes';
+            $createdTicket->created_by = $agent->id;
+
+            if ($isAgentInitiated) {
+                // Skip all ticket creation emails for agent-initiated tickets
+                add_filter('fluent_support/should_send_notification', function ($shouldSend, $channel, $type) {
+                    if ($channel === 'email' && in_array($type, ['ticket_created_email_to_customer', 'ticket_created_email_to_admin', 'ticket_created_by_agent_email_to_customer'])) {
+                        return false;
+                    }
+                    return $shouldSend;
+                }, 10, 3);
+
+                $initializedMessage = $agent->full_name . __(' initialized this ticket', 'fluent-support');
+
+                // Agent response: actual ticket content — sends reply email to customer
+                $agentResponse = Conversation::create([
+                    'ticket_id'         => $createdTicket->id,
+                    'person_id'         => $agent->id,
+                    'conversation_type' => 'response',
+                    'content'           => $createdTicket->content
+                ]);
+
+                do_action('fluent_support/agent_initiated_ticket_response', $agentResponse, $createdTicket, $agent);
+
+                $createdTicket->content = $initializedMessage;
+
+            }
+
+            $createdTicket->save();
+        }
+
         do_action('fluent_support/ticket_created', $createdTicket, $customer);
-        do_action('fluent_support/ticket_created_behalf_of_customer', $createdTicket, $customer, Helper::getAgentByUserId());
+        do_action('fluent_support/ticket_created_behalf_of_customer', $createdTicket, $customer, $agent);
 
         return $createdTicket;
     }

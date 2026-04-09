@@ -29,7 +29,7 @@ class AIActivityLoggerController extends Controller
             ] );
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -50,7 +50,7 @@ class AIActivityLoggerController extends Controller
             return Helper::updateAISettings($settings);
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
@@ -65,7 +65,7 @@ class AIActivityLoggerController extends Controller
             return Helper::getSettings();
         } catch (\Exception $e) {
             return $this->sendError([
-                'message' => $e->getMessage()
+                'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
     }
