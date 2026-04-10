@@ -29,7 +29,7 @@ class AdminBarHandler
         wp_enqueue_script('fst_global_summary', Vite::getEnqueuePath('admin/js/global_summary.js'), ['jquery'], FLUENT_SUPPORT_VERSION);
 
         if (!Vite::isServingFromDevServer()) {
-            wp_enqueue_style('fluent_support_vendor', Vite::getEnqueuePath('admin/css/style.css'), [], FLUENT_SUPPORT_VERSION);
+            wp_enqueue_style('fluent_support_admin_app', Vite::getEnqueuePath('admin/css/alpha-admin.css'), [], FLUENT_SUPPORT_VERSION);
         }
 
         wp_localize_script('fst_global_summary', 'fst_bar_vars', [

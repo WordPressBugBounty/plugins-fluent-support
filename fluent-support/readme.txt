@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,11 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.1.1 (Date: April 10, 2026) =
+* Fixed an issue where the global ticket summary was not rendering outside Fluent Support pages
+* Fixed Slack notification sending issue (Pro)
+* Fixed activity log staff filter dropdown collapsing issue
 
 = 2.1.0 (Date: April 09, 2026) =
 * Added Agent Groups to organize support teams and enable smart ticket distribution
