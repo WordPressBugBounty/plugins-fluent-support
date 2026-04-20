@@ -382,7 +382,7 @@ class ReportingController extends Controller
         };
 
         $newTickets = $countTickets('new');
-        $closedTickets = $countTickets('closed');
+        $closedTickets = $countTickets('closed', 'resolved_at');
 
         $openQuery = clone $baseQuery;
         $openQuery->where('status', '!=', 'closed');

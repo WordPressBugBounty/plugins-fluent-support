@@ -51,7 +51,9 @@ class TicketsMigrator
                 INDEX `idx_product_id` (`product_id`),
                 INDEX `idx_priority` (`priority`),
                 INDEX `idx_status` (`status`),
-                INDEX `idx_created_at` (`created_at`)
+                INDEX `idx_created_at` (`created_at`),
+                INDEX `idx_resolved_at` (`resolved_at`),
+                INDEX `idx_status_resolved_at` (`status`, `resolved_at`)
             ) $charsetCollate;";
             $created = dbDelta($sql);
             return $created;
@@ -110,23 +112,26 @@ class TicketsMigrator
             $existing_index_names[] = $index->Key_name;
         }
 
-        // Desired indexes — keys and values are all hardcoded string literals.
+        // Desired indexes — keys and values (including composite column lists) are
+        // all hardcoded string literals; no user input reaches these queries.
         $indexes = [
-            'idx_customer_id' => 'customer_id',
-            'idx_agent_id'    => 'agent_id',
-            'idx_mailbox_id'  => 'mailbox_id',
-            'idx_product_id'  => 'product_id',
-            'idx_priority'    => 'priority',
-            'idx_status'      => 'status',
-            'idx_created_at'  => 'created_at',
+            'idx_customer_id'      => '`customer_id`',
+            'idx_agent_id'         => '`agent_id`',
+            'idx_mailbox_id'       => '`mailbox_id`',
+            'idx_product_id'       => '`product_id`',
+            'idx_priority'         => '`priority`',
+            'idx_status'           => '`status`',
+            'idx_created_at'       => '`created_at`',
+            'idx_resolved_at'      => '`resolved_at`',
+            'idx_status_resolved_at' => '`status`, `resolved_at`',
         ];
 
         // Add missing indexes. $table is esc_sql()'d above; $index_name and
-        // $column_name are hardcoded array literals — no user input reaches this query.
-        foreach ($indexes as $index_name => $column_name) {
+        // $columns are hardcoded array literals — no user input reaches this query.
+        foreach ($indexes as $index_name => $columns) {
             if (!in_array($index_name, $existing_index_names)) {
                 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- all identifiers are either esc_sql()'d or hardcoded literals.
-                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` (`{$column_name}`)");
+                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` ({$columns})");
             }
         }
     }

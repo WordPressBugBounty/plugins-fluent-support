@@ -215,6 +215,18 @@ class TicketService
                     'content'           => $createdTicket->content
                 ]);
 
+                if ($attachmentHashes = Arr::get($ticketData, 'attachments', [])) {
+                    Attachment::where('ticket_id', $createdTicket->id)
+                        ->whereIn('file_hash', $attachmentHashes)
+                        ->where('status', 'active')
+                        ->update([
+                            'person_id'       => $agentResponse->person_id,
+                            'conversation_id' => $agentResponse->id
+                        ]);
+
+                    $agentResponse->load('attachments');
+                }
+
                 do_action('fluent_support/agent_initiated_ticket_response', $agentResponse, $createdTicket, $agent);
 
                 $createdTicket->content = $initializedMessage;

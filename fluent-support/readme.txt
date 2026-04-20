@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 6.9
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,15 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.1.2 (Date: April 20, 2026) =
+* Simplified image upload flow: the Create/Reply button now appears only after the upload is complete.
+* Enabled attachments for ticket emails, including Agent-created tickets and Agent-initiated tickets.
+* Fixed an issue where alpha-admin.css was loading on all admin pages when the ticket summary feature was enabled.
+* Fixed inaccurate Personal Report metrics; all ticket closures and replies are now correctly counted regardless of assignment.
+* Fixed admin UI styling to properly align the Fluent Support canvas within the admin interface.
+* Prevented duplicate shortcode copy notifications in settings.
+* Improved dark mode UI consistency by enhancing blocked status warning visibility, fixing Reply/Close button state styling, and improving icon contrast with standardized dropdown icon styling.
 
 = 2.1.1 (Date: April 10, 2026) =
 * Fixed an issue where the global ticket summary was not rendering outside Fluent Support pages

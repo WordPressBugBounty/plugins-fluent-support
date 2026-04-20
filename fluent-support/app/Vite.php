@@ -184,7 +184,7 @@ class Vite
     }
 
     // CSS files that are standalone entry outputs (NOT merged into style.css).
-    // Everything else from Vite chunk splitting is merged into admin/css/style.css.
+    // Everything else from Vite chunk splitting is merged into admin/css/alpha-admin.css.
     private array $standaloneCssPaths = [
         'admin/css/alpha-admin.css',
         'portal/css/app.css',
@@ -433,7 +433,7 @@ class Vite
         $cssMap = [
             'admin/css/alpha-admin.css' => 'scss/alpha-admin.scss',
             'portal/css/app.css'        => 'customer_portal/app.scss',
-            'admin/css/all_public.css'   => 'scss/all_public.scss',
+            'admin/css/all_public.css'  => 'scss/all_public.scss',
         ];
 
         $jsMap = [
@@ -471,7 +471,7 @@ class Vite
 
             'admin/css/alpha-admin.css' => 'scss/alpha-admin.scss',
             'portal/css/app.css'        => 'customer_portal/app.scss',
-            'admin/css/all_public.css'   => 'scss/all_public.scss',
+            'admin/css/all_public.css'  => 'scss/all_public.scss',
         ];
 
         if (isset($pathMap[$path])) {

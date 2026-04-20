@@ -434,7 +434,15 @@ class EmailNotificationHandler
 
             $attachments = [];
 
-            if ($emailSettings['send_attachments'] == 'yes' && ($files = $response->attachments)) {
+            if ($emailSettings['send_attachments'] == 'yes') {
+                $files = $response->attachments;
+
+                // Agent-initiated ticket uploads are stored on the ticket, while this email
+                // is rendered from the synthetic first response created during ticket creation.
+                if ((!$files || $files->isEmpty()) && $ticket->attachments) {
+                    $files = $ticket->attachments;
+                }
+
                 foreach ($files as $file) {
                     if ($file->driver == 'local') {
                         $filePath = $file->file_path;

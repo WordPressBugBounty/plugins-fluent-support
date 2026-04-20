@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Fluent Support\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-09 10:09+0000\n"
+"POT-Creation-Date: 2026-04-20 12:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -215,7 +215,7 @@ msgstr ""
 
 #: app/Services/TranslationStrings.php:42
 #: app/Services/EmailNotification/Settings.php:259
-#: app/Hooks/Handlers/AdminBarHandler.php:95
+#: app/Hooks/Handlers/AdminBarHandler.php:91
 msgid "Action"
 msgstr ""
 
@@ -294,7 +294,7 @@ msgid "Add Another Action"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:53
-#: app/Services/TranslationStrings.php:981
+#: app/Services/TranslationStrings.php:986
 msgid "Add Attachment"
 msgstr ""
 
@@ -306,7 +306,7 @@ msgstr ""
 msgid "Add Business Inbox"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:960
+#: app/Services/TranslationStrings.php:965
 msgid ""
 "Add custom fields to your tickets and collect extra data from ticket open "
 "form."
@@ -372,7 +372,7 @@ msgstr ""
 msgid "Add Tags"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:946
+#: app/Services/TranslationStrings.php:951
 msgid ""
 "Add Tags and segment your tickets by tags filter then you can also do bulk "
 "actions"
@@ -430,7 +430,7 @@ msgstr ""
 msgid "Additional Info"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:982
+#: app/Services/TranslationStrings.php:987
 msgid "Additional info"
 msgstr ""
 
@@ -438,7 +438,7 @@ msgstr ""
 msgid "Address"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:886
+#: app/Services/TranslationStrings.php:891
 msgid "address available"
 msgstr ""
 
@@ -480,7 +480,7 @@ msgstr ""
 msgid "Advanced filter"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:889
+#: app/Services/TranslationStrings.php:894
 msgid "afternoon"
 msgstr ""
 
@@ -541,7 +541,7 @@ msgstr ""
 msgid "Agent is restricted for this mailbox ticket"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:891
+#: app/Services/TranslationStrings.php:896
 msgid "Agent Job Title( ex: Developer, Support Staff )"
 msgstr ""
 
@@ -618,7 +618,7 @@ msgid "AI Intelligence"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:109
-#: app/Services/TranslationStrings.php:983
+#: app/Services/TranslationStrings.php:988
 msgid "All"
 msgstr ""
 
@@ -657,7 +657,7 @@ msgid "All Product"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:115
-#: app/Services/TranslationStrings.php:984
+#: app/Services/TranslationStrings.php:989
 msgid "All Products"
 msgstr ""
 
@@ -682,7 +682,7 @@ msgid "All ticket moves to the selected Business"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:117
-#: app/Services/TranslationStrings.php:985
+#: app/Services/TranslationStrings.php:990
 msgid "All Tickets"
 msgstr ""
 
@@ -736,7 +736,7 @@ msgstr ""
 msgid "AND"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:893
+#: app/Services/TranslationStrings.php:898
 msgid "and"
 msgstr ""
 
@@ -761,7 +761,7 @@ msgid "App Secret"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:127
-#: app/Services/TranslationStrings.php:986
+#: app/Services/TranslationStrings.php:991
 msgid "Apply"
 msgstr ""
 
@@ -793,15 +793,15 @@ msgstr ""
 msgid "Approve Draft Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:894
+#: app/Services/TranslationStrings.php:899
 msgid "are waiting for reply with"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:908
+#: app/Services/TranslationStrings.php:913
 msgid "Are you sure to delete this Action?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:890
+#: app/Services/TranslationStrings.php:895
 msgid "Are you sure to delete this agent? All associated data will be deleted"
 msgstr ""
 
@@ -811,15 +811,15 @@ msgid ""
 "with this customer"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:940
+#: app/Services/TranslationStrings.php:945
 msgid "Are you sure to delete this product?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:953
+#: app/Services/TranslationStrings.php:958
 msgid "Are you sure to delete this tag?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:944
+#: app/Services/TranslationStrings.php:949
 msgid "Are you sure to delete this template?"
 msgstr ""
 
@@ -841,11 +841,11 @@ msgid ""
 "have to change all your used webhook"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:967
+#: app/Services/TranslationStrings.php:972
 msgid "Are you sure to remove this bookmark?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:950
+#: app/Services/TranslationStrings.php:955
 msgid "Are you sure want to set this business box for webhook?"
 msgstr ""
 
@@ -857,11 +857,11 @@ msgstr ""
 msgid "Are you sure you want to merge these tickets?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:901
+#: app/Services/TranslationStrings.php:906
 msgid "Are you sure, you want to close selected tickets?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:909
+#: app/Services/TranslationStrings.php:914
 msgid "Are you sure, you want to delete selected tickets?"
 msgstr ""
 
@@ -870,7 +870,7 @@ msgid "Are You Sure? You can not undo this action."
 msgstr ""
 
 #: app/Services/TranslationStrings.php:142
-#: app/Services/TranslationStrings.php:987
+#: app/Services/TranslationStrings.php:992
 msgid "Ascending"
 msgstr ""
 
@@ -930,7 +930,7 @@ msgstr ""
 msgid "Assigner Last Name"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:934
+#: app/Services/TranslationStrings.php:939
 msgid "At this moment you don't have any bookmarked tickets."
 msgstr ""
 
@@ -975,7 +975,7 @@ msgstr ""
 msgid "Available Shortcodes"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:895
+#: app/Services/TranslationStrings.php:900
 msgid "average"
 msgstr ""
 
@@ -1003,7 +1003,7 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:988
+#: app/Services/TranslationStrings.php:993
 msgid "Back to All Tickets"
 msgstr ""
 
@@ -1011,7 +1011,7 @@ msgstr ""
 msgid "BetterDocs"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:896
+#: app/Services/TranslationStrings.php:901
 msgid "billing"
 msgstr ""
 
@@ -1028,7 +1028,7 @@ msgstr ""
 msgid "Blocked"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:897
+#: app/Services/TranslationStrings.php:902
 msgid ""
 "Bookmarking tickets is a pro feature. Please upgrade to Fluent Support Pro "
 "to use this feature"
@@ -1046,7 +1046,7 @@ msgstr ""
 msgid "Browse File"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:989
+#: app/Services/TranslationStrings.php:994
 msgid "Browse Files"
 msgstr ""
 
@@ -1133,11 +1133,11 @@ msgstr ""
 msgid "Business name"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:898
+#: app/Services/TranslationStrings.php:903
 msgid "button to get the authorization code."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1029
+#: app/Services/TranslationStrings.php:1034
 msgid "by"
 msgstr ""
 
@@ -1157,7 +1157,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:900
+#: app/Services/TranslationStrings.php:905
 msgid "cancel"
 msgstr ""
 
@@ -1205,7 +1205,7 @@ msgstr ""
 msgid "Click Here to Renew your License"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:990
+#: app/Services/TranslationStrings.php:995
 msgid "Click Here to Write a reply"
 msgstr ""
 
@@ -1230,7 +1230,7 @@ msgid "Close Selected Tickets"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:206
-#: app/Services/TranslationStrings.php:991
+#: app/Services/TranslationStrings.php:996
 msgid "Close Ticket"
 msgstr ""
 
@@ -1239,12 +1239,12 @@ msgid "Close Ticket Silently"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:208
-#: app/Services/TranslationStrings.php:992 app/Services/Helper.php:122
+#: app/Services/TranslationStrings.php:997 app/Services/Helper.php:122
 #: app/Services/Helper.php:705
 msgid "Closed"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:902
+#: app/Services/TranslationStrings.php:907
 msgid "closed"
 msgstr ""
 
@@ -1274,11 +1274,11 @@ msgstr ""
 msgid "Complete Signup"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:993
+#: app/Services/TranslationStrings.php:998
 msgid "Completed"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:903
+#: app/Services/TranslationStrings.php:908
 msgid "completed"
 msgstr ""
 
@@ -1330,7 +1330,7 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:904
+#: app/Services/TranslationStrings.php:909
 msgid "confirm"
 msgstr ""
 
@@ -1389,7 +1389,7 @@ msgstr ""
 msgid "Content is required"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:994
+#: app/Services/TranslationStrings.php:999
 msgid "Conversation"
 msgstr ""
 
@@ -1425,7 +1425,7 @@ msgstr ""
 msgid "Could not find a contact?"
 msgstr ""
 
-#: app/Hooks/Handlers/AdminBarHandler.php:94
+#: app/Hooks/Handlers/AdminBarHandler.php:90
 msgid "Count"
 msgstr ""
 
@@ -1469,7 +1469,7 @@ msgstr ""
 msgid "Create Customer"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:951
+#: app/Services/TranslationStrings.php:956
 msgid ""
 "Create Multiple Shared inbox and connect your email inbox with Fluent Support"
 msgstr ""
@@ -1494,7 +1494,7 @@ msgstr ""
 msgid "Create New User in WordPress"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:905
+#: app/Services/TranslationStrings.php:910
 msgid "Create reply templates and quickly send responses to the tickets."
 msgstr ""
 
@@ -1512,8 +1512,8 @@ msgid "Create Task"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:248
-#: app/Services/TranslationStrings.php:1028
-#: app/Services/TranslationStrings.php:1031
+#: app/Services/TranslationStrings.php:1033
+#: app/Services/TranslationStrings.php:1036
 msgid "Create Ticket"
 msgstr ""
 
@@ -1526,7 +1526,7 @@ msgstr ""
 msgid "Created At"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:995
+#: app/Services/TranslationStrings.php:1000
 msgid "Created at"
 msgstr ""
 
@@ -1538,7 +1538,7 @@ msgstr ""
 msgid "Created On"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1032
+#: app/Services/TranslationStrings.php:1037
 msgid "created this ticket on your behalf"
 msgstr ""
 
@@ -1721,7 +1721,7 @@ msgid "Dashboard"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:282
-#: app/Services/TranslationStrings.php:996
+#: app/Services/TranslationStrings.php:1001
 msgid "Date"
 msgstr ""
 
@@ -1782,7 +1782,7 @@ msgid "Deleting..."
 msgstr ""
 
 #: app/Services/TranslationStrings.php:294
-#: app/Services/TranslationStrings.php:997
+#: app/Services/TranslationStrings.php:1002
 msgid "Descending"
 msgstr ""
 
@@ -1939,7 +1939,7 @@ msgstr ""
 msgid "Edit Tag"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:910
+#: app/Services/TranslationStrings.php:915
 msgid "eg: Awesome Business Inc"
 msgstr ""
 
@@ -1981,7 +1981,7 @@ msgstr ""
 msgid "Email is required"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:913
+#: app/Services/TranslationStrings.php:918
 msgid "Email Marketing Automation, Newsletter and CRM Plugin for WordPress"
 msgstr ""
 
@@ -2042,7 +2042,7 @@ msgstr ""
 msgid "Enable signature for this agent"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:915
+#: app/Services/TranslationStrings.php:920
 msgid "Enable This Email Notification"
 msgstr ""
 
@@ -2098,11 +2098,11 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:916
+#: app/Services/TranslationStrings.php:921
 msgid "estimated"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:917
+#: app/Services/TranslationStrings.php:922
 msgid "evening"
 msgstr ""
 
@@ -2126,7 +2126,7 @@ msgstr ""
 msgid "Export Agents Summary"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:998
+#: app/Services/TranslationStrings.php:1003
 msgid "Failed"
 msgstr ""
 
@@ -2134,7 +2134,7 @@ msgstr ""
 msgid "Failed to copy shortcode"
 msgstr ""
 
-#: app/Http/Controllers/FluentBoardsController.php:81
+#: app/Http/Controllers/FluentBoardsController.php:83
 msgid "Failed to create task."
 msgstr ""
 
@@ -2190,7 +2190,7 @@ msgstr ""
 msgid "Field Value Options"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:920
+#: app/Services/TranslationStrings.php:925
 msgid "field."
 msgstr ""
 
@@ -2222,12 +2222,12 @@ msgstr ""
 msgid "File Upload Integrations"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:921
+#: app/Services/TranslationStrings.php:926
 msgid "files"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:892
-#: app/Services/TranslationStrings.php:1027
+#: app/Services/TranslationStrings.php:897
+#: app/Services/TranslationStrings.php:1032
 msgid ""
 "Files with a size less than 2MB. Supported Types: images, text, pdf, zip"
 msgstr ""
@@ -2240,7 +2240,7 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:933
+#: app/Services/TranslationStrings.php:938
 msgid ""
 "Filter and select specific ticket and move these to another mailbox easily"
 msgstr ""
@@ -2341,7 +2341,7 @@ msgstr ""
 msgid "Fluent Support Personal Data Eraser"
 msgstr ""
 
-#: app/Hooks/Handlers/AdminBarHandler.php:79
+#: app/Hooks/Handlers/AdminBarHandler.php:75
 msgid "Fluent Support Stats"
 msgstr ""
 
@@ -2456,7 +2456,7 @@ msgstr ""
 msgid "Get Authorized"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:922
+#: app/Services/TranslationStrings.php:927
 msgid "Get Overall reports of all the support agents and their performance"
 msgstr ""
 
@@ -2533,7 +2533,7 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:923
+#: app/Services/TranslationStrings.php:928
 msgid "has been deprecated. Switched to"
 msgstr ""
 
@@ -2667,7 +2667,7 @@ msgid ""
 "submit a ticket or any response."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1040
+#: app/Services/TranslationStrings.php:1045
 msgid "If you still have related issues. Please reopen this ticket and reply"
 msgstr ""
 
@@ -2697,11 +2697,11 @@ msgstr ""
 msgid "Importing..."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:924
+#: app/Services/TranslationStrings.php:929
 msgid "in one click."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:925
+#: app/Services/TranslationStrings.php:930
 msgid ""
 "in your HelpScout Redirection URL. This is required as you have to authorize "
 "your app before start importing."
@@ -2723,7 +2723,7 @@ msgstr ""
 msgid "Inbox Settings"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:918
+#: app/Services/TranslationStrings.php:923
 msgid "Include Agents in Summary"
 msgstr ""
 
@@ -2751,7 +2751,7 @@ msgstr ""
 msgid "Insert Content"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:927
+#: app/Services/TranslationStrings.php:932
 msgid "Install & Activate FluentCRM (it's free)"
 msgstr ""
 
@@ -2763,7 +2763,7 @@ msgstr ""
 msgid "Installation has been completed"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:928
+#: app/Services/TranslationStrings.php:933
 msgid ""
 "Integrate your support customers with FluentCRM to segment, automate your "
 "email marketing."
@@ -2851,7 +2851,7 @@ msgstr ""
 msgid "IP Address"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:914
+#: app/Services/TranslationStrings.php:919
 msgid ""
 "is a Self Hosted Email Marketing Automation Plugin for WordPress. Manage "
 "your leads and customers, email campaigns, automated email sequencing, "
@@ -2990,11 +2990,11 @@ msgstr ""
 msgid "Loading Customer Portal. Please wait..."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:999
+#: app/Services/TranslationStrings.php:1004
 msgid "Log Out"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:929
+#: app/Services/TranslationStrings.php:934
 msgid "logged"
 msgstr ""
 
@@ -3014,7 +3014,7 @@ msgstr ""
 msgid "Login Form"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:907
+#: app/Services/TranslationStrings.php:912
 msgid "Looks like you have caught up everything for now"
 msgstr ""
 
@@ -3086,7 +3086,7 @@ msgstr ""
 msgid "Manual Trigger"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:930
+#: app/Services/TranslationStrings.php:935
 msgid "manual workflow"
 msgstr ""
 
@@ -3106,7 +3106,7 @@ msgstr ""
 msgid "Max File Size (in MegaByte)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:931
+#: app/Services/TranslationStrings.php:936
 msgid "max wait time"
 msgstr ""
 
@@ -3187,7 +3187,7 @@ msgstr ""
 msgid "More Actions"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:932
+#: app/Services/TranslationStrings.php:937
 msgid "morning"
 msgstr ""
 
@@ -3343,7 +3343,7 @@ msgid "No Thanks"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:508
-#: app/Services/TranslationStrings.php:1000
+#: app/Services/TranslationStrings.php:1005
 msgid "No tickets found"
 msgstr ""
 
@@ -3352,7 +3352,7 @@ msgid "No workflows selected for deletion."
 msgstr ""
 
 #: app/Services/TranslationStrings.php:510
-#: app/Services/TranslationStrings.php:1001 app/Services/Helper.php:60
+#: app/Services/TranslationStrings.php:1006 app/Services/Helper.php:60
 #: app/Services/Helper.php:74
 msgid "Normal"
 msgstr ""
@@ -3406,8 +3406,8 @@ msgstr ""
 msgid "Number of tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:935
-#: app/Services/TranslationStrings.php:1036
+#: app/Services/TranslationStrings.php:940
+#: app/Services/TranslationStrings.php:1041
 msgid "of"
 msgstr ""
 
@@ -3425,11 +3425,11 @@ msgstr ""
 msgid "Only %s files are allowed."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1026
+#: app/Services/TranslationStrings.php:1031
 msgid "Only you and official support agents can view this conversation"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1002
+#: app/Services/TranslationStrings.php:1007
 msgid "Open"
 msgstr ""
 
@@ -3466,11 +3466,11 @@ msgstr ""
 msgid "OR"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:936
+#: app/Services/TranslationStrings.php:941
 msgid "or"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:937
+#: app/Services/TranslationStrings.php:942
 msgid "or contact support for assistance."
 msgstr ""
 
@@ -3482,7 +3482,7 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:938
+#: app/Services/TranslationStrings.php:943
 msgid "out of"
 msgstr ""
 
@@ -3503,11 +3503,11 @@ msgid "Overview"
 msgstr ""
 
 #: app/Services/TranslationStrings.php:535
-#: app/Services/TranslationStrings.php:1003
+#: app/Services/TranslationStrings.php:1008
 msgid "Page"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1037
+#: app/Services/TranslationStrings.php:1042
 msgid "page"
 msgstr ""
 
@@ -3611,7 +3611,7 @@ msgstr ""
 msgid "Please copy and paste this url:"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1035
+#: app/Services/TranslationStrings.php:1040
 msgid "Please do not share any private information."
 msgstr ""
 
@@ -3643,7 +3643,7 @@ msgstr ""
 msgid "Please let us know your invoice number"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:912
+#: app/Services/TranslationStrings.php:917
 msgid "Please make sure your website can send emails from this email address"
 msgstr ""
 
@@ -3684,7 +3684,7 @@ msgid ""
 "Please provide a valid verification code that was sent to your email address"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1034
+#: app/Services/TranslationStrings.php:1039
 msgid "Please provide details about your problem"
 msgstr ""
 
@@ -3713,7 +3713,7 @@ msgstr ""
 msgid "Please provide search string"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:887
+#: app/Services/TranslationStrings.php:892
 msgid ""
 "Please provide the email address where admin will get email if enabled in "
 "email settings"
@@ -3779,11 +3779,11 @@ msgstr ""
 msgid "Please select tag first"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:948
+#: app/Services/TranslationStrings.php:953
 msgid "Please select the business in where you want to move the tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:947
+#: app/Services/TranslationStrings.php:952
 msgid ""
 "Please select the fallback business in where the existing tickets will be "
 "transferred"
@@ -3801,6 +3801,30 @@ msgstr ""
 msgid "Please verify reCAPTCHA before saving."
 msgstr ""
 
+#: app/Services/TranslationStrings.php:574
+msgid ""
+"Please wait for all attachments to finish uploading before creating the "
+"ticket."
+msgstr ""
+
+#: app/Services/TranslationStrings.php:575
+msgid ""
+"Please wait for all attachments to finish uploading before submitting the "
+"reply."
+msgstr ""
+
+#: app/Services/TranslationStrings.php:576
+msgid ""
+"Please wait for the attachment to finish uploading before creating the "
+"ticket."
+msgstr ""
+
+#: app/Services/TranslationStrings.php:577
+msgid ""
+"Please wait for the attachment to finish uploading before submitting the "
+"reply."
+msgstr ""
+
 #: app/Services/EmailNotification/Settings.php:131
 msgid "Portal Page"
 msgstr ""
@@ -3810,56 +3834,56 @@ msgstr ""
 msgid "Powerful platform for any member-focused business"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:574
+#: app/Services/TranslationStrings.php:578
 msgid "Preferred Product"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:575
+#: app/Services/TranslationStrings.php:579
 msgid "Press enter to save"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:576
+#: app/Services/TranslationStrings.php:580
 msgid "Preview"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:577
+#: app/Services/TranslationStrings.php:581
 msgid "Previous Conversations"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:578
+#: app/Services/TranslationStrings.php:582
 msgid "Priority"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1038
+#: app/Services/TranslationStrings.php:1043
 msgid "priority"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:579
+#: app/Services/TranslationStrings.php:583
 msgid "Priority (Customer)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1004
+#: app/Services/TranslationStrings.php:1009
 msgid "Private"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1005
+#: app/Services/TranslationStrings.php:1010
 msgid "Processing"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:580
+#: app/Services/TranslationStrings.php:584
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:117
 msgid "Product"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:581
+#: app/Services/TranslationStrings.php:585
 msgid "Product Description"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:582
+#: app/Services/TranslationStrings.php:586
 msgid "Product Distribution by Responses"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:583
+#: app/Services/TranslationStrings.php:587
 msgid "Product Distribution by Tickets"
 msgstr ""
 
@@ -3875,7 +3899,7 @@ msgstr ""
 msgid "Product has been updated"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:584
+#: app/Services/TranslationStrings.php:588
 msgid "Product ID"
 msgstr ""
 
@@ -3883,19 +3907,19 @@ msgstr ""
 msgid "Product is required"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:585
+#: app/Services/TranslationStrings.php:589
 msgid "Product Reports"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:586
+#: app/Services/TranslationStrings.php:590
 msgid "Product Statistics"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:587
+#: app/Services/TranslationStrings.php:591
 msgid "Product Summary"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:588
+#: app/Services/TranslationStrings.php:592
 msgid "Product Title"
 msgstr ""
 
@@ -3903,23 +3927,23 @@ msgstr ""
 msgid "Product Title is required"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:589
+#: app/Services/TranslationStrings.php:593
 msgid "Product-Specific Bots"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:590 app/Services/Helper.php:1031
+#: app/Services/TranslationStrings.php:594 app/Services/Helper.php:1031
 msgid "Products"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:591
+#: app/Services/TranslationStrings.php:595
 msgid "Products & Services"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:592
+#: app/Services/TranslationStrings.php:596
 msgid "Products Reports"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:593
+#: app/Services/TranslationStrings.php:597
 msgid "Products Settings"
 msgstr ""
 
@@ -3927,15 +3951,15 @@ msgstr ""
 msgid "Profile picture has been updated successfully"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:594
+#: app/Services/TranslationStrings.php:598
 msgid "Prompt"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1006
+#: app/Services/TranslationStrings.php:1011
 msgid "Public"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:595
+#: app/Services/TranslationStrings.php:599
 msgid "Public Label"
 msgstr ""
 
@@ -3943,39 +3967,39 @@ msgstr ""
 msgid "Public Ticket Interaction"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:596
+#: app/Services/TranslationStrings.php:600
 msgid "Purchase Date"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:597
+#: app/Services/TranslationStrings.php:601
 msgid "Purchase one here"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:598
+#: app/Services/TranslationStrings.php:602
 msgid "Purchases"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:599
+#: app/Services/TranslationStrings.php:603
 msgid "Quantity"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:600
+#: app/Services/TranslationStrings.php:604
 msgid "Quick Setup Options"
 msgstr ""
 
-#: app/Hooks/Handlers/AdminBarHandler.php:39
+#: app/Hooks/Handlers/AdminBarHandler.php:35
 msgid "Quick Summary"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:601
+#: app/Services/TranslationStrings.php:605
 msgid "Re-open"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:602
+#: app/Services/TranslationStrings.php:606
 msgid "Read Documentation"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:603
+#: app/Services/TranslationStrings.php:607
 msgid "Read the email piping documentation"
 msgstr ""
 
@@ -3983,38 +4007,38 @@ msgstr ""
 msgid "Recaptcha"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:941
+#: app/Services/TranslationStrings.php:946
 msgid "reCAPTCHA Settings"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:942
+#: app/Services/TranslationStrings.php:947
 msgid "reCAPTCHA Version"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:604
+#: app/Services/TranslationStrings.php:608
 msgid "Reconnect"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:605
-#: app/Services/TranslationStrings.php:1007
+#: app/Services/TranslationStrings.php:609
+#: app/Services/TranslationStrings.php:1012
 msgid "Refresh"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:606
+#: app/Services/TranslationStrings.php:610
 msgid "Regenerate"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:607
-#: app/Services/TranslationStrings.php:1039
+#: app/Services/TranslationStrings.php:611
+#: app/Services/TranslationStrings.php:1044
 msgid "Related Product/Service"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:608
-#: app/Services/TranslationStrings.php:1008
+#: app/Services/TranslationStrings.php:612
+#: app/Services/TranslationStrings.php:1013
 msgid "Reopen This ticket"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:609
+#: app/Services/TranslationStrings.php:613
 msgid "Replied By Agent"
 msgstr ""
 
@@ -4022,7 +4046,7 @@ msgstr ""
 msgid "Replied by Agent (To Customer)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:610
+#: app/Services/TranslationStrings.php:614
 msgid "Replied By Customer"
 msgstr ""
 
@@ -4030,21 +4054,21 @@ msgstr ""
 msgid "Replied by Customer (To Agent/Admin)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:611
+#: app/Services/TranslationStrings.php:615
 msgid "Replies"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:943
+#: app/Services/TranslationStrings.php:948
 msgid "replies and"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:612
-#: app/Services/TranslationStrings.php:1009
+#: app/Services/TranslationStrings.php:616
+#: app/Services/TranslationStrings.php:1014
 msgid "Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:615
-#: app/Services/TranslationStrings.php:1010
+#: app/Services/TranslationStrings.php:619
+#: app/Services/TranslationStrings.php:1015
 msgid "Reply and Close"
 msgstr ""
 
@@ -4056,11 +4080,11 @@ msgstr ""
 msgid "Reply has been added"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:613
+#: app/Services/TranslationStrings.php:617
 msgid "Reply Title"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:614
+#: app/Services/TranslationStrings.php:618
 msgid "Reply To Selected Tickets"
 msgstr ""
 
@@ -4068,28 +4092,28 @@ msgstr ""
 msgid "Reporting"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:616 app/Hooks/Handlers/Menu.php:69
+#: app/Services/TranslationStrings.php:620 app/Hooks/Handlers/Menu.php:69
 #: app/Hooks/Handlers/Menu.php:70 app/Hooks/Handlers/Menu.php:165
 msgid "Reports"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:617
+#: app/Services/TranslationStrings.php:621
 msgid "Request Token"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:618
+#: app/Services/TranslationStrings.php:622
 msgid "Required"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:619
+#: app/Services/TranslationStrings.php:623
 msgid "Reset"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:620
+#: app/Services/TranslationStrings.php:624
 msgid "Reset Filter"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:621
+#: app/Services/TranslationStrings.php:625
 msgid "Reset Filters"
 msgstr ""
 
@@ -4101,11 +4125,11 @@ msgstr ""
 msgid "Reset password"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:622
+#: app/Services/TranslationStrings.php:626
 msgid "Reset To Default Gravatar"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:623
+#: app/Services/TranslationStrings.php:627
 msgid "Reset to gravatar?"
 msgstr ""
 
@@ -4121,15 +4145,15 @@ msgstr ""
 msgid "Reset your password for %s support portal"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:624
+#: app/Services/TranslationStrings.php:628
 msgid "Resolve Stats"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:625
+#: app/Services/TranslationStrings.php:629
 msgid "Response Content"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:626
+#: app/Services/TranslationStrings.php:630
 msgid "Response Count"
 msgstr ""
 
@@ -4145,15 +4169,15 @@ msgstr ""
 msgid "Response has been successfully recorded"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:627
+#: app/Services/TranslationStrings.php:631
 msgid "Response Stats"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:628
+#: app/Services/TranslationStrings.php:632
 msgid "Response Title"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:629 app/Services/Helper.php:702
+#: app/Services/TranslationStrings.php:633 app/Services/Helper.php:702
 #: app/Modules/StatModule.php:81 app/Modules/StatModule.php:124
 #: app/Modules/StatModule.php:168
 #: app/Http/Controllers/ReportingController.php:444
@@ -4164,19 +4188,19 @@ msgstr ""
 msgid "Restrict Content pro"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:630
+#: app/Services/TranslationStrings.php:634
 msgid "Restrictions"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:631
+#: app/Services/TranslationStrings.php:635
 msgid "Resume Previous Migration"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:632
+#: app/Services/TranslationStrings.php:636
 msgid "Review your Workflow"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:633
+#: app/Services/TranslationStrings.php:637
 msgid "Run Workflow"
 msgstr ""
 
@@ -4184,57 +4208,57 @@ msgstr ""
 msgid "Run workflows"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:634
+#: app/Services/TranslationStrings.php:638
 msgid "Running the"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:635
+#: app/Services/TranslationStrings.php:639
 msgid "Save"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:636
+#: app/Services/TranslationStrings.php:640
 msgid "Save Configuration"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:637
+#: app/Services/TranslationStrings.php:641
 msgid "Save Filter"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:638
+#: app/Services/TranslationStrings.php:642
 msgid "Save Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:640
+#: app/Services/TranslationStrings.php:644
 msgid "Save search"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:639
+#: app/Services/TranslationStrings.php:643
 msgid "Save Settings"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:641
+#: app/Services/TranslationStrings.php:645
 msgid "Saved Draft"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:642
+#: app/Services/TranslationStrings.php:646
 msgid "Saved Filters"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:643 app/Hooks/Handlers/Menu.php:124
+#: app/Services/TranslationStrings.php:647 app/Hooks/Handlers/Menu.php:124
 #: app/Hooks/Handlers/Menu.php:125 app/Hooks/Handlers/Menu.php:203
 msgid "Saved Replies"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:644
-#: app/Services/TranslationStrings.php:1011
+#: app/Services/TranslationStrings.php:648
+#: app/Services/TranslationStrings.php:1016
 msgid "Search"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:645
+#: app/Services/TranslationStrings.php:649
 msgid "Search Agents"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:646
+#: app/Services/TranslationStrings.php:650
 msgid "Search Customers..."
 msgstr ""
 
@@ -4242,7 +4266,7 @@ msgstr ""
 msgid "Search deleted successfully."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:647
+#: app/Services/TranslationStrings.php:651
 msgid "Search Existing contact or provide email address"
 msgstr ""
 
@@ -4250,27 +4274,27 @@ msgstr ""
 msgid "Search ID not found."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:648
+#: app/Services/TranslationStrings.php:652
 msgid "Search Name"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:650
+#: app/Services/TranslationStrings.php:654
 msgid "Search or provide email address"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:651
+#: app/Services/TranslationStrings.php:655
 msgid "Search replies"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:649
+#: app/Services/TranslationStrings.php:653
 msgid "Search Widget..."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:652
+#: app/Services/TranslationStrings.php:656
 msgid "Search..."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:653
+#: app/Services/TranslationStrings.php:657
 msgid "Secret Key"
 msgstr ""
 
@@ -4283,7 +4307,7 @@ msgstr ""
 msgid "Security verification failed. Please try again"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:654
+#: app/Services/TranslationStrings.php:658
 msgid "Select"
 msgstr ""
 
@@ -4291,51 +4315,51 @@ msgstr ""
 msgid "Select a Country"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:677
+#: app/Services/TranslationStrings.php:681
 msgid "Select a customer"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:678
+#: app/Services/TranslationStrings.php:682
 msgid "Select a fallback group"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:676
+#: app/Services/TranslationStrings.php:680
 msgid "Select a Page"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:679
+#: app/Services/TranslationStrings.php:683
 msgid "Select a product"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:655
+#: app/Services/TranslationStrings.php:659
 msgid "Select Action"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:656
+#: app/Services/TranslationStrings.php:660
 msgid "Select Agent"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:657
+#: app/Services/TranslationStrings.php:661
 msgid "Select Agent Group"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:658
+#: app/Services/TranslationStrings.php:662
 msgid "Select Agents"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:659
+#: app/Services/TranslationStrings.php:663
 msgid "Select All"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:680
+#: app/Services/TranslationStrings.php:684
 msgid "Select an Agent"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:681
+#: app/Services/TranslationStrings.php:685
 msgid "Select an option:"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:660
+#: app/Services/TranslationStrings.php:664
 msgid "Select Board"
 msgstr ""
 
@@ -4343,59 +4367,59 @@ msgstr ""
 msgid "Select Business"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:661
+#: app/Services/TranslationStrings.php:665
 msgid "Select Business Box"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:662
+#: app/Services/TranslationStrings.php:666
 msgid "Select Business Inbox"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:919
+#: app/Services/TranslationStrings.php:924
 msgid "Select columns that you want to export"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:663
+#: app/Services/TranslationStrings.php:667
 msgid "Select Contact Property"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:664
+#: app/Services/TranslationStrings.php:668
 msgid "Select Customer"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:682
+#: app/Services/TranslationStrings.php:686
 msgid "Select date range"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:665
+#: app/Services/TranslationStrings.php:669
 msgid "Select Field"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:666
+#: app/Services/TranslationStrings.php:670
 msgid "Select Field Type"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:667
+#: app/Services/TranslationStrings.php:671
 msgid "Select Form Property"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:668
+#: app/Services/TranslationStrings.php:672
 msgid "Select Integration Event"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:669
+#: app/Services/TranslationStrings.php:673
 msgid "Select Mailboxes"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:670
+#: app/Services/TranslationStrings.php:674
 msgid "Select Model"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:671
+#: app/Services/TranslationStrings.php:675
 msgid "Select Operator"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:672
+#: app/Services/TranslationStrings.php:676
 msgid "Select Option"
 msgstr ""
 
@@ -4403,20 +4427,20 @@ msgstr ""
 msgid "Select Portal Page"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:673
+#: app/Services/TranslationStrings.php:677
 msgid "Select Product"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:683
+#: app/Services/TranslationStrings.php:687
 msgid "Select products"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:684
-#: app/Services/TranslationStrings.php:1041
+#: app/Services/TranslationStrings.php:688
+#: app/Services/TranslationStrings.php:1046
 msgid "Select related Product/Service"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:674
+#: app/Services/TranslationStrings.php:678
 msgid "Select Stage"
 msgstr ""
 
@@ -4434,11 +4458,11 @@ msgid ""
 "new contact then a double optin email will be sent"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:685
+#: app/Services/TranslationStrings.php:689
 msgid "Select ticket that you want to move"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:675
+#: app/Services/TranslationStrings.php:679
 msgid "Select Value"
 msgstr ""
 
@@ -4448,7 +4472,7 @@ msgid ""
 "Support fields."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:949
+#: app/Services/TranslationStrings.php:954
 msgid "selected"
 msgstr ""
 
@@ -4460,7 +4484,7 @@ msgstr ""
 msgid "Selected Business has been set as default"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:686
+#: app/Services/TranslationStrings.php:690
 msgid "Selected item already selected"
 msgstr ""
 
@@ -4476,7 +4500,7 @@ msgstr ""
 msgid "Selected tags has been added to tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:687
+#: app/Services/TranslationStrings.php:691
 msgid "Selected workflows deleted successfully"
 msgstr ""
 
@@ -4484,11 +4508,11 @@ msgstr ""
 msgid "Self-hosted email and marketing automation for WordPress"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:689
+#: app/Services/TranslationStrings.php:693
 msgid "Send as Informational Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:688
+#: app/Services/TranslationStrings.php:692
 msgid "Send Attachments"
 msgstr ""
 
@@ -4502,23 +4526,23 @@ msgstr ""
 msgid "Send ticket activity notifications to slack"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:694
+#: app/Services/TranslationStrings.php:698
 msgid "Set as Default"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:695
+#: app/Services/TranslationStrings.php:699
 msgid "Set as Default Group"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:690
+#: app/Services/TranslationStrings.php:694
 msgid "Set Business Mailbox"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:691
+#: app/Services/TranslationStrings.php:695
 msgid "Set Estimated Time"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:692
+#: app/Services/TranslationStrings.php:696
 msgid "Set Estimation"
 msgstr ""
 
@@ -4530,21 +4554,21 @@ msgstr ""
 msgid "Set Product"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:693
+#: app/Services/TranslationStrings.php:697
 msgid "Set Your Trigger & Conditions"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:696
+#: app/Services/TranslationStrings.php:700
 #: app/Modules/PermissionManager.php:502 app/Hooks/Handlers/Menu.php:135
 #: app/Hooks/Handlers/Menu.php:136
 msgid "Settings"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:697
+#: app/Services/TranslationStrings.php:701
 msgid "Settings could not be found"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:698
+#: app/Services/TranslationStrings.php:702
 msgid "Settings could not be loaded"
 msgstr ""
 
@@ -4560,31 +4584,31 @@ msgstr ""
 msgid "Settings has been updated"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:699
+#: app/Services/TranslationStrings.php:703
 msgid "Setup products/services for ticket categorization"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:700
+#: app/Services/TranslationStrings.php:704
 msgid "Share Essentials"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:952
+#: app/Services/TranslationStrings.php:957
 msgid "shipping"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:701
+#: app/Services/TranslationStrings.php:705
 msgid "Shipping Details"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:702
+#: app/Services/TranslationStrings.php:706
 msgid "Shipping details"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:703
+#: app/Services/TranslationStrings.php:707
 msgid "Shipping method"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:704
+#: app/Services/TranslationStrings.php:708
 msgid "Shortcode copied to clipboard:"
 msgstr ""
 
@@ -4592,11 +4616,11 @@ msgstr ""
 msgid "Shortcut"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:705
+#: app/Services/TranslationStrings.php:709
 msgid "Show Bulk Action"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:706
+#: app/Services/TranslationStrings.php:710
 msgid "Signin and Registration forms are handled by FluentAuth Plugin"
 msgstr ""
 
@@ -4604,11 +4628,11 @@ msgstr ""
 msgid "Signup"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:707
+#: app/Services/TranslationStrings.php:711
 msgid "Signup Form"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:708
+#: app/Services/TranslationStrings.php:712
 msgid "Site Key"
 msgstr ""
 
@@ -4616,27 +4640,27 @@ msgstr ""
 msgid "Slack"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:709
+#: app/Services/TranslationStrings.php:713
 msgid "Slack Integration"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:710
+#: app/Services/TranslationStrings.php:714
 msgid "Slack User ID"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:711
+#: app/Services/TranslationStrings.php:715
 msgid "Slug"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:712
+#: app/Services/TranslationStrings.php:716
 msgid "Slug (Optional)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:713
+#: app/Services/TranslationStrings.php:717
 msgid "Smart Codes"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:714
+#: app/Services/TranslationStrings.php:718
 msgid "Some General Prompts"
 msgstr ""
 
@@ -4653,7 +4677,7 @@ msgid ""
 "in the login form"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:715
+#: app/Services/TranslationStrings.php:719
 msgid "Something went wrong"
 msgstr ""
 
@@ -4669,7 +4693,7 @@ msgstr ""
 msgid "Something went wrong. Please try again later."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:716
+#: app/Services/TranslationStrings.php:720
 msgid "Something went wrong. Please try again."
 msgstr ""
 
@@ -4718,11 +4742,11 @@ msgstr ""
 msgid "Sorry, no tickets available for import."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:717
+#: app/Services/TranslationStrings.php:721
 msgid "Sorry, settings could not be loaded"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:906
+#: app/Services/TranslationStrings.php:911
 msgid "Sorry, this customer has one ticket only"
 msgstr ""
 
@@ -4772,38 +4796,38 @@ msgid ""
 "new signed url"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:718
-#: app/Services/TranslationStrings.php:1012
+#: app/Services/TranslationStrings.php:722
+#: app/Services/TranslationStrings.php:1017
 msgid "Sort"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:719
-#: app/Services/TranslationStrings.php:1013
+#: app/Services/TranslationStrings.php:723
+#: app/Services/TranslationStrings.php:1018
 msgid "Sort By"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:720
+#: app/Services/TranslationStrings.php:724
 msgid "Source"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:721
+#: app/Services/TranslationStrings.php:725
 #: app/Modules/PermissionManager.php:487
 msgid "Split Ticket"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:722
+#: app/Services/TranslationStrings.php:726
 msgid "Staff"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:723
+#: app/Services/TranslationStrings.php:727
 msgid "Start"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:724
+#: app/Services/TranslationStrings.php:728
 msgid "Start date"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1030
+#: app/Services/TranslationStrings.php:1035
 msgid "started the conversation"
 msgstr ""
 
@@ -4815,42 +4839,42 @@ msgstr ""
 msgid "State"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:725
+#: app/Services/TranslationStrings.php:729
 msgid "Stats"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:726
-#: app/Services/TranslationStrings.php:1014
+#: app/Services/TranslationStrings.php:730
+#: app/Services/TranslationStrings.php:1019
 #: app/Models/Traits/CustomerTrait.php:86
 #: app/Hooks/Handlers/PrivacyHandler.php:220
 msgid "Status"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:727
+#: app/Services/TranslationStrings.php:731
 msgid "Step 1 of 2"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:728
+#: app/Services/TranslationStrings.php:732
 msgid "Step 2 of 2"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:729
+#: app/Services/TranslationStrings.php:733
 msgid "Subject"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1042
+#: app/Services/TranslationStrings.php:1047
 msgid "subject"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1044
+#: app/Services/TranslationStrings.php:1049
 msgid "Submit a Support Ticket"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:730
+#: app/Services/TranslationStrings.php:734
 msgid "Submit Log"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:731
+#: app/Services/TranslationStrings.php:735
 msgid "Subscribe to our Bi-Monthly newsletter"
 msgstr ""
 
@@ -4858,11 +4882,11 @@ msgstr ""
 msgid "Subscribed"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:732
+#: app/Services/TranslationStrings.php:736
 msgid "Subscription"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:733
+#: app/Services/TranslationStrings.php:737
 msgid "Success"
 msgstr ""
 
@@ -4870,7 +4894,7 @@ msgstr ""
 msgid "Successfully registered to the site."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1015
+#: app/Services/TranslationStrings.php:1020
 msgid "Suggested Articles"
 msgstr ""
 
@@ -4878,11 +4902,11 @@ msgstr ""
 msgid "Support"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:734
+#: app/Services/TranslationStrings.php:738
 msgid "Support Candy"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:735
+#: app/Services/TranslationStrings.php:739
 msgid "Support Channel"
 msgstr ""
 
@@ -4890,7 +4914,7 @@ msgstr ""
 msgid "Support Customer Field"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:736
+#: app/Services/TranslationStrings.php:740
 msgid "Support Inbox Email"
 msgstr ""
 
@@ -4898,12 +4922,12 @@ msgstr ""
 msgid "Support Portal"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:737
+#: app/Services/TranslationStrings.php:741
 msgid "Support Portal Page (For Customers)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:738
-#: app/Services/TranslationStrings.php:1016 app/Services/Helper.php:1036
+#: app/Services/TranslationStrings.php:742
+#: app/Services/TranslationStrings.php:1021 app/Services/Helper.php:1036
 msgid "Support Staff"
 msgstr ""
 
@@ -4936,7 +4960,7 @@ msgstr ""
 msgid "Support ticket has been created at Fluent Support. Ticket ID: %d"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:739
+#: app/Services/TranslationStrings.php:743
 msgid "Support Tickets"
 msgstr ""
 
@@ -4955,7 +4979,7 @@ msgstr ""
 msgid "Supported Types: %1$s and max file size: %2$.01fMB"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:741
+#: app/Services/TranslationStrings.php:745
 msgid "Tag Description"
 msgstr ""
 
@@ -4967,27 +4991,27 @@ msgstr ""
 msgid "Tag has been removed from this ticket"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:742
+#: app/Services/TranslationStrings.php:746
 msgid "Tag Name"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:743
+#: app/Services/TranslationStrings.php:747
 msgid "Tag Title"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:744
+#: app/Services/TranslationStrings.php:748
 msgid "Tags"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:745
+#: app/Services/TranslationStrings.php:749
 msgid "Task Description"
 msgstr ""
 
-#: app/Http/Controllers/FluentBoardsController.php:88
+#: app/Http/Controllers/FluentBoardsController.php:90
 msgid "Task successfully added to Fluent Boards"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:746
+#: app/Services/TranslationStrings.php:750
 msgid "Task Title"
 msgstr ""
 
@@ -4995,19 +5019,19 @@ msgstr ""
 msgid "Telegram"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:747
+#: app/Services/TranslationStrings.php:751
 msgid "Telegram Chat ID"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:748
+#: app/Services/TranslationStrings.php:752
 msgid "Telegram Integration"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:749
+#: app/Services/TranslationStrings.php:753
 msgid "Templates"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:750
+#: app/Services/TranslationStrings.php:754
 msgid "Terms & Condition"
 msgstr ""
 
@@ -5025,7 +5049,7 @@ msgid ""
 "Dropbox/Google Drive and paste the link in the response"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:751
+#: app/Services/TranslationStrings.php:755
 msgid "The following settings will be applied to the newly created"
 msgstr ""
 
@@ -5045,7 +5069,7 @@ msgstr ""
 msgid "The standard plugin for knowledge base and documentation"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:954
+#: app/Services/TranslationStrings.php:959
 msgid "the status will be active."
 msgstr ""
 
@@ -5065,7 +5089,7 @@ msgstr ""
 msgid "There was an error verifying the API key."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:752
+#: app/Services/TranslationStrings.php:756
 msgid "This bot will handle general queries for all products"
 msgstr ""
 
@@ -5114,62 +5138,62 @@ msgid ""
 "submitted"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:753
+#: app/Services/TranslationStrings.php:757
 msgid "This is a"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:939
+#: app/Services/TranslationStrings.php:944
 msgid ""
 "This is a pro feature. Please upgrade to Fluent Support Pro to use this "
 "feature"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:754
+#: app/Services/TranslationStrings.php:758
 msgid "This is an agent only field"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:755
+#: app/Services/TranslationStrings.php:759
 msgid "This migrator will migrate total"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:926
+#: app/Services/TranslationStrings.php:931
 msgid ""
 "This reply will be visible to the customer but will not update the ticket's "
 "'waiting since' timestamp."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1017
+#: app/Services/TranslationStrings.php:1022
 msgid "This ticket is"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:955
-#: app/Services/TranslationStrings.php:1045
+#: app/Services/TranslationStrings.php:960
+#: app/Services/TranslationStrings.php:1050
 msgid "This ticket was closed on"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:945
+#: app/Services/TranslationStrings.php:950
 msgid "This will permanently delete response. Continue?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:756
-#: app/Services/TranslationStrings.php:1018
+#: app/Services/TranslationStrings.php:760
+#: app/Services/TranslationStrings.php:1023
 msgid "Thread Follower"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:740
+#: app/Services/TranslationStrings.php:744
 msgid "THREAD STARTER"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:757
-#: app/Services/TranslationStrings.php:1019
+#: app/Services/TranslationStrings.php:761
+#: app/Services/TranslationStrings.php:1024
 msgid "Thread Starter"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:758
+#: app/Services/TranslationStrings.php:762
 msgid "Ticket"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:759
+#: app/Services/TranslationStrings.php:763
 msgid "Ticket Activity"
 msgstr ""
 
@@ -5177,7 +5201,7 @@ msgstr ""
 msgid "Ticket Agent Change (To Agent)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:760
+#: app/Services/TranslationStrings.php:764
 msgid "Ticket Assigned"
 msgstr ""
 
@@ -5195,7 +5219,7 @@ msgstr ""
 msgid "Ticket Closed by Agent (To Customer)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:761
+#: app/Services/TranslationStrings.php:765
 #: app/Hooks/Handlers/PrivacyHandler.php:79
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:142
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:143
@@ -5218,7 +5242,7 @@ msgstr ""
 msgid "Ticket Created At"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:780
+#: app/Services/TranslationStrings.php:784
 msgid "Ticket created at"
 msgstr ""
 
@@ -5238,30 +5262,30 @@ msgstr ""
 msgid "Ticket Description (you can use any smart code)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:762
-#: app/Services/TranslationStrings.php:1046
+#: app/Services/TranslationStrings.php:766
+#: app/Services/TranslationStrings.php:1051
 msgid "Ticket Details"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:763
+#: app/Services/TranslationStrings.php:767
 msgid "Ticket Email Settings"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:764
+#: app/Services/TranslationStrings.php:768
 msgid "Ticket Filters"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:765 app/Services/Helper.php:1021
+#: app/Services/TranslationStrings.php:769 app/Services/Helper.php:1021
 msgid "Ticket Form Config"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:956
+#: app/Services/TranslationStrings.php:961
 msgid ""
 "Ticket Form Customization including Knowledge base integration is available "
 "on Pro Version"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:766
+#: app/Services/TranslationStrings.php:770
 msgid "Ticket Form Settings"
 msgstr ""
 
@@ -5290,8 +5314,8 @@ msgstr ""
 msgid "Ticket has been reopened"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:767
-#: app/Services/TranslationStrings.php:1020
+#: app/Services/TranslationStrings.php:771
+#: app/Services/TranslationStrings.php:1025
 #: app/Hooks/Handlers/PrivacyHandler.php:71
 #: app/Hooks/Handlers/PrivacyHandler.php:153
 msgid "Ticket ID"
@@ -5301,23 +5325,23 @@ msgstr ""
 msgid "Ticket Importer"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:768
+#: app/Services/TranslationStrings.php:772
 msgid "Ticket Link(Agent)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:769
+#: app/Services/TranslationStrings.php:773
 msgid "Ticket Link(Customer)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:770
+#: app/Services/TranslationStrings.php:774
 msgid "Ticket Mailbox"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:771
+#: app/Services/TranslationStrings.php:775
 msgid "Ticket Migration Settings"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:781
+#: app/Services/TranslationStrings.php:785
 #: app/Http/Controllers/WidgetsController.php:45
 msgid "Ticket not found"
 msgstr ""
@@ -5326,19 +5350,19 @@ msgstr ""
 msgid "Ticket not found or customer already assigned."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:772
+#: app/Services/TranslationStrings.php:776
 #: app/Hooks/Handlers/PrivacyHandler.php:99
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:157
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:158
 msgid "Ticket Priority"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:773
+#: app/Services/TranslationStrings.php:777
 #: app/Hooks/Handlers/PrivacyHandler.php:87
 msgid "Ticket Product"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:774
+#: app/Services/TranslationStrings.php:778
 msgid "Ticket Public URL"
 msgstr ""
 
@@ -5367,7 +5391,7 @@ msgstr ""
 msgid "Ticket Reply – Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:775
+#: app/Services/TranslationStrings.php:779
 msgid "Ticket Resolve Stats"
 msgstr ""
 
@@ -5375,21 +5399,21 @@ msgstr ""
 msgid "Ticket Status"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:776
+#: app/Services/TranslationStrings.php:780
 msgid "Ticket Submitted"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:777
-#: app/Hooks/Handlers/AdminBarHandler.php:46
+#: app/Services/TranslationStrings.php:781
+#: app/Hooks/Handlers/AdminBarHandler.php:42
 msgid "Ticket Summary"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:778 app/Services/Helper.php:1016
+#: app/Services/TranslationStrings.php:782 app/Services/Helper.php:1016
 #: app/Hooks/Handlers/PrivacyHandler.php:91
 msgid "Ticket Tags"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:779
+#: app/Services/TranslationStrings.php:783
 #: app/Hooks/Handlers/PrivacyHandler.php:75
 #: app/Services/Integrations/FluentCrm/CreateTicketAction.php:80
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:135
@@ -5411,20 +5435,20 @@ msgstr ""
 msgid "Ticket: %s"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:782 app/Hooks/Handlers/Menu.php:59
+#: app/Services/TranslationStrings.php:786 app/Hooks/Handlers/Menu.php:59
 #: app/Hooks/Handlers/Menu.php:60 app/Hooks/Handlers/Menu.php:160
 msgid "Tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:957
+#: app/Services/TranslationStrings.php:962
 msgid "tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:783
+#: app/Services/TranslationStrings.php:787
 msgid "Tickets Awaiting Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:784
+#: app/Services/TranslationStrings.php:788
 msgid "Tickets Handled"
 msgstr ""
 
@@ -5432,7 +5456,7 @@ msgstr ""
 msgid "Tickets Permissions"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:958
+#: app/Services/TranslationStrings.php:963
 msgid "tickets with"
 msgstr ""
 
@@ -5485,56 +5509,56 @@ msgstr ""
 msgid "Tickets – Waiting for reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:785
+#: app/Services/TranslationStrings.php:789
 msgid "Time"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:786
+#: app/Services/TranslationStrings.php:790
 msgid "Time Logging"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:787
+#: app/Services/TranslationStrings.php:791
 msgid "Time Sheet"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:788
-#: app/Services/TranslationStrings.php:1021
-#: app/Hooks/Handlers/AdminBarHandler.php:93
+#: app/Services/TranslationStrings.php:792
+#: app/Services/TranslationStrings.php:1026
+#: app/Hooks/Handlers/AdminBarHandler.php:89
 msgid "Title"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:959
+#: app/Services/TranslationStrings.php:964
 msgid "title"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:789
+#: app/Services/TranslationStrings.php:793
 #: app/Http/Controllers/CustomerPortalController.php:123
 msgid "Title is required"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:790
+#: app/Services/TranslationStrings.php:794
 msgid "To"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:962
+#: app/Services/TranslationStrings.php:967
 msgid ""
 "To create tickets using webhooks please copy this webhook URL and paste to "
 "the site from where you want to create ticket in this site."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:961
+#: app/Services/TranslationStrings.php:966
 msgid "to this following address."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:885
+#: app/Services/TranslationStrings.php:890
 msgid "Today's Active Tickets By Products"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:791
+#: app/Services/TranslationStrings.php:795
 msgid "Tokens"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:792
+#: app/Services/TranslationStrings.php:796
 msgid "Tone of customer"
 msgstr ""
 
@@ -5542,7 +5566,7 @@ msgstr ""
 msgid "Too many login attempts. Please try again after 15 minutes."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:793
+#: app/Services/TranslationStrings.php:797
 msgid "Total"
 msgstr ""
 
@@ -5550,7 +5574,7 @@ msgstr ""
 msgid "Total Closed"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:794
+#: app/Services/TranslationStrings.php:798
 msgid "Total Hours"
 msgstr ""
 
@@ -5559,24 +5583,24 @@ msgstr ""
 msgid "Total Replies"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:795
+#: app/Services/TranslationStrings.php:799
 msgid "Total Responses"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:796
+#: app/Services/TranslationStrings.php:800
 msgid "Total Summaries"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:797
+#: app/Services/TranslationStrings.php:801
 #: app/Services/Tickets/TicketStats.php:19
 msgid "Total Tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:798
+#: app/Services/TranslationStrings.php:802
 msgid "Trigger"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:799
+#: app/Services/TranslationStrings.php:803
 msgid "Trigger Type"
 msgstr ""
 
@@ -5584,23 +5608,23 @@ msgstr ""
 msgid "Tutor LMS"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:800
+#: app/Services/TranslationStrings.php:804
 msgid "Twilio Integration"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:801
+#: app/Services/TranslationStrings.php:805
 msgid "Type"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:963
+#: app/Services/TranslationStrings.php:968
 msgid "type and press enter"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:802
+#: app/Services/TranslationStrings.php:806
 msgid "Type Compare Value"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:803
+#: app/Services/TranslationStrings.php:807
 msgid "Un-Assigned"
 msgstr ""
 
@@ -5617,15 +5641,15 @@ msgid ""
 "Unable to identify. Please make sure you have provided correct information."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:804
+#: app/Services/TranslationStrings.php:808
 msgid "Unassigned"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:805 app/Models/Traits/AgentTrait.php:178
+#: app/Services/TranslationStrings.php:809 app/Models/Traits/AgentTrait.php:178
 msgid "Unassigned Tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:806
+#: app/Services/TranslationStrings.php:810
 msgid "Uncheck all"
 msgstr ""
 
@@ -5633,11 +5657,11 @@ msgstr ""
 msgid "Unknown error occurred"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1022
+#: app/Services/TranslationStrings.php:1027
 msgid "Unknown error. Please reload this page"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:807
+#: app/Services/TranslationStrings.php:811
 msgid "Unknown File"
 msgstr ""
 
@@ -5647,83 +5671,83 @@ msgstr ""
 msgid "Unsupported file submitted, allowed image file types are: %s"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:808
+#: app/Services/TranslationStrings.php:812
 msgid "Update"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:809
+#: app/Services/TranslationStrings.php:813
 msgid "Update And Approve Response"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:810
+#: app/Services/TranslationStrings.php:814
 msgid "Update Custom Field"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:811
+#: app/Services/TranslationStrings.php:815
 msgid "Update Customer"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:822
+#: app/Services/TranslationStrings.php:826
 msgid "Update customer"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:812
+#: app/Services/TranslationStrings.php:816
 msgid "Update Estimation"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:813
+#: app/Services/TranslationStrings.php:817
 msgid "Update Field"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:814
+#: app/Services/TranslationStrings.php:818
 msgid "Update Filter"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:815
+#: app/Services/TranslationStrings.php:819
 msgid "Update Group"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:816
+#: app/Services/TranslationStrings.php:820
 msgid "Update Product"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:817
+#: app/Services/TranslationStrings.php:821
 msgid "Update Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:818
+#: app/Services/TranslationStrings.php:822
 msgid "Update Response"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:819
+#: app/Services/TranslationStrings.php:823
 msgid "Update Settings"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:820
+#: app/Services/TranslationStrings.php:824
 msgid "Update Ticket Tag"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:821
+#: app/Services/TranslationStrings.php:825
 msgid "Update Workflow"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:823
+#: app/Services/TranslationStrings.php:827
 msgid "Updating Custom Field Data"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:964
+#: app/Services/TranslationStrings.php:969
 msgid "Upgrade Now"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:824
+#: app/Services/TranslationStrings.php:828
 msgid "Upgrade To Pro"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:825
+#: app/Services/TranslationStrings.php:829
 msgid "Upgrade to Pro"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:826
+#: app/Services/TranslationStrings.php:830
 msgid "Upload a Custom Picture"
 msgstr ""
 
@@ -5748,29 +5772,33 @@ msgstr ""
 msgid "Upload and store the files to your WordPress File System Storage."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:965
+#: app/Services/TranslationStrings.php:831
+msgid "Uploading 1 attachment. Please wait before submitting."
+msgstr ""
+
+#: app/Services/TranslationStrings.php:970
 msgid "Use incoming webhook to create ticket from external sites."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:827
+#: app/Services/TranslationStrings.php:832
 msgid "Use OpenAI for responses, ticket summaries, and sentiment analysis"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:829
+#: app/Services/TranslationStrings.php:834
 msgid "Use reCAPTCHA on"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:828
+#: app/Services/TranslationStrings.php:833
 msgid "Use Shortcode"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:830
+#: app/Services/TranslationStrings.php:835
 #: app/Hooks/Handlers/AuthHandler.php:357
 #: app/Hooks/Handlers/AuthHandler.php:359
 msgid "Username"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:831
+#: app/Services/TranslationStrings.php:836
 msgid "Username is required for WordPress user."
 msgstr ""
 
@@ -5780,15 +5808,15 @@ msgstr ""
 msgid "Username: %s"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:888
+#: app/Services/TranslationStrings.php:893
 msgid "Using advanced filtering you can get more specific tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:832
+#: app/Services/TranslationStrings.php:837
 msgid "Validate Captcha"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:833
+#: app/Services/TranslationStrings.php:838
 msgid "Variant"
 msgstr ""
 
@@ -5809,23 +5837,23 @@ msgstr ""
 msgid "Verify and Login"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:834
+#: app/Services/TranslationStrings.php:839
 msgid "Verify License"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:835
+#: app/Services/TranslationStrings.php:840
 msgid "Verifying your API connection. Please wait"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:836
+#: app/Services/TranslationStrings.php:841
 msgid "Version 2"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:837
+#: app/Services/TranslationStrings.php:842
 msgid "Version 3"
 msgstr ""
 
-#: app/Hooks/Handlers/AdminBarHandler.php:105
+#: app/Hooks/Handlers/AdminBarHandler.php:101
 msgid "View"
 msgstr ""
 
@@ -5845,7 +5873,7 @@ msgstr ""
 msgid "View Dashboard"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:838
+#: app/Services/TranslationStrings.php:843
 msgid "View Details"
 msgstr ""
 
@@ -5857,27 +5885,27 @@ msgstr ""
 msgid "View Tickets (Read Only)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1023
+#: app/Services/TranslationStrings.php:1028
 msgid "View Your Tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:966
+#: app/Services/TranslationStrings.php:971
 msgid "wait time"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:839
+#: app/Services/TranslationStrings.php:844
 msgid "Waiting"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:840
+#: app/Services/TranslationStrings.php:845
 msgid "Waiting For Reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:841 app/Services/Helper.php:706
+#: app/Services/TranslationStrings.php:846 app/Services/Helper.php:706
 msgid "Waiting Tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:842
+#: app/Services/TranslationStrings.php:847
 msgid "Waiting Time"
 msgstr ""
 
@@ -5885,47 +5913,47 @@ msgstr ""
 msgid "Waiting Today"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:843
+#: app/Services/TranslationStrings.php:848
 msgid "Want to deactivate this license?"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:844
+#: app/Services/TranslationStrings.php:849
 msgid "Want to move all or custom selected"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:845
+#: app/Services/TranslationStrings.php:850
 msgid "Warning"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:846
+#: app/Services/TranslationStrings.php:851
 msgid "Watchers"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:847
+#: app/Services/TranslationStrings.php:852
 msgid "We will send tips and advanced usage of FluentSupport (monthly)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:911
+#: app/Services/TranslationStrings.php:916
 msgid "Web and Email Based (MailBox)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:848
+#: app/Services/TranslationStrings.php:853
 msgid "Web Based"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:849
+#: app/Services/TranslationStrings.php:854
 msgid "Welcome aboard!"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:850
+#: app/Services/TranslationStrings.php:855
 msgid "Welcome back to Fluent Support"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:851
+#: app/Services/TranslationStrings.php:856
 msgid "What we collect"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1043
+#: app/Services/TranslationStrings.php:1048
 msgid "What's this support ticket about?"
 msgstr ""
 
@@ -5933,11 +5961,11 @@ msgstr ""
 msgid "WhatsApp"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:852
+#: app/Services/TranslationStrings.php:857
 msgid "WhatsApp Phone Number"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:853
+#: app/Services/TranslationStrings.php:858
 msgid ""
 "When new agents are created without being assigned to any group, they will "
 "automatically be added to the default group."
@@ -5955,31 +5983,31 @@ msgstr ""
 msgid "WooCommerce"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:854
+#: app/Services/TranslationStrings.php:859
 msgid "WordPress plugin then you can migrate from this section."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:855
+#: app/Services/TranslationStrings.php:860
 msgid "Work Description"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:856
+#: app/Services/TranslationStrings.php:861
 msgid "Work Description:"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:857
+#: app/Services/TranslationStrings.php:862
 msgid "Workflow"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:858
+#: app/Services/TranslationStrings.php:863
 msgid "Workflow Actions (Tasks)"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:862
+#: app/Services/TranslationStrings.php:867
 msgid "Workflow duplicated successfully"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:859
+#: app/Services/TranslationStrings.php:864
 msgid "Workflow Name"
 msgstr ""
 
@@ -5987,23 +6015,23 @@ msgstr ""
 msgid "Workflow Permissions"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:863
+#: app/Services/TranslationStrings.php:868
 msgid "Workflow title is required"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:860
+#: app/Services/TranslationStrings.php:865
 msgid "Workflow Trigger"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:861
+#: app/Services/TranslationStrings.php:866
 msgid "Workflow Type"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:968
+#: app/Services/TranslationStrings.php:973
 msgid "workflow will perform the following actions:"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:864 app/Hooks/Handlers/Menu.php:113
+#: app/Services/TranslationStrings.php:869 app/Hooks/Handlers/Menu.php:113
 #: app/Hooks/Handlers/Menu.php:114 app/Hooks/Handlers/Menu.php:211
 msgid "Workflows"
 msgstr ""
@@ -6012,36 +6040,36 @@ msgstr ""
 msgid "WPManageNinja LLC"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1024
+#: app/Services/TranslationStrings.php:1029
 msgid "Write a reply"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:865
+#: app/Services/TranslationStrings.php:870
 msgid "Yes"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:866
+#: app/Services/TranslationStrings.php:871
 msgid "Yes, Count me in!"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:867
+#: app/Services/TranslationStrings.php:872
 msgid "Yes, Delete Selected Tickets"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:868
+#: app/Services/TranslationStrings.php:873
 msgid "Yes, Delete this Action"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:869
-#: app/Services/TranslationStrings.php:1025
+#: app/Services/TranslationStrings.php:874
+#: app/Services/TranslationStrings.php:1030
 msgid "You"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:870
+#: app/Services/TranslationStrings.php:875
 msgid "You are adding internal Note. Only support staff can see this note."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:871
+#: app/Services/TranslationStrings.php:876
 msgid "You are almost done"
 msgstr ""
 
@@ -6068,15 +6096,15 @@ msgstr ""
 msgid "You are not allowed to signup using this form"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:872
+#: app/Services/TranslationStrings.php:877
 msgid "You can not change the slug once save a custom field"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:873
+#: app/Services/TranslationStrings.php:878
 msgid "You can upload maximum"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:899
+#: app/Services/TranslationStrings.php:904
 msgid ""
 "You cannot edit subject for this email. This subject pattern is required for "
 "email reply parsing"
@@ -6119,7 +6147,7 @@ msgstr ""
 msgid "You have been logged out"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:1033
+#: app/Services/TranslationStrings.php:1038
 msgid ""
 "Your account is currently inactive. You cannot create new tickets or reply "
 "to existing ones. Please contact the site administrator for assistance"
@@ -6129,13 +6157,13 @@ msgstr ""
 msgid "Your account is not active. Please contact support."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:874
+#: app/Services/TranslationStrings.php:879
 msgid ""
 "Your Admin Email Address and Support From Email should not be same. Please "
 "use a different email address."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:875
+#: app/Services/TranslationStrings.php:880
 msgid "Your Bookmarked Tickets"
 msgstr ""
 
@@ -6144,7 +6172,7 @@ msgstr ""
 msgid "Your Email Address"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:969
+#: app/Services/TranslationStrings.php:974
 msgid "your email piping settings first"
 msgstr ""
 
@@ -6152,15 +6180,15 @@ msgstr ""
 msgid "Your Feed Name"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:876
+#: app/Services/TranslationStrings.php:881
 msgid "Your Help Scout authorization code is:"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:877
+#: app/Services/TranslationStrings.php:882
 msgid "Your License Key"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:879
+#: app/Services/TranslationStrings.php:884
 msgid "Your license key is valid and activated"
 msgstr ""
 
@@ -6170,15 +6198,15 @@ msgstr ""
 msgid "Your Login code for %1s"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:880
+#: app/Services/TranslationStrings.php:885
 msgid "Your mailbox is active."
 msgstr ""
 
-#: app/Services/TranslationStrings.php:881
+#: app/Services/TranslationStrings.php:886
 msgid "Your masked mailbox email has been issued"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:882
+#: app/Services/TranslationStrings.php:887
 msgid "Your previously selected model"
 msgstr ""
 
@@ -6230,7 +6258,7 @@ msgstr ""
 msgid "Your search has been saved successfully!"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:883
+#: app/Services/TranslationStrings.php:888
 msgid "Your support portal is now configured and ready to help your customers."
 msgstr ""
 
@@ -6238,11 +6266,11 @@ msgstr ""
 msgid "Your verification code has been expired. Please try again"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:878
+#: app/Services/TranslationStrings.php:883
 msgid "Your Workflow Name"
 msgstr ""
 
-#: app/Services/TranslationStrings.php:884
+#: app/Services/TranslationStrings.php:889
 msgid "Zendesk Domain"
 msgstr ""
 

@@ -9,10 +9,7 @@
     "file": "admin/js/global_summary.js",
     "name": "global_summary",
     "src": "resources/admin/global_summary.js",
-    "isEntry": true,
-    "css": [
-      "admin/global_summary.css"
-    ]
+    "isEntry": true
   },
   "resources/admin/start.js": {
     "file": "admin/js/start.js",
