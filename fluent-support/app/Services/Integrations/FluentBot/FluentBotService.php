@@ -21,9 +21,9 @@ class FluentBotService
         return (new FluentBotHelper())->generateResponse($responseContent, $ticket, $productId, $chatId);
     }
 
-    public function generateStreamResponse(string $responseContent, $ticket, $productId, $chatId = null)
+    public function generateStreamResponse(string $responseContent, $ticket, $productId, $chatId = null, $selectedConversations = null, $includeTicketContent = true, $seedMessages = null)
     {
-        return (new FluentBotHelper())->generateStreamResponse($responseContent, $ticket, $productId, $chatId);
+        return (new FluentBotHelper())->generateStreamResponse($responseContent, $ticket, $productId, $chatId, $selectedConversations, $includeTicketContent, $seedMessages);
     }
 
     public function getTicketSummary($ticket)
@@ -34,6 +34,21 @@ class FluentBotService
     public function getTicketTone($ticket)
     {
         return (new FluentBotHelper())->generateTicketTone($ticket);
+    }
+
+    public function getChatMessages($chatId, $productId = null, $cursor = null)
+    {
+        return (new FluentBotHelper())->getChatMessages($chatId, $productId, $cursor);
+    }
+
+    public function getCustomPresets(): array
+    {
+        return (new FluentBotHelper())->getCustomPresets();
+    }
+
+    public function saveCustomPresets(array $presets): array
+    {
+        return (new FluentBotHelper())->saveCustomPresets($presets);
     }
 
 }

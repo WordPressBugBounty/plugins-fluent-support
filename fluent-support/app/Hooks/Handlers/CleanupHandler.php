@@ -10,6 +10,8 @@ use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Includes\FileSystem;
 use FluentSupport\App\Services\Integrations\Maintenance;
+use FluentSupport\Database\Migrations\NotificationsMigrator;
+use FluentSupport\Database\Migrations\NotificationUsersMigrator;
 
 class CleanupHandler
 {
@@ -24,6 +26,8 @@ class CleanupHandler
         $this->cleanActivityLogs();
 
         $this->cleanAIActivityLogs();
+
+        $this->cleanInternalNotifications();
     }
 
     protected function cleanLiveActivities()
@@ -68,6 +72,35 @@ class CleanupHandler
         $oldDateTime = gmdate('Y-m-d H:i:s', current_time('timestamp') - ($defaultDays * 86400));
 
         AIActivityLogs::where('created_at', '<', $oldDateTime)->delete();
+    }
+
+    protected function cleanInternalNotifications()
+    {
+        global $wpdb;
+
+        $notificationsTable = $wpdb->prefix . NotificationsMigrator::$tableName;
+        $notificationUsersTable = $wpdb->prefix . NotificationUsersMigrator::$tableName;
+
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $notificationsTable)) !== $notificationsTable
+            || $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $notificationUsersTable)) !== $notificationUsersTable) {
+            return;
+        }
+
+        $oldDateTime = gmdate('Y-m-d H:i:s', current_time('timestamp') - (15 * 86400));
+
+        $wpdb->query($wpdb->prepare(
+            "DELETE notification_users
+            FROM {$notificationUsersTable} AS notification_users
+            INNER JOIN {$notificationsTable} AS notifications
+                ON notification_users.notification_id = notifications.id
+            WHERE notifications.created_at < %s",
+            $oldDateTime
+        ));
+
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$notificationsTable} WHERE created_at < %s",
+            $oldDateTime
+        ));
     }
 
     public function maybeDeleteAttachmentsOnClose($ticket)

@@ -64,4 +64,17 @@ class Agent extends Person
         )->wherePivot('source_type', 'agent_group');
     }
 
+    public function scopeMentionBy($query, $search)
+    {
+        if (!$search) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($search) {
+            $q->where('first_name', 'LIKE', '%' . $search . '%')
+              ->orWhere('last_name', 'LIKE', '%' . $search . '%')
+              ->orWhere('email', 'LIKE', '%' . $search . '%');
+        });
+    }
+
 }

@@ -11,7 +11,9 @@ use FluentSupport\App\Models\TagPivot;
 use FluentSupport\App\Models\TicketTag;
 use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\Helper;
+use FluentSupport\App\Services\Notifications\NotificationSettings;
 use FluentSupport\App\Services\TranslationStrings;
+use FluentSupport\App\Services\Integrations\FluentBooking\FluentBookingService;
 use FluentSupport\App\Vite;
 
 class Menu
@@ -455,6 +457,7 @@ class Menu
                 'go_back_after_reply' => 'yes'
             ],
             'notification_integrations'  => $integrationDrivers,
+            'internal_notification_settings' => (new NotificationSettings())->get(false),
             'server_time'                => gmdate('Y-m-d\TH:i:sP'),
             'has_email_parser'           => defined('FLUENTSUPPORTPRO_PLUGIN_VERSION'),
             'ticket_tags'                => $tags,
@@ -470,6 +473,8 @@ class Menu
             'auth_provider'              => Helper::getAuthProvider(),
             'fluent_bot_integration'     =>  Helper::fluentBotIntegrationStatus(),
         ));
+
+        $appVars['fluent_booking'] = (new FluentBookingService())->getStatus();
 
         if (defined('FLUENTCRM')) {
             $appVars['fluentcrm_config'] = Helper::getFluentCRMTagConfig();

@@ -43,6 +43,8 @@ class TicketsMigrator
                 `resolved_at` TIMESTAMP NULL,
                 `closed_by` BIGINT(20) UNSIGNED NULL,
                 `created_by` BIGINT(20) UNSIGNED NULL,
+                `serial_number` BIGINT UNSIGNED NULL,
+                `ticket_number` VARCHAR(192) NULL DEFAULT NULL,
                 `created_at` TIMESTAMP NULL,
                 `updated_at` TIMESTAMP NULL,
                 INDEX `idx_customer_id` (`customer_id`),
@@ -53,7 +55,9 @@ class TicketsMigrator
                 INDEX `idx_status` (`status`),
                 INDEX `idx_created_at` (`created_at`),
                 INDEX `idx_resolved_at` (`resolved_at`),
-                INDEX `idx_status_resolved_at` (`status`, `resolved_at`)
+                INDEX `idx_status_resolved_at` (`status`, `resolved_at`),
+                INDEX `idx_ticket_number` (`ticket_number`(191)),
+                UNIQUE KEY `uniq_serial_number` (`serial_number`)
             ) $charsetCollate;";
             $created = dbDelta($sql);
             return $created;
@@ -93,6 +97,20 @@ class TicketsMigrator
             // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- $table is sanitized via esc_sql(); column name is a hardcoded literal.
             $wpdb->query("ALTER TABLE `{$table}` ADD `created_by` BIGINT(20) UNSIGNED NULL AFTER `closed_by`");
         }
+
+        if (!in_array('serial_number', $existing_columns)) {
+            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- $table is sanitized via esc_sql(); column name is a hardcoded literal.
+            $wpdb->query("ALTER TABLE `{$table}` ADD `serial_number` BIGINT UNSIGNED NULL AFTER `created_by`");
+
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table is sanitized via esc_sql().
+            $wpdb->query("UPDATE `{$table}` SET `serial_number` = `id` WHERE `serial_number` IS NULL");
+        }
+
+        if (!in_array('ticket_number', $existing_columns)) {
+            // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- $table is sanitized via esc_sql(); column name is a hardcoded literal.
+            $wpdb->query("ALTER TABLE `{$table}` ADD `ticket_number` VARCHAR(192) NULL DEFAULT NULL AFTER `serial_number`");
+        }
+
     }
 
     public static function addMissingIndexes($table)
@@ -124,6 +142,8 @@ class TicketsMigrator
             'idx_created_at'       => '`created_at`',
             'idx_resolved_at'      => '`resolved_at`',
             'idx_status_resolved_at' => '`status`, `resolved_at`',
+            'idx_ticket_number'    => '`ticket_number`(191)',
+            'uniq_serial_number'   => '`serial_number`',
         ];
 
         // Add missing indexes. $table is esc_sql()'d above; $index_name and
@@ -131,7 +151,8 @@ class TicketsMigrator
         foreach ($indexes as $index_name => $columns) {
             if (!in_array($index_name, $existing_index_names)) {
                 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- all identifiers are either esc_sql()'d or hardcoded literals.
-                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` ({$columns})");
+                $indexType = $index_name === 'uniq_serial_number' ? 'UNIQUE KEY' : 'INDEX';
+                $wpdb->query("ALTER TABLE `{$table}` ADD {$indexType} `{$index_name}` ({$columns})");
             }
         }
     }

@@ -12,8 +12,11 @@ class FluentCart
     {
 //        add_filter('fluent_support/customer_extra_widgets', array($this, 'getFluentCartPurchaseWidgets'), 120, 2);
         // add_filter('fluent_support/customer_extra_widgets', array($this, 'getFluentCartProLicenseWidget'), 125, 2);
-        add_action('fluent_cart/order_created', [$this, 'addCustomer'], 10, 1);
-        if (!apply_filters('fluent_support/disable_fc_menu', false)) {
+
+        if (
+            !apply_filters('fluent_support/disable_fc_menu', false) &&
+            Helper::getBusinessSettings('ticket_link_portal') === 'fluent_cart'
+        ) {
             $this->renderCustomerPortalInFluentCartDashboard();
         }
     }
@@ -106,60 +109,6 @@ class FluentCart
 
     //     return $widgets;
     // }
-
-    public function addCustomer($param)
-    {
-        $fluentCartCustomer = Arr::get($param, 'customer');
-
-        if (empty($fluentCartCustomer['email'])) {
-            return;
-        }
-
-        $customerData = [
-            'email' => $fluentCartCustomer['email'],
-            'first_name' => $fluentCartCustomer['first_name'] ?? '',
-            'last_name' => $fluentCartCustomer['last_name'] ?? '',
-            'status' => 'active'
-        ];
-
-        // Add user_id if available
-        if (!empty($fluentCartCustomer['user_id'])) {
-            $customerData['user_id'] = $fluentCartCustomer['user_id'];
-        }
-
-        // Address field mappings for efficient processing
-        $addressMappings = [
-            'city' => 'city',
-            'state' => 'state',
-            'country' => 'country',
-            'postcode' => 'zip'
-        ];
-
-        // Process primary address fields
-        foreach ($addressMappings as $source => $target) {
-            if (!empty($fluentCartCustomer[$source])) {
-                $customerData[$target] = $fluentCartCustomer[$source];
-            }
-        }
-
-        // Use billing address as fallback and add address lines
-        $billingAddress = $fluentCartCustomer['primary_billing_address'] ?? [];
-        if (!empty($billingAddress)) {
-            foreach ($addressMappings as $source => $target) {
-                if (empty($customerData[$target]) && !empty($billingAddress[$source])) {
-                    $customerData[$target] = $billingAddress[$source];
-                }
-            }
-
-            foreach (['address_1' => 'address_line_1', 'address_2' => 'address_line_2'] as $source => $target) {
-                if (!empty($billingAddress[$source])) {
-                    $customerData[$target] = $billingAddress[$source];
-                }
-            }
-        }
-
-        Customer::maybeCreateCustomer($customerData);
-    }
 
     /**
      * Get customer's product licenses from FluentCart Pro
@@ -285,7 +234,7 @@ class FluentCart
 
     private function renderCustomerPortalInFluentCartDashboard()
     {
-        if (!function_exists('fluent_cart_api') || Helper::getBusinessSettings('enable_fc_menu') != 'yes' ) {
+        if (!function_exists('fluent_cart_api') || Helper::getBusinessSettings('ticket_link_portal') !== 'fluent_cart' ) {
             return;
         }
 
@@ -294,8 +243,7 @@ class FluentCart
             'render_callback' => function () {
                 echo do_shortcode('[fluent_support_portal]');
             },
-            'priority'        => 'high',
-            'page_id_x'       => apply_filters('fluent_support/fc_menu_page_id', 573),
+            'priority'        => 'high'
         ]);
     }
 }

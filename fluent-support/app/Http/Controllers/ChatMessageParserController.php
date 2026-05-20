@@ -26,6 +26,13 @@ class ChatMessageParserController extends Controller
      */
     public function handleTelegramWebhook(Request $request, HandleTelegramEvent $handler, $token)
     {
+        if (!$this->verifyWebhookSignature('telegram', $request)) {
+            return $this->sendError([
+                'message' => __('Invalid request signature.', 'fluent-support'),
+                'status'  => false
+            ], 403);
+        }
+
         try {
             return $this->sendSuccess([
                 'message' => __('Response has been successfully recorded', 'fluent-support'),
@@ -42,14 +49,28 @@ class ChatMessageParserController extends Controller
 
     /**
      * handleSlackEvent responsible for getting information from integrated slack request and response
+     * @param Request $request
      * @param HandleSlackEvent $handler
      * @param $token
      * @return array
      */
-    public function handleSlackEvent(HandleSlackEvent $handler, $token)
+    public function handleSlackEvent(Request $request, HandleSlackEvent $handler, $token)
     {
-        try{
-            $this->sendSuccess([
+        if (!$this->verifyWebhookSignature('slack', $request)) {
+            return $this->sendError([
+                'message' => __('Invalid request signature.', 'fluent-support'),
+                'status'  => false
+            ], 403);
+        }
+
+        if ($request->getSafe('type', 'sanitize_text_field') === 'url_verification') {
+            return new \WP_REST_Response($request->getSafe('challenge', 'sanitize_text_field'), 200, [
+                'Content-Type' => 'text/plain; charset=utf-8'
+            ]);
+        }
+
+        try {
+            return $this->sendSuccess([
                 'message' => 'received',
                 'result' => $handler->handleEvent($token)
             ]);
@@ -59,5 +80,29 @@ class ChatMessageParserController extends Controller
                 'status'  => false
             ]);
         }
+    }
+
+    /**
+     * Verify webhook signature using platform-specific logic.
+     *
+     * Pro plugin or third-party code may hook into the filter
+     * 'fluent_support/verify_webhook_signature_{platform}' to enable
+     * cryptographic signature verification. When no verifier is
+     * registered, fall back to the existing token-based validation
+     * handled by the downstream webhook handlers.
+     *
+     * @param string $platform 'telegram' or 'slack'
+     * @param Request $request
+     * @return bool
+     */
+    private function verifyWebhookSignature($platform, Request $request)
+    {
+        $hookName = 'fluent_support/verify_webhook_signature_' . $platform;
+
+        if (!has_filter($hookName)) {
+            return true;
+        }
+
+        return (bool) apply_filters($hookName, false, $request);
     }
 }

@@ -208,6 +208,12 @@ class CustomerPortalHandler
             'customer_status' => static::customerStatus()->status ?? static::customerStatus(),
             'max_file_upload' => Helper::getBusinessSettings('max_file_upload', 3),
             'agent_feedback_rating' => Helper::getBusinessSettings('agent_feedback_rating', 'no'),
+            'can_view_private_ticket_number' => current_user_can('manage_options') || PermissionManager::currentUserCan([
+                    'fst_view_tickets',
+                    'fst_manage_own_tickets',
+                    'fst_manage_unassigned_tickets',
+                    'fst_manage_other_tickets'
+                ]),
         ];
 
         if ($this->isSignedTicketView()) {

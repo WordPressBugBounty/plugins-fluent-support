@@ -835,9 +835,25 @@ class SettingsController extends Controller
             'object_type' => 'fluent_bot_settings',
             'object_id'   => 1,
             'key'         => '_fs_fluent_bot_config'
-        ])->first();
+        ])->orderByDesc('id')->first();
 
         $settings = $meta ? Helper::safeUnserialize($meta->value) : [];
+
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+
+        unset($settings['generalApiKey']);
+
+        if (!empty($settings['productMappings']) && is_array($settings['productMappings'])) {
+            $settings['productMappings'] = array_map(function ($mapping) {
+                if (!is_array($mapping)) {
+                    return $mapping;
+                }
+                unset($mapping['apiKey']);
+                return $mapping;
+            }, $settings['productMappings']);
+        }
 
         $productItems = Product::all()->map(function ($product) {
             return [
@@ -846,13 +862,17 @@ class SettingsController extends Controller
             ];
         })->values()->all();
 
-        return array_merge([
-            'generalApiKey'    => '',
-            'generalBotId'     => '',
-            'isEnabled'        => false,
-            'productMappings'  => [],
-            'products'         => $productItems
-        ], $settings, [
+        // Default generalBotEnabled to true for backward compatibility with configs saved
+        // before this flag existed — existing installs expect general bot to work on GET.
+        $defaults = [
+            'generalBotId'      => '',
+            'generalBotEnabled' => true,
+            'isEnabled'         => false,
+            'productMappings'   => [],
+            'products'          => $productItems,
+        ];
+
+        return array_merge($defaults, $settings, [
             'products' => $productItems
         ]);
     }
@@ -860,43 +880,59 @@ class SettingsController extends Controller
     public function saveFluentBotSettings(Request $request)
     {
         $data = [
-            'generalBotId'     => $request->getSafe('generalBotId', 'sanitize_text_field'),
-            'isEnabled'        => $request->getSafe('isEnabled', 'rest_sanitize_boolean'),
+            'generalBotId'      => $request->getSafe('generalBotId', 'sanitize_text_field'),
+            'generalBotEnabled' => filter_var($request->get('generalBotEnabled', true), FILTER_VALIDATE_BOOLEAN),
+            'isEnabled'         => $request->getSafe('isEnabled', 'rest_sanitize_boolean'),
             'productMappings'  => []
         ];
 
         $productMappings = (array) $request->get('productMappings', []);
+        $seenProductIds = [];
 
         foreach ($productMappings as $mapping) {
             if (!is_array($mapping)) {
                 continue;
             }
 
+            $productId = intval($mapping['productId'] ?? 0);
+            $botId = trim(sanitize_text_field($mapping['botId'] ?? ''));
+
+            // Drop invalid rows: empty botId would override the general bot with nothing
+            // at resolution time (resolveApiCredentials), producing runtime failures.
+            if ($productId < 1 || $botId === '') {
+                continue;
+            }
+
+            // Dedupe by productId — first valid mapping wins.
+            if (isset($seenProductIds[$productId])) {
+                continue;
+            }
+            $seenProductIds[$productId] = true;
+
             $data['productMappings'][] = [
-                'productId'    => intval($mapping['productId'] ?? 0),
+                'productId'    => $productId,
                 'productTitle' => sanitize_text_field($mapping['productTitle'] ?? ''),
-                'botId'        => sanitize_text_field($mapping['botId'] ?? ''),
+                'botId'        => $botId,
             ];
         }
 
         $serialized = maybe_serialize($data);
 
-        $existing = Meta::where([
+        $where = [
             'object_type' => 'fluent_bot_settings',
             'object_id'   => 1,
             'key'         => '_fs_fluent_bot_config'
-        ])->first();
+        ];
+
+        $existing = Meta::where($where)->orderByDesc('id')->first();
 
         if ($existing) {
+            // Update the latest row; do not prune siblings — concurrent first-writes could
+            // race and delete each other's inserts, leaving zero rows (data loss).
+            // Reads use orderByDesc('id')->first() so duplicates are harmless at read time.
             $existing->update(['value' => $serialized]);
         } else {
-            Meta::create([
-                'object_type' => 'fluent_bot_settings',
-                'object_id'   => 1,
-                'key'         => '_fs_fluent_bot_config',
-                'value'       => $serialized
-            ]);
-
+            Meta::create(array_merge($where, ['value' => $serialized]));
             AIActivityLogsMigrator::migrate();
         }
 
@@ -904,6 +940,34 @@ class SettingsController extends Controller
             'success' => true,
             'message' => 'Settings saved successfully',
             'data'    => $data
+        ];
+    }
+
+    public function getFluentBotPresets()
+    {
+        $service = new \FluentSupport\App\Services\Integrations\FluentBot\FluentBotService();
+        $custom = $service->getCustomPresets();
+
+        if (!empty($custom)) {
+            return ['presets' => $custom];
+        }
+
+        // Return defaults without persisting — saving happens only when the user explicitly posts.
+        $helper = new \FluentSupport\App\Services\Integrations\FluentBot\FluentBotHelper();
+        return ['presets' => $helper->getPresetPrompts('createResponse')];
+    }
+
+    public function saveFluentBotPresets(Request $request)
+    {
+        $presets = (array) $request->get('presets', []);
+
+        $service = new \FluentSupport\App\Services\Integrations\FluentBot\FluentBotService();
+        $saved = $service->saveCustomPresets($presets);
+
+        return [
+            'success' => true,
+            'message' => __('Prompt options saved successfully', 'fluent-support'),
+            'presets' => $saved
         ];
     }
 

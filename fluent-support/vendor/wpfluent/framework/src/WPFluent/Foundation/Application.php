@@ -21,10 +21,29 @@ use FluentSupport\Framework\Foundation\ComponentBinder;
 use FluentSupport\Framework\Foundation\Concerns\FoundationTrait;
 
 /**
- * @property \FluentSupport\Framework\Foundation\Config $config
- * @property \FluentSupport\Framework\Http\Router\Router $router
- * @property \FluentSupport\Framework\Http\Request\Request $request
- * @property \FluentSupport\Framework\Http\Response\Response $response
+ * Application — service container with magic property access via __get.
+ *
+ * Properties below are bound in {@see ComponentBinder::bindComponents()} and
+ * {@see Application::init()}/{@see Application::setAppLevelNamespace()}. Each
+ * `@property` declaration teaches PHPStan about a runtime container binding so
+ * `$app->view->render(...)` and similar access can be type-checked.
+ *
+ * @property \FluentSupport\Framework\Foundation\Config        $config
+ * @property \FluentSupport\Framework\View\View                $view
+ * @property \FluentSupport\Framework\Cache\Cache              $cache
+ * @property \FluentSupport\Framework\Http\Router\Router       $router
+ * @property \FluentSupport\Framework\Http\Request\Request     $request
+ * @property \FluentSupport\Framework\Http\Response\Response   $response
+ * @property \FluentSupport\Framework\Validator\Validator      $validator
+ * @property \FluentSupport\Framework\Events\Dispatcher        $events
+ * @property \FluentSupport\Framework\Encryption\Encrypter     $encrypter
+ * @property \FluentSupport\Framework\Encryption\Encrypter     $crypt
+ * @property \FluentSupport\Framework\Database\DatabaseManager $db
+ * @property \FluentSupport\Framework\Http\URL                 $url
+ * @property \FluentSupport\Framework\Support\Mail             $mail
+ * @property \FluentSupport\Framework\Support\Pipeline         $pipeline
+ * @property string                             $__pluginfile__
+ * @property string                             $__namespace__
  */
 class Application extends Container
 {

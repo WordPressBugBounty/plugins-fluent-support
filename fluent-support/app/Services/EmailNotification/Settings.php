@@ -4,10 +4,11 @@ namespace FluentSupport\App\Services\EmailNotification;
 use FluentSupportPro\Database\Migrations\TimeTrackMigrator;
 
 use FluentSupport\App\Services\Helper;
+use FluentSupport\App\Services\Notifications\NotificationSettings;
+use FluentSupport\Framework\Support\Arr;
 
 class Settings
 {
-
     public function getEmailSettingsKeys()
     {
         $key = apply_filters('fluent_support/email_setting_keys', [
@@ -32,6 +33,15 @@ class Settings
             ];
         }
 
+        if ($settingsKey == NotificationSettings::OPTION_KEY) {
+            $notificationSettings = new NotificationSettings();
+
+            return [
+                'settings' => $notificationSettings->get(false),
+                'fields'   => $notificationSettings->getFields()
+            ];
+        }
+
         return [
             'settings' => [],
             'fields'   => []
@@ -46,8 +56,22 @@ class Settings
      */
     public function save($settingsKey, $settings)
     {
+        if ($settingsKey == 'global_business_settings' && is_array($settings) && array_key_exists('internal_notifications_enabled', $settings)) {
+            $notificationSettings = new NotificationSettings();
+            $savedNotificationSettings = $notificationSettings->get(false);
+            $savedNotificationSettings['enabled'] = $settings['internal_notifications_enabled'];
+            $notificationSettings->save($savedNotificationSettings);
+        }
+
         if ($settingsKey == 'global_business_settings' && empty($settings['accepted_file_types'])) {
             $settings['accepted_file_types'] = [];
+        }
+
+        if ($settingsKey == 'global_business_settings') {
+            $settings['ticket_link_portal_migrated'] = 'yes';
+            if (isset($settings['min_serial_number'])) {
+                $settings['min_serial_number'] = max(1, (int) $settings['min_serial_number']);
+            }
         }
 
         if ($settingsKey == 'global_business_settings' && !empty($settings['agent_time_tracking'])) {
@@ -56,7 +80,13 @@ class Settings
             }
         }
 
-        return Helper::updateOption($settingsKey, $settings);
+        if ($settingsKey == NotificationSettings::OPTION_KEY) {
+            return (new NotificationSettings())->save($settings);
+        }
+
+        $result = Helper::updateOption($settingsKey, $settings);
+
+        return $result;
     }
 
     /**
@@ -74,6 +104,8 @@ class Settings
 
         $defaults = [
             'portal_page_id'        => '',
+            'ticket_link_portal'    => 'default',
+            'ticket_link_portal_migrated' => 'no',
             // translators: %1$s is opening paragraph tag, %2$s is closing paragraph tag
             'login_message'         => sprintf(__('%1$sPlease login or create an account to access the Customer Support Portal%2$s [fluent_support_auth]', 'fluent-support'), '<p>', '</p>'),
             'disable_public_ticket' => 'no',
@@ -82,9 +114,14 @@ class Settings
             'max_file_upload'       => 3,
             'del_files_on_close'    => 'no',
             'enable_admin_bar_summary' => 'no',
+            'internal_notifications_enabled' => 'no',
             'enable_draft_mode' => 'no',
             'agent_feedback_rating' => 'no',
-            'keyboard_shortcuts'   => 'yes'
+            'keyboard_shortcuts'   => 'yes',
+            'enable_min_serial_number' => 'no',
+            'ticket_prefix'        => '',
+            'min_serial_number'    => 1,
+            'enable_fluent_booking_integration' => 'no',
         ];
 
         //Get default/existing settings from database using the key global_business_settings
@@ -96,8 +133,39 @@ class Settings
         }
 
         $settings = wp_parse_args($existingSettings, $defaults);
+        $settings['ticket_link_portal'] = $settings['ticket_link_portal'] ?: 'default';
+
+        if (Arr::get($settings, 'ticket_link_portal_migrated') !== 'yes') {
+            $settings['ticket_link_portal'] = $this->resolveLegacyTicketLinkPortal($settings);
+            $settings['ticket_link_portal_migrated'] = 'yes';
+            Helper::updateOption('global_business_settings', $settings);
+        }
 
         return $settings;
+    }
+
+    private function resolveLegacyTicketLinkPortal($settings)
+    {
+        $selectedPortal = Arr::get($settings, 'ticket_link_portal', 'default');
+
+        if ($selectedPortal && $selectedPortal !== 'default') {
+            return $selectedPortal;
+        }
+
+        $ticketFormSettings = Helper::getOption('_ticket_form_settings', []);
+
+        if (Arr::get($settings, 'enable_fc_menu') === 'yes') {
+            return 'fluent_cart';
+        }
+
+        // The legacy pro plugin defaulted enable_woo_menu to 'yes', so treat an
+        // absent value the same as 'yes' — only skip migration if explicitly 'no'.
+        // WC portal was always Pro-only, so require Pro to be active as well.
+        if (defined('FLUENTSUPPORTPRO_PLUGIN_VERSION') && defined('WC_PLUGIN_FILE') && Arr::get($ticketFormSettings, 'enable_woo_menu', 'yes') !== 'no') {
+            return 'woocommerce';
+        }
+
+        return 'default';
     }
 
 
@@ -107,6 +175,7 @@ class Settings
      */
     private function getGlobalBusinessSettingsFields()
     {
+        $nextSerialNumber = \FluentSupport\App\Models\Ticket::getNextSerialNumber();
 
         $mimeGroups = Helper::getMimeGroups();
 
@@ -126,15 +195,41 @@ class Settings
         );
 
         $fields = [
+            'ticket_link_portal_description' => [
+                'type'        => 'html-viewer',
+                'label'       => __('Customer Portal', 'fluent-support'),
+                'wrapper_class' => 'fs_portal_destination_description',
+            ],
+            'ticket_link_portal' => [
+                'type'        => 'input-radio',
+                'wrapper_class' => 'fs_portal_destination_options',
+                'options'     => $this->getTicketLinkPortalOptions(),
+            ],
+            'fluent_community_portal_link' => [
+                'type'          => 'html-viewer',
+                'wrapper_class' => 'fs_fluent_community_portal_link',
+                'html'          => $this->getFluentCommunityPortalLinkHtml(),
+                'dependency'    => [
+                    'depends_on' => 'ticket_link_portal',
+                    'operator'   => '=',
+                    'value'      => 'fluent_community'
+                ],
+            ],
             'portal_page_id'        => [
                 'type'        => 'input-options',
-                'label'       => __('Portal Page', 'fluent-support'),
+                'label'       => __('Select a Page', 'fluent-support'),
+                'wrapper_class' => 'fs_portal_page_selector',
                 'show_id'     => true,
                 'placeholder' => __('Select Portal Page', 'fluent-support'),
                 'options'     => Helper::getWPPages(),//Get list of published pages
                 'inline_help' => __('Please provide the page id where you want to show the tickets for your customers. Use shortcode <code>[fluent_support_portal]</code> in that page', 'fluent-support'),
                 'admin_url'   => admin_url(),
                 'home_url'    => home_url('/'),
+                'dependency'  => [
+                    'depends_on' => 'ticket_link_portal',
+                    'operator'   => '=',
+                    'value'      => 'default'
+                ],
             ],
             'login_message'         => [
                 'type'        => 'wp-editor',
@@ -184,6 +279,18 @@ class Settings
                 'checkbox_label' => __('Enable Fluent Summary In Admin Bar', 'fluent-support'),
                 'inline_help'    => __('If you enable this, logged in user can see the ticket summary from top nav bar.', 'fluent-support')
             ],
+            'internal_notifications_enabled' => [
+                'wrapper_class' => '',
+                'type'           => 'inline-checkbox',
+                'true_label'     => 'yes',
+                'false-label'    => 'no',
+                'checkbox_label' => __('Enable Internal Notifications', 'fluent-support'),
+                'inline_help'    => sprintf(
+                    '<ul><li>%1$s</li><li>%2$s</li></ul>',
+                    __('Enable the in-app notification bell, unread counts, and notification event storage for agents.', 'fluent-support'),
+                    __('Notification data older than 15 days will be removed automatically.', 'fluent-support')
+                )
+            ],
             'enable_draft_mode' => [
                 'wrapper_class' => '',
                 'type'           => 'inline-checkbox',
@@ -214,8 +321,56 @@ class Settings
                 'checkbox_label' => __('Enable Keyboard Shortcuts', 'fluent-support'),
                 'inline_help'    => __("If you enable this, agents can use keyboard shortcuts for faster actions.", 'fluent-support'),
                 'shortcut_modal' => $this->getKeyboardShortcutModalData()
+            ],
+            'enable_min_serial_number' => [
+                'wrapper_class'  => '',
+                'type'           => 'inline-checkbox',
+                'true_label'     => 'yes',
+                'false-label'    => 'no',
+                'checkbox_label' => __('Enable Minimum Ticket Number', 'fluent-support'),
+                'inline_help'    => __('Enable this to start public ticket numbers from a custom minimum number.', 'fluent-support')
+            ],
+            'min_serial_number' => [
+                'wrapper_class'      => 'fs_settings_half_field',
+                'type'               => 'input-text',
+                'data_type'          => 'number',
+                'label'              => __('Minimum Ticket Number', 'fluent-support'),
+                'help'               => __('Once a ticket is created, you cannot lower this value below the current highest ticket number. Set this carefully — raising it is easy, but lowering it below an existing ticket number is not allowed.', 'fluent-support'),
+                'inline_help'        => sprintf(
+                    __('Next Ticket Number: %d', 'fluent-support'),
+                    $nextSerialNumber
+                ),
+                'next_serial_number' => $nextSerialNumber,
+                'dependency'         => [
+                    'depends_on' => 'enable_min_serial_number',
+                    'operator'   => '=',
+                    'value'      => 'yes'
+                ]
+            ],
+            'ticket_prefix' => [
+                'wrapper_class' => 'fs_settings_half_field',
+                'type'          => 'input-text',
+                'data_type'     => 'text',
+                'label'         => __('Ticket Prefix', 'fluent-support'),
+                'inline_help'   => __('Optional prefix for newly created public ticket numbers.', 'fluent-support'),
+                'dependency'    => [
+                    'depends_on' => 'enable_min_serial_number',
+                    'operator'   => '=',
+                    'value'      => 'yes'
+                ]
             ]
         ];
+        if (defined('FLUENT_BOOKING_VERSION')) {
+            $fields['enable_fluent_booking_integration'] = [
+                'wrapper_class'  => '',
+                'type'           => 'inline-checkbox',
+                'true_label'     => 'yes',
+                'false-label'    => 'no',
+                'checkbox_label' => __('Enable Fluent Booking Integration', 'fluent-support'),
+                'inline_help'    => __('If you enable this, agents can create booking links and view meeting details inside tickets.', 'fluent-support')
+            ];
+        }
+
         if (defined('FLUENTSUPPORTPRO_PLUGIN_VERSION')) {
             $fields['agent_feedback_rating'] = [
                 'wrapper_class' => '',
@@ -235,18 +390,60 @@ class Settings
                 'inline_help' => __("If you enable this setting, the agent can specify the amount of time needed to complete a ticket.", 'fluent-support')
             ];
 
-            if (defined('FLUENTCART_VERSION')) {
-                $fields['enable_fc_menu'] = [
-                    'type'           => 'inline-checkbox',
-                    'checkbox_label' => 'Add support link to FluentCart account navigation',
-                    'inline_help'    => __("If you enable this setting, support link will be added to FluentCart account navigation.", 'fluent-support'),
-                    'true_label'     => 'yes',
-                    'false_label'    => 'no'
-                ];
-            }
         }
 
         return $fields;
+    }
+
+    private function getTicketLinkPortalOptions()
+    {
+        $options = [
+            [
+                'id'    => 'default',
+                'label' => __('Default Portal Page', 'fluent-support'),
+            ],
+        ];
+
+        if (Helper::isPortalActive('fluent_cart')) {
+            $options[] = [
+                'id'    => 'fluent_cart',
+                'label' => __('FluentCart Account Navigation', 'fluent-support'),
+            ];
+        }
+
+        if (Helper::isPortalActive('woocommerce')) {
+            $options[] = [
+                'id'    => 'woocommerce',
+                'label' => __('WooCommerce Account Navigation', 'fluent-support'),
+            ];
+        }
+
+        if (Helper::isPortalActive('fluent_community')) {
+            $options[] = [
+                'id'    => 'fluent_community',
+                'label' => __('FluentCommunity Portal', 'fluent-support'),
+            ];
+        }
+
+        return apply_filters('fluent_support/ticket_link_portal_options', $options);
+    }
+
+    private function getFluentCommunityPortalLinkHtml()
+    {
+        if (!defined('FLUENT_COMMUNITY_PLUGIN_VERSION') || !class_exists('\FluentCommunity\App\Services\Helper')) {
+            return '';
+        }
+
+        $portalLink = rtrim(\FluentCommunity\App\Services\Helper::baseUrl('support/'), '/\\') . '/';
+
+        return '<div class="fs_portal_link_content">'
+            . '<span class="fs_portal_link_label">' . esc_html__('FluentCommunity Portal URL', 'fluent-support') . '</span>'
+            . '<button type="button" class="fs_portal_link_token" data-portal-link="' . esc_attr($portalLink) . '">'
+            . '<span class="fs_portal_link_text">' . esc_html($portalLink) . '</span>'
+            . '<span class="fs_portal_link_action">' . esc_html__('Copy', 'fluent-support') . '</span>'
+            . '</button>'
+            . '<p class="fc_inline_help">' . esc_html__('Copy this URL and add it to your FluentCommunity menu.', 'fluent-support') . '</p>'
+            . '</div>';
     }
 
     /**

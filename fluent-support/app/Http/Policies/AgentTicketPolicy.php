@@ -166,6 +166,11 @@ class AgentTicketPolicy extends Policy
         return PermissionManager::canAccessTicketRoutes();
     }
 
+    public function getRuntimeConfig(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
     public function generateStreamResponse(Request $request)
     {
         return PermissionManager::canAccessTicketRoutes();
@@ -179,5 +184,60 @@ class AgentTicketPolicy extends Policy
     public function getTicketTone(Request $request)
     {
         return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function markRead(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function markAllRead(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function getChatId(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function getChatMessages(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function getContextSelection(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
+    public function saveChatId(Request $request)
+    {
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
+    }
+
+    public function deleteChatId(Request $request)
+    {
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
+    }
+
+    public function saveContextSelection(Request $request)
+    {
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
+    }
+
+    public function createFeedback(Request $request)
+    {
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
+    }
+
+    public function deleteFeedback(Request $request)
+    {
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
     }
 }

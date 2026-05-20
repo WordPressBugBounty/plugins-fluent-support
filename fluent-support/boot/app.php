@@ -47,6 +47,19 @@ return function ($file) {
                 wp_schedule_event(time(), 'weekly', 'fluent_support_weekly_tasks');
             }
 
+            global $wpdb;
+            $table = esc_sql($wpdb->prefix . 'fs_tickets');
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $table is sanitized via esc_sql(); no user input.
+            $column_exists = $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'serial_number'");
+            if ($column_exists) {
+                // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                $has_null = $wpdb->get_var("SELECT id FROM `{$table}` WHERE `serial_number` IS NULL LIMIT 1");
+                if ($has_null) {
+                    // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+                    $wpdb->query("UPDATE `{$table}` SET `serial_number` = `id` WHERE `serial_number` IS NULL");
+                }
+            }
+
             /*
              * The below schedule is powered by Action Scheduler by WooCommerce
              * It will run every 30 minutes.

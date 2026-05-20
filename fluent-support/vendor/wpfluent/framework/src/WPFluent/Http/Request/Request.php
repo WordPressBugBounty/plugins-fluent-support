@@ -15,6 +15,7 @@ class Request
         InteractsWithHeadersTrait,
         InputHelperMethodsTrait,
         InteractsWithFilesTrait,
+        InteractsWithIPTrait,
         MacroableTrait {
             __call as macroCall;
         }
@@ -391,18 +392,47 @@ class Request
     }
 
     /**
-     * Retrieve an item from the cookie
-     * @param  string $key
-     * @param  mixed $default
+     * Retrieve an item from the cookie jar.
+     *
+     * Returns the raw cookie value, with one exception: if the value is a
+     * valid strict-base64 string AND the decoded bytes parse as JSON, the
+     * decoded value is returned instead. This keeps backwards compatibility
+     * with callers that stored base64(json(...)) payloads, while normal
+     * cookies (utm_*, UUIDs, hex hashes, JWTs, plain strings) pass through
+     * unchanged because they fail one of the two gates.
+     *
+     * @param  string|null $key      Cookie name, or null for the full array
+     * @param  mixed       $default  Returned when $key is set but absent
      * @return mixed
      */
     public function cookie($key = null, $default = null)
     {
-        $cookie = $key ? Arr::get(
-            $this->cookie, $key, $default
-        ) : $this->cookie;
+        if ($key === null) {
+            return $this->cookie;
+        }
 
-        return json_decode(base64_decode($cookie, true));
+        $raw = Arr::get($this->cookie, $key, $default);
+
+        // Pass through defaults, non-strings, and empty strings unchanged
+        if ($raw === $default || !is_string($raw) || $raw === '') {
+            return $raw;
+        }
+
+        // Auto-detect base64(json(...)) payloads. Both gates must pass;
+        // otherwise return the raw cookie. Strict mode rejects values
+        // containing characters outside the base64 alphabet (e.g. '-'),
+        // and most plain values fail the JSON parse on the decoded bytes.
+        $decoded = base64_decode($raw, true);
+        if ($decoded === false) {
+            return $raw;
+        }
+
+        $parsed = json_decode($decoded, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $raw;
+        }
+
+        return $parsed;
     }
 
     /**
@@ -622,40 +652,6 @@ class Request
     }
 
     /**
-     * Get user ip address.
-     * 
-     * @return string
-     */
-    public function getIp()
-    {
-        if ($this->isProxyEnabled()) {
-            if (!empty($forwarded = $this->server('HTTP_X_FORWARDED_FOR'))) {
-                $ips = explode(',', $forwarded);
-
-                foreach ($ips as $ip) {
-                    $ip = trim($ip);
-
-                    if (filter_var($ip, FILTER_VALIDATE_IP)) {
-                        return $ip;
-                    }
-                }
-            }
-        }
-
-        return $this->server('REMOTE_ADDR');
-    }
-
-    /**
-     * Check if proxy support is enabled.
-     * 
-     * @return boolean
-     */
-    protected function isProxyEnabled()
-    {
-        return $this->app->applyCustomFilters('proxy_support', false);
-    }
-
-    /**
      * Get the request method.
      * 
      * @return string
@@ -750,10 +746,12 @@ class Request
             $status = 403;
         }
 
-        $message = $message ?: 'Request has benn aborted.';
+        $message = $message ?: "{$status} Request has been aborted.";
 
         return new \WP_REST_Response(
-            is_array($message) ? $message : ['message' => (string) $message], $status
+            is_array($message) ? $message : [
+                'message' => (string) $message
+            ], $status
         );
     }
 
@@ -774,7 +772,7 @@ class Request
         }
 
         $message = $message
-            ?: "Request has benn terminated with status {$status}.";
+            ?: "Request has been terminated with status {$status}.";
 
         return wp_send_json(
             is_array($message) ? $message : ['message' => (string) $message], $status

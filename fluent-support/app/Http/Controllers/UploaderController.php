@@ -77,13 +77,25 @@ class UploaderController extends Controller
     private function resolveTicketId($request)
     {
         $ticketId = $request->getSafe('ticket_id', 'intval');
-        return $ticketId == 'undefined' ? null : $ticketId;
+
+        if ($ticketId == 'undefined' || !$ticketId) {
+            return null;
+        }
+
+        if (Helper::getCurrentAgent()) {
+            return $ticketId;
+        }
+
+        $ticket = Ticket::wherePublicIdentifier($ticketId)->first();
+
+        return $ticket ? $ticket->id : null;
     }
 
     private function resolvePerson($ticketId, Request $request)
     {
-        if ($request->getSafe('is_agent', 'sanitize_text_field') == 'yes') {
-            return Helper::getCurrentAgent();
+        $agent = Helper::getCurrentAgent();
+        if ($agent) {
+            return $agent;
         }
 
         if ($ticketId && Helper::isPublicSignedTicketEnabled()) {
@@ -91,7 +103,8 @@ class UploaderController extends Controller
             if ($intendedTicketHash && $intendedTicketHash != 'undefined') {
                 $ticket = Ticket::with(['customer'])
                     ->where('hash', $intendedTicketHash)
-                    ->find($ticketId);
+                    ->wherePublicIdentifier($ticketId)
+                    ->first();
 
                 if ($ticket && $ticket->customer) {
                     return $ticket->customer;
@@ -123,7 +136,7 @@ class UploaderController extends Controller
     private function createAttachmentRecords($uploadedFiles, $ticketId, $person, $imageType)
     {
         $attachments = [];
-        $full_path = null;
+        $directPasteUrl = null;
 
         foreach ($uploadedFiles as $file) {
             if (empty($file['file_path'])) continue;
@@ -142,13 +155,14 @@ class UploaderController extends Controller
                 ]
             ];
 
-            if($imageType == 'direct_paste'){
-                $full_path = esc_url($file['url']);
-            }
-
             try {
                 $attachment = Attachment::create($fileData);
                 $attachments[] = $attachment->file_hash;
+
+                if ($imageType == 'direct_paste') {
+                    $directPasteUrl = $attachment->secureUrl;
+                }
+
                 do_action('fluent_support/attachment_uploaded_as_temp', $attachment, $ticketId);
                 $driver = Helper::getUploadDriverKey();
 
@@ -158,7 +172,7 @@ class UploaderController extends Controller
             }
         }
 
-        return $imageType == 'direct_paste' ? $full_path : $attachments;
+        return $imageType == 'direct_paste' ? $directPasteUrl : $attachments;
     }
 
     public function uploadImage(Request $request)

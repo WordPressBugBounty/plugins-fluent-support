@@ -16,6 +16,8 @@ class Ticket extends Model
 
     protected $dates = ['waiting_since'];
 
+    protected $appends = ['display_ticket_number'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -45,7 +47,9 @@ class Ticket extends Model
         'total_close_time',
         'resolved_at',
         'closed_by',
-        'created_by'
+        'created_by',
+        'serial_number',
+        'ticket_number'
     ];
 
     public static function boot()
@@ -67,6 +71,12 @@ class Ticket extends Model
 
         });
 
+        static::created(function ($model) {
+            if (empty($model->serial_number) || empty($model->ticket_number)) {
+                $model->assignTicketNumber();
+            }
+        });
+
         static::deleting(function ($model) {
             //Delete the ticket meta
             Meta::where('object_type', 'ticket_meta')->where('object_id', $model->id)->delete();
@@ -74,6 +84,8 @@ class Ticket extends Model
             Meta::where('object_type', 'ticket')->where('object_id', $model->id)->delete();
             //Delete draft info
             Meta::where('object_type', '_fs_auto_draft')->where('object_id', $model->id)->delete();
+            //Delete internal notifications and notification recipient rows for the ticket
+            Notification::deleteByTicketId($model->id);
             //delete the responses first (their attachments are cleaned up by Conversation::deleting)
             Conversation::deleteAll($model->id);
             // Delete ticket-level attachments (conversation_id IS NULL) and remove the ticket upload directory
@@ -92,7 +104,9 @@ class Ticket extends Model
         'content',
         'title',
         'slug',
-        'id'
+        'id',
+        'serial_number',
+        'ticket_number'
     ];
 
     /**
@@ -754,6 +768,74 @@ class Ticket extends Model
         $this->delete();
     }
 
+    public static function getNextSerialNumber()
+    {
+        $businessSettings = Helper::getOption('global_business_settings', []);
+        $minNumber = (int) ($businessSettings['min_serial_number'] ?? 1);
+        $minNumber = (int) apply_filters('fluent_support/min_serial_number', $minNumber);
+
+        try {
+            $lastTicketNumber = self::query()->max('serial_number');
+        } catch (\Exception $e) {
+            $lastTicketNumber = null;
+        }
+
+        $nextNumber = ((int) $lastTicketNumber) + 1;
+
+        return max($nextNumber, $minNumber);
+    }
+
+    public static function isMinimumSerialNumberEnabled()
+    {
+        $businessSettings = Helper::getOption('global_business_settings', []);
+        return ($businessSettings['enable_min_serial_number'] ?? 'no') === 'yes';
+    }
+
+    public static function getTicketPrefix($ticket = null)
+    {
+        $businessSettings = Helper::getOption('global_business_settings', []);
+        $prefix = self::isMinimumSerialNumberEnabled() ? trim((string) ($businessSettings['ticket_prefix'] ?? '')) : '';
+
+        $productId = $ticket ? $ticket->product_id : null;
+
+        return apply_filters('fluent_support/ticket_prefix', $prefix, $ticket, $productId);
+    }
+
+    public function getDisplayTicketNumberAttribute()
+    {
+        return $this->ticket_number ?: ($this->serial_number ?: $this->id);
+    }
+
+    public function scopeWherePublicIdentifier($query, $identifier)
+    {
+        return $query->where('serial_number', $identifier);
+    }
+
+    protected function assignTicketNumber()
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $nextNumber = $this->serial_number ?: (self::isMinimumSerialNumberEnabled() ? self::getNextSerialNumber() : $this->id);
+            $ticketNumber = $this->ticket_number ?: (self::getTicketPrefix($this) . $nextNumber);
+
+            try {
+                self::where('id', $this->id)->update([
+                    'serial_number' => $nextNumber,
+                    'ticket_number' => $ticketNumber
+                ]);
+                $this->serial_number = $nextNumber;
+                $this->ticket_number = $ticketNumber;
+
+                return $nextNumber;
+            } catch (\Exception $e) {
+                if (stripos($e->getMessage(), 'duplicate') === false) {
+                    throw $e;
+                }
+            }
+        }
+
+        throw new \RuntimeException('Could not allocate a unique ticket number.');
+    }
+
     public static function slugify($title)
     {
         $slug = sanitize_title($title, 'support-ticket-' . time(), 'display');
@@ -1102,4 +1184,3 @@ class Ticket extends Model
     }
 
 }
-

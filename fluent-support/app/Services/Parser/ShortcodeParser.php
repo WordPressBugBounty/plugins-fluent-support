@@ -102,6 +102,10 @@ class ShortcodeParser
                 return Helper::getTicketAdminUrl($ticket);
             }
 
+            if($valueKey == 'public_id') {
+                return $ticket->display_ticket_number;
+            }
+
             $accesors = ['id', 'title', 'content', 'priority', 'client_priority', 'status', 'created_at'];
             if(in_array($valueKey, $accesors)) {
                 return $ticket->{$valueKey};

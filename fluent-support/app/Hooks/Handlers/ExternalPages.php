@@ -167,7 +167,7 @@ class ExternalPages
             wp_die('Invalid ticket ID', 'Bad Request', ['response' => 400]);
         }
 
-        $ticket = Ticket::where('id', $ticketId)->first();
+        $ticket = Ticket::wherePublicIdentifier($ticketId)->first();
 
         if (!$ticket) {
             $this->showInvalidPortalMessage();
@@ -199,7 +199,9 @@ class ExternalPages
             wp_die('Invalid ticket ID', 'Bad Request', ['response' => 400]);
         }
 
-        $ticket = Ticket::where('hash', $ticketHash)->where('id', $ticketId)->first();
+        $ticket = Ticket::where('hash', $ticketHash)
+            ->wherePublicIdentifier($ticketId)
+            ->first();
 
         if (!$ticket) {
             $this->showInvalidPortalMessage();

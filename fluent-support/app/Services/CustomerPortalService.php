@@ -52,7 +52,7 @@ class CustomerPortalService
 
         return [
             'ticket'     => $this->syncTicketAdditionData($ticket),
-            'responses'  => $this->getResponses($ticketId),
+            'responses'  => $this->getResponses($ticket->id),
             'sign_on_id' => $ticket->customer_id
         ];
     }
@@ -78,6 +78,7 @@ class CustomerPortalService
 
         $disabledFields = apply_filters('fluent_support/disabled_ticket_fields', []);
         $this->validateDisabledFields($data, $disabledFields);
+
         return $this->storeTicket($data, $customer, $disabledFields);
     }
 
@@ -96,12 +97,19 @@ class CustomerPortalService
         $data['content'] = wp_specialchars_decode(wp_unslash($data['content']));
         $data['conversation_type'] = 'response';
 
-        $ticket = Ticket::with(['customer'])->findOrFail($ticketId);
+        $ticket = Ticket::with(['customer'])->wherePublicIdentifier($ticketId)->firstOrFail();
         $customer = $this->getCustomer($customerAdditionalData, $ticket);
 
         $this->checkCustomerTicketAccess($customer, $ticket, 'response');
 
         $responseData = (new ResponseService())->createResponse($data, $customer, $ticket);
+        $responseData['ticket'] = Ticket::find($ticket->id);
+        $responseData['response']->content = Helper::refreshSignedAttachmentUrls($responseData['response']->content, $ticket->id);
+        $responseData['response']->load([
+            'attachments' => function ($query) {
+                $query->where('status', 'active');
+            }
+        ]);
 
         return [
             'message'  => __('Reply has been added', 'fluent-support'),
@@ -120,7 +128,7 @@ class CustomerPortalService
      */
     public function closeTicket($customerAdditionalData, $ticketId)
     {
-        $ticket = Ticket::with(['customer'])->findOrFail($ticketId);
+        $ticket = Ticket::with(['customer'])->wherePublicIdentifier($ticketId)->firstOrFail();
         $customer = $this->getCustomer($customerAdditionalData, $ticket);
 
         $this->checkCustomerTicketAccess($customer, $ticket, 'close');
@@ -140,7 +148,7 @@ class CustomerPortalService
      */
     public function reOpenTicket($customerAdditionalData, $ticketId)
     {
-        $ticket = Ticket::with(['customer'])->findOrFail($ticketId);
+        $ticket = Ticket::with(['customer'])->wherePublicIdentifier($ticketId)->firstOrFail();
         $customer = $this->getCustomer($customerAdditionalData, $ticket);
 
         $this->checkCustomerTicketAccess($customer, $ticket, 'reopen');
@@ -398,7 +406,7 @@ class CustomerPortalService
      */
     private function getTicketByID($ticketId)
     {
-        $ticket = Ticket::where('id', $ticketId)
+        $ticket = Ticket::wherePublicIdentifier($ticketId)
             ->with([
                 'customer'    => function ($query) {
                     $query->select(['first_name', 'email', 'person_type', 'last_name', 'id', 'avatar']);
@@ -407,7 +415,7 @@ class CustomerPortalService
                 },
                 'product',
                 'attachments' => function ($q) {
-                    $q->whereIn('status', ['active', 'inline']);
+                    $q->where('status', 'active');
                 }
             ])
             ->first();
@@ -470,32 +478,53 @@ class CustomerPortalService
                 'person' => function ($query) {
                     $query->select(['first_name', 'email', 'person_type', 'last_name', 'id', 'title', 'avatar']);
                 },
-                'attachments'
+                'attachments' => function ($query) {
+                    $query->where('status', 'active');
+                }
             ])
             ->filterByType(['response', 'ticket_merge_activity', 'ticket_split_activity'])
             ->orderBy('created_at', 'desc')
             ->orderBy('id', 'desc')
             ->get();
 
-            foreach ($responses as $response) {
-                if (defined('FLUENTSUPPORTPRO_PLUGIN_VERSION') && Helper::isAgentFeedbackEnabled()) {
-                    $agentFeedback = Meta::where('object_id', $response->id)
-                        ->where('object_type', 'conversation_meta')
-                        ->where('key', 'agent_feedback_ratings')
-                        ->first();
+        $contents = [];
+        foreach ($responses as $response) {
+            $contents[$response->id] = $response->content;
+        }
 
-                    if ($agentFeedback) {
-                        $response->agent_feedback = $agentFeedback->value;
-                    }
-                }
+        $contents = Helper::refreshSignedAttachmentUrlsInContents($contents, $ticketId);
 
-                // translators: %s is the time duration (e.g., "2 hours", "3 days")
-                $response->human_date = sprintf(__('%s ago', 'fluent-support'), human_time_diff(strtotime($response->created_at), current_time('timestamp')));
-                $response->content = links_add_target(make_clickable($response->content));
-                if ($response->person) {
-                    $response->person->setHidden(['email']);
-                }
+        $feedbacks = [];
+        if (defined('FLUENTSUPPORTPRO_PLUGIN_VERSION') && Helper::isAgentFeedbackEnabled()) {
+            $responseIds = $responses->pluck('id')->toArray();
+            if ($responseIds) {
+                $feedbacks = Meta::where('object_type', 'conversation_meta')
+                    ->where('key', 'agent_feedback_ratings')
+                    ->whereIn('object_id', $responseIds)
+                    ->get()
+                    ->keyBy('object_id');
             }
+        }
+
+        foreach ($responses as $response) {
+            if ($feedbacks && $feedbacks->has($response->id)) {
+                $response->agent_feedback = $feedbacks->get($response->id)->value;
+            }
+
+            // translators: %s is the time duration (e.g., "2 hours", "3 days")
+            $response->human_date = sprintf(__('%s ago', 'fluent-support'), human_time_diff(strtotime($response->created_at), current_time('timestamp')));
+            if (isset($contents[$response->id])) {
+                $response->content = $contents[$response->id];
+            }
+
+            $responseContent = apply_filters('fluent_support/response_content_before_render', $response->content, $response, null);
+            $responseContent = links_add_target(make_clickable($responseContent));
+            $response->content = apply_filters('fluent_support/response_content_after_render', $responseContent, $response, null);
+
+            if ($response->person) {
+                $response->person->setHidden(['email']);
+            }
+        }
 
         return $responses;
     }
@@ -507,7 +536,10 @@ class CustomerPortalService
      */
     private function syncTicketAdditionData($ticket)
     {
-        $ticket->content = links_add_target(make_clickable($ticket->content));
+        $ticket->content = Helper::refreshSignedAttachmentUrls($ticket->content, $ticket->id);
+        $ticketContent = apply_filters('fluent_support/ticket_content_before_render', $ticket->content, $ticket);
+        $ticketContent = links_add_target(make_clickable($ticketContent));
+        $ticket->content = apply_filters('fluent_support/ticket_content_after_render', $ticketContent, $ticket);
 
         if ($ticket->customer) {
             $ticket->customer->setHidden(['email']);

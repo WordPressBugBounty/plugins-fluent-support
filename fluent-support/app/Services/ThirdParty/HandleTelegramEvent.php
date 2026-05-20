@@ -85,8 +85,8 @@ class HandleTelegramEvent
      */
     private function validateToken ($token)
     {
-        if (\FluentSupportPro\App\Services\Integrations\Telegram\TelegramHelper::getWebhookToken() != $token) {
-            throw new \Exception('Bot Token could not be verified', 404);
+        if (!hash_equals(\FluentSupportPro\App\Services\Integrations\Telegram\TelegramHelper::getWebhookToken(), $token)) {
+            throw new \Exception('Bot Token could not be verified', 403);
         }
         return true;
     }

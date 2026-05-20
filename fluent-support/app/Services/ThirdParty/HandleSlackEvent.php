@@ -23,10 +23,6 @@ class HandleSlackEvent
 
         $request = App::getInstance('request');
 
-        if ($request->getSafe('type', 'sanitize_text_field') == 'url_verification') {
-            echo wp_kses_post($request->getSafe('challenge', 'sanitize_text_field'));
-        }
-
         return (new SlackNotification())->processSlackEvent($request->get('event'));
     }
 
@@ -54,8 +50,8 @@ class HandleSlackEvent
      */
     private function validateToken ($token)
     {
-        if (\FluentSupportPro\App\Services\Integrations\Slack\SlackHelper::getWebhookToken() != $token) {
-            throw new \Exception('Bot Token could not be verified', 404);
+        if (!hash_equals(\FluentSupportPro\App\Services\Integrations\Slack\SlackHelper::getWebhookToken(), $token)) {
+            throw new \Exception('Bot Token could not be verified', 403);
         }
         return true;
     }

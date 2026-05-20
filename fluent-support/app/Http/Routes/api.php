@@ -32,6 +32,7 @@ $router->prefix('tickets')->withPolicy('AgentTicketPolicy')->group(function ($ro
     $router->post('/label-search', 'TicketController@storeOrUpdateLabelSearch');
     $router->delete('/{label_search_id}/label-search', 'TicketController@deleteLabelSearch')->int('label_search_id');
 
+    $router->get('/{ticket_id}/mentionable-agents', 'TicketController@getMentionableAgents')->int('ticket_id');
     $router->get('/{ticket_id}', 'TicketController@getTicket')->int('ticket_id');
 
     $router->get('/{ticket_id}/widgets', 'TicketController@getTicketWidgets')->int('ticket_id');
@@ -67,6 +68,11 @@ $router->prefix('tickets')->withPolicy('AgentTicketPolicy')->group(function ($ro
     $router->put('/{ticket_id}/change-customer', 'TicketController@changeTicketCustomer')->int('ticket_id');
     $router->get('/{ticket_id}/custom-data', 'TicketController@getTicketCustomData')->int('ticket_id');
 
+    $router->get('fluent-booking/event-types', 'TicketController@getFluentBookingEventTypes');
+    $router->get('/{ticket_id}/fluent-booking/availability', 'TicketController@getFluentBookingAvailability')->int('ticket_id');
+    $router->post('/{ticket_id}/fluent-booking/booking-link', 'TicketController@createFluentBookingLink')->int('ticket_id');
+    $router->get('/{ticket_id}/fluent-booking/meetings', 'TicketController@getFluentBookingMeetings')->int('ticket_id');
+
     $router->post('bulk-actions', 'TicketController@doBulkActions'); // close_tickets | delete_tickets | assign_agent | assign_tags
     $router->post('bulk-reply', 'TicketController@doBulkReplies');
 
@@ -85,6 +91,14 @@ $router->prefix('tickets')->withPolicy('AgentTicketPolicy')->group(function ($ro
 });
 
 $router->get('widgets', 'WidgetsController')->withPolicy('AgentTicketPolicy');
+
+$router->prefix('notifications')->withPolicy('AgentTicketPolicy')->group(function ($router) {
+    $router->get('/', 'NotificationController@index');
+    $router->get('/unread', 'NotificationController@unread');
+    $router->get('/unread-count', 'NotificationController@unreadCount');
+    $router->post('/mark-all-read', 'NotificationController@markAllRead');
+    $router->post('/{notification_id}/mark-read', 'NotificationController@markRead')->int('notification_id');
+});
 
 $router->prefix('products')->withPolicy('AdminSettingsPolicy')->group(function ($router) {
     $router->get('/', 'ProductController@index');
@@ -130,6 +144,8 @@ $router->prefix('settings')->withPolicy('AdminSettingsPolicy')->group(function (
     $router->get('/settings-menu', 'SettingsController@getSettingsMenu');
     $router->get('/fluent-bot-integration', 'SettingsController@getFluentBotSettings');
     $router->post('/fluent-bot-integration', 'SettingsController@saveFluentBotSettings');
+    $router->get('/fluent-bot-presets', 'SettingsController@getFluentBotPresets');
+    $router->post('/fluent-bot-presets', 'SettingsController@saveFluentBotPresets');
 });
 
 $router->prefix('agents')->withPolicy('AdminSensitivePolicy')->group(function ($router) {
@@ -235,10 +251,19 @@ $router->prefix('public')->withPolicy('PublicPolicy')->group(function ($router) 
 
 $router->prefix('fluent-bot')->withPolicy('AgentTicketPolicy')->group(function ($router) {
     $router->get('/preset-prompts', 'FluentBotController@getPresetPrompts');
+    $router->get('/runtime-config', 'FluentBotController@getRuntimeConfig');
+    $router->post('/{id}/feedback', 'FluentBotController@createFeedback')->int('id');
+    $router->delete('/{id}/feedback/{feedback_id}', 'FluentBotController@deleteFeedback')->int('id')->int('feedback_id');
     $router->post('/{id}/generate-response', 'FluentBotController@generateResponse')->int('id');
     $router->post('/{id}/generate-stream-response', 'FluentBotController@generateStreamResponse')->int('id');
     $router->post('/{id}/get-ticket-summary', 'FluentBotController@getTicketSummary')->int('id');
     $router->post('/{id}/get-ticket-tone', 'FluentBotController@getTicketTone')->int('id');
+    $router->get('/{id}/chat-id', 'FluentBotController@getChatId')->int('id');
+    $router->post('/{id}/chat-id', 'FluentBotController@saveChatId')->int('id');
+    $router->delete('/{id}/chat-id', 'FluentBotController@deleteChatId')->int('id');
+    $router->get('/{id}/chat-messages', 'FluentBotController@getChatMessages')->int('id');
+    $router->get('/{id}/context-selection', 'FluentBotController@getContextSelection')->int('id');
+    $router->post('/{id}/context-selection', 'FluentBotController@saveContextSelection')->int('id');
 });
 
 $router->prefix('activity-logger')->withPolicy('ActivityLoggerPolicy')->group(function ($router) {
@@ -272,4 +297,3 @@ $router->prefix('ticket_importer')->withPolicy('AdminSettingsPolicy')->group(fun
 
 $router->post('ticket_image_upload', 'UploaderController@uploadImage')
     ->withPolicy('AgentTicketPolicy');
-

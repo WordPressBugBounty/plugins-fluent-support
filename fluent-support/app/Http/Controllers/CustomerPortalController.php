@@ -259,7 +259,7 @@ class CustomerPortalController extends Controller
 
         $customerAdditionalData = $this->getCustomerAdditionalData($request);
 
-        $ticket = Ticket::findOrFail($ticket_id);
+        $ticket = Ticket::wherePublicIdentifier($ticket_id)->firstOrFail();
 
         $data = $request->sanitize();
 
@@ -328,7 +328,7 @@ class CustomerPortalController extends Controller
         $customerPortalService = new CustomerPortalService();
 
         // just for validation
-        $ticket = Ticket::with(['customer'])->findOrFail($ticketId);
+        $ticket = Ticket::with(['customer'])->wherePublicIdentifier($ticketId)->firstOrFail();
         $customerAdditionalData = $this->getCustomerAdditionalData($request);
         $customer = $customerPortalService->getCustomer($customerAdditionalData, $ticket);
         $customerPortalService->checkCustomerTicketAccess($customer, $ticket, 'feedback');

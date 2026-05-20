@@ -4,6 +4,7 @@ namespace FluentSupport\App\Modules;
 
 use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Services\Helper;
+use FluentSupport\App\Services\Tickets\AgentTicketAccess;
 use FluentSupport\Framework\Support\Arr;
 
 /**
@@ -340,15 +341,7 @@ class PermissionManager
      */
     public static function getRestrictedMailboxIds()
     {
-        $agent = Helper::getAgentByUserId();
-        $restrictions = $agent->getMeta('agent_restrictions');
-
-        // Only enforce mailbox restrictions when the toggle is explicitly enabled
-        if (!empty($restrictions['businessBoxRestrictions']) && !empty($restrictions['restrictedBusinessBoxes'])) {
-            return $restrictions['restrictedBusinessBoxes'];
-        }
-
-        return [];
+        return (new AgentTicketAccess())->getRestrictedMailboxIds();
 
     }
 
@@ -451,20 +444,7 @@ class PermissionManager
      */
     public static function canAccessTicket($ticket)
     {
-        $permissionLevel = self::currentTicketVisibility();
-
-        if ($permissionLevel == self::VISIBILITY_ALL) {
-            return true;
-        }
-
-        $agent = Helper::getAgentByUserId();
-
-        if ($ticket->agent_id == $agent->id) {
-            return true;
-        }
-
-        // Allow access to unassigned tickets for agents with assigned_and_unassigned visibility
-        return !$ticket->agent_id && $permissionLevel == self::VISIBILITY_ASSIGNED_AND_UNASSIGNED;
+        return (new AgentTicketAccess())->currentAgentCanAccess($ticket);
     }
 
     /**

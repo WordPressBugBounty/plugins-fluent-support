@@ -185,7 +185,10 @@ class TicketHelper
 
         //Get lis of tickets which are waiting for reply
         $tickets = Ticket::where('agent_id', $agentId)
-            ->whereNotIn('mailbox_id', $restrictedBusinessBoxes)
+            ->where(function ($q) use ($restrictedBusinessBoxes) {
+                $q->whereNotIn('mailbox_id', $restrictedBusinessBoxes);
+                $q->orWhereNull('mailbox_id');
+            })
             ->where('status', '!=', 'closed')
             ->applyFilters([
                 'waiting_for_reply' => 'yes'
@@ -206,7 +209,10 @@ class TicketHelper
             //Get the ticket list which status is not closed and agent id is null or 0
             $tickets = Ticket::where('status', '!=', 'closed')
                 ->oldest('id')
-                ->whereNotIn('mailbox_id', $restrictedBusinessBoxes)
+                ->where(function ($q) use ($restrictedBusinessBoxes) {
+                    $q->whereNotIn('mailbox_id', $restrictedBusinessBoxes);
+                    $q->orWhereNull('mailbox_id');
+                })
                 ->where(function ($q) {
                     $q->whereNull('agent_id');
                     $q->orWhere('agent_id', '0');
@@ -252,7 +258,10 @@ class TicketHelper
                 'agent'
             ])
             ->limit(5)
-            ->whereNotIn('mailbox_id', $restrictedBusinessBoxes)
+            ->where(function ($q) use ($restrictedBusinessBoxes) {
+                $q->whereNotIn('mailbox_id', $restrictedBusinessBoxes);
+                $q->orWhereNull('mailbox_id');
+            })
             ->join('fs_tag_pivot', 'fs_tag_pivot.source_id', '=', 'fs_tickets.id')
             ->where('fs_tag_pivot.source_type', '=', 'ticket_watcher')
             ->where('fs_tag_pivot.tag_id', '=', $agent->id)

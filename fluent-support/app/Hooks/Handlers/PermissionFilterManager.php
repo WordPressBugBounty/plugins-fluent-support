@@ -2,8 +2,8 @@
 
 namespace FluentSupport\App\Hooks\Handlers;
 
-use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\Helper;
+use FluentSupport\App\Services\Tickets\AgentTicketAccess;
 
 class PermissionFilterManager
 {
@@ -15,30 +15,13 @@ class PermissionFilterManager
 
     public function filterAgentTickets($ticketsQuery, $userId = false)
     {
-        $permissionLevel = PermissionManager::getAgentTicketVisibility($userId);
+        $agent = Helper::getAgentByUserId($userId ?: null);
 
-        if ($permissionLevel == PermissionManager::VISIBILITY_ALL) {
-            return;
-        }
-
-        $agent = Helper::getAgentByUserId();
-
-        if ($permissionLevel == PermissionManager::VISIBILITY_ASSIGNED_ONLY) {
-            $ticketsQuery->where('agent_id', $agent->id);
-        } else {
-            // assigned_and_unassigned: own tickets + unassigned tickets
-            $ticketsQuery->where(function ($q) use ($agent) {
-                $q->where('agent_id', $agent->id);
-                $q->orWhereNull('agent_id');
-            });
-        }
+        (new AgentTicketAccess())->applyVisibilityScope($ticketsQuery, $agent);
     }
 
     public function filterAgentTicketsByMailboxes($ticketsQuery, $args = [] )
     {
-        $restrictedBusinessBoxes = PermissionManager::getRestrictedMailboxIds();
-        if (!empty($restrictedBusinessBoxes)) {
-            $ticketsQuery->whereNotIn('mailbox_id', $restrictedBusinessBoxes);
-        }
+        (new AgentTicketAccess())->applyMailboxRestrictionScope($ticketsQuery);
     }
 }

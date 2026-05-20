@@ -82,6 +82,7 @@ class ResponseService
         }
 
         $agentAdded = false;
+        $previousAgentId = (int) $ticket->agent_id;
         $updateData = [];
 
         if ($person->person_type == 'agent') {
@@ -136,7 +137,7 @@ class ResponseService
 
         $ticket->save();
 
-        Helper::tempImageMoveUploadDir($ticket->id, 'conversation', $createdResponse->id);
+        Helper::tempImageMoveUploadDir($ticket->id, 'conversation', $createdResponse->id, $person->id);
 
         //If file upload failed to local during create response
         if ($attachmentHashes = Arr::get($data, 'attachments', [])) {
@@ -190,7 +191,7 @@ class ResponseService
              * @param object $ticket
              * @param object $assigner
              */
-            do_action('fluent_support/agent_assigned_to_ticket', $person, $ticket, $assigner);
+            do_action('fluent_support/agent_assigned_to_ticket', $person, $ticket, $assigner, $previousAgentId);
             $updateData['agent'] = $ticket->agent;
         }
 

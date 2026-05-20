@@ -18,9 +18,11 @@ use FluentSupport\App\Services\ProfileInfoService;
 use FluentSupport\App\Services\TicketHelper;
 use FluentSupport\App\Services\TicketQueryService;
 use FluentSupport\App\Modules\PermissionManager;
+use FluentSupport\App\Services\Tickets\AgentTicketAccess;
 use FluentSupport\App\Services\Tickets\ResponseService;
 use FluentSupport\App\Models\AgentGroup;
 use FluentSupport\App\Services\Tickets\TicketService;
+use FluentSupport\App\Services\Integrations\FluentBooking\FluentBookingService;
 
 /**
  *  TicketController class for REST API related to ticket
@@ -246,7 +248,7 @@ class TicketController extends Controller
 
             if (!$ticketWith) {
                 $ticketWith = ['customer', 'agent', 'product', 'mailbox', 'tags', 'attachments' => function ($q) {
-                    $q->whereIn('status', ['active', 'inline']);
+                    $q->where('status', 'active');
                 }];
             }
 
@@ -255,7 +257,13 @@ class TicketController extends Controller
 
             //Eager load responses with their nested relations to avoid N+1 queries
             $ticket->load(['responses' => function ($q) {
-                $q->with('person', 'attachments', 'ccinfo');
+                $q->with([
+                    'person',
+                    'ccinfo',
+                    'attachments' => function ($q) {
+                        $q->where('status', 'active');
+                    }
+                ]);
             }]);
 
             //Check if ticket is in a restricted mailbox
@@ -308,9 +316,38 @@ class TicketController extends Controller
                 }
             }
 
+            $contents = ['ticket' => $ticket->content];
+            foreach ($ticket->responses as $response) {
+                $contents['response_' . $response->id] = $response->content;
+            }
+
+            $contents = Helper::refreshSignedAttachmentUrlsInContents($contents, $ticket->id);
+            $ticket->content = $contents['ticket'];
+
             //Format response content
             foreach ($ticket->responses as $response) {
-                $response->content = links_add_target(make_clickable(wpautop($response->content, false)));
+                $responseKey = 'response_' . $response->id;
+                if (isset($contents[$responseKey])) {
+                    $response->content = $contents[$responseKey];
+                }
+
+                $responseContent = apply_filters(
+                    'fluent_support/response_content_before_render',
+                    $response->content,
+                    $response,
+                    $ticket
+                );
+
+                $responseContent = links_add_target(make_clickable(wpautop($responseContent, false)));
+
+
+                $response->content = apply_filters(
+                    'fluent_support/response_content_after_render',
+                    $responseContent,
+                    $response,
+                    $ticket
+                );
+
                 if (!empty($response->ccinfo)) {
                     $val = Helper::safeUnserialize($response->ccinfo->value);
                     if (isset($val['cc_email']) && !empty($val['cc_email'])) {
@@ -323,7 +360,19 @@ class TicketController extends Controller
                 }
             }
 
-            $ticket->content = links_add_target(make_clickable(wpautop($ticket->content, false)));
+            $ticketContent = apply_filters(
+                'fluent_support/ticket_content_before_render',
+                $ticket->content,
+                $ticket
+            );
+
+            $ticketContent = links_add_target(make_clickable(wpautop($ticketContent, false)));
+
+            $ticket->content = apply_filters(
+                'fluent_support/ticket_content_after_render',
+                $ticketContent,
+                $ticket
+            );
 
             //Get last activity by agent
             $ticket->live_activity = TicketHelper::getActivity($ticket->id, $agent->id);
@@ -374,6 +423,85 @@ class TicketController extends Controller
         }
     }
 
+    public function getMentionableAgents(Request $request, $ticket_id)
+    {
+        try {
+            $ticket = Ticket::findOrFail($ticket_id);
+
+            if (in_array($ticket->mailbox_id, PermissionManager::getRestrictedMailboxIds())) {
+                throw new \Exception(esc_html__('Ticket cannot be fetched due to restricted mailbox', 'fluent-support'));
+            }
+
+            $this->ensureCanAccessTicket($ticket);
+
+            $search = trim($request->getSafe('search', 'sanitize_text_field', ''));
+            $limit = min(max(absint($request->getSafe('limit', 'intval', 20)), 1), 50);
+
+            return [
+                'agents' => $this->getMentionableAgentList($ticket, $search, $limit)
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
+    }
+
+    protected function getMentionableAgentList($ticket, $search, $limit)
+    {
+        $allAgents = Agent::select(['id', 'first_name', 'last_name', 'email', 'user_id'])
+            ->mentionBy($search)
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get();
+
+        if ($allAgents->isEmpty()) {
+            return [];
+        }
+
+        $restrictions = $this->getAgentRestrictionsMap($allAgents->pluck('id')->all());
+        $ticketAccess = new AgentTicketAccess();
+        $results = [];
+
+        foreach ($allAgents as $agent) {
+            if (!$ticketAccess->canAccess($agent, $ticket, $restrictions[$agent->id] ?? [])) {
+                continue;
+            }
+
+            $results[] = [
+                'id'         => strval($agent->id),
+                'first_name' => $agent->first_name,
+                'last_name'  => $agent->last_name,
+                'email'      => $agent->email,
+            ];
+
+            if (count($results) >= $limit) {
+                break;
+            }
+        }
+
+        return $results;
+    }
+
+    protected function getAgentRestrictionsMap(array $agentIds)
+    {
+        if (!$agentIds) {
+            return [];
+        }
+
+        $metas = Meta::where('object_type', 'person_meta')
+            ->where('key', 'agent_restrictions')
+            ->whereIn('object_id', $agentIds)
+            ->get();
+
+        $restrictions = [];
+        foreach ($metas as $meta) {
+            $restrictions[$meta->object_id] = Helper::safeUnserialize($meta->value) ?: [];
+        }
+
+        return $restrictions;
+    }
+
     /**
      * createResponse method will create response by agent for the ticket
      * @param Request $request
@@ -409,6 +537,12 @@ class TicketController extends Controller
 
             $responseData = (new ResponseService())->createResponse($data, $agent, $ticket);
 
+            $responseData['response']->content = Helper::refreshSignedAttachmentUrls($responseData['response']->content, $ticket->id);
+            $responseData['response']->load([
+                'attachments' => function ($q) {
+                    $q->where('status', 'active');
+                }
+            ]);
             $responseData['response']->content = wp_specialchars_decode(wpautop($responseData['response']->content, false));
 
             return [
@@ -416,6 +550,113 @@ class TicketController extends Controller
                 'response'    => $responseData['response'],
                 'ticket'      => $responseData['ticket'],
                 'update_data' => $responseData['update_data']
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
+    }
+
+    public function getFluentBookingEventTypes()
+    {
+        try {
+            // All FluentBooking endpoints require manage permission; view-only agents cannot call a meeting.
+            $this->ensureCanManageTickets();
+
+            $service = new FluentBookingService();
+            $eventTypes = $service->getEventTypes();
+
+            return [
+                'status'      => $service->getStatus($eventTypes),
+                'event_types' => $eventTypes
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
+    }
+
+    public function createFluentBookingLink(Request $request, $ticket_id)
+    {
+        try {
+            // All FluentBooking endpoints require manage permission; view-only agents cannot call a meeting.
+            $this->ensureCanManageTickets();
+
+            $ticket = Ticket::with('customer')->findOrFail($ticket_id);
+
+            // Enforces per-ticket visibility (e.g. own-tickets-only agents cannot access unassigned tickets).
+            $this->ensureCanAccessTicket($ticket);
+
+            $eventId = $request->getSafe('event_type_id', 'intval');
+
+            if (!$eventId) {
+                throw new \Exception(esc_html__('Please select a FluentBooking event type.', 'fluent-support'));
+            }
+
+            return (new FluentBookingService())->createBookingLink(
+                $ticket,
+                $eventId,
+                $request->getSafe('message', 'wp_kses_post'),
+                $request->get('selected_slots', []),
+                $request->getSafe('timezone', 'sanitize_text_field', '')
+            );
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
+    }
+
+    public function getFluentBookingAvailability(Request $request, $ticket_id)
+    {
+        try {
+            // All FluentBooking endpoints require manage permission; view-only agents cannot call a meeting.
+            $this->ensureCanManageTickets();
+
+            $ticket = Ticket::with('customer')->findOrFail($ticket_id);
+
+            // Enforces per-ticket visibility (e.g. own-tickets-only agents cannot access unassigned tickets).
+            $this->ensureCanAccessTicket($ticket);
+
+            $eventId = $request->getSafe('event_type_id', 'intval');
+
+            if (!$eventId) {
+                throw new \Exception(esc_html__('Please select a FluentBooking event type.', 'fluent-support'));
+            }
+
+            return [
+                'availability' => (new FluentBookingService())->getAvailabilitySlots(
+                    $eventId,
+                    $request->getSafe('range', 'sanitize_key', 'next_3_days'),
+                    $request->getSafe('timezone', 'sanitize_text_field'),
+                    $request->getSafe('duration', 'intval'),
+                    $ticket,
+                    $request->get('selected_dates', []),
+                    $request->getSafe('calendar_month', 'sanitize_text_field', '')
+                )
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
+    }
+
+    public function getFluentBookingMeetings($ticket_id)
+    {
+        try {
+            // All FluentBooking endpoints require manage permission; view-only agents cannot call a meeting.
+            $this->ensureCanManageTickets();
+
+            $ticket = Ticket::with('customer')->findOrFail($ticket_id);
+
+            // Enforces per-ticket visibility (e.g. own-tickets-only agents cannot access unassigned tickets).
+            $this->ensureCanAccessTicket($ticket);
+
+            return [
+                'meetings' => (new FluentBookingService())->getTicketMeetings($ticket)
             ];
         } catch (\Exception $e) {
             return $this->sendError([
@@ -645,11 +886,12 @@ class TicketController extends Controller
                 $ticket->load('product');
                 $updateData['product'] = $ticket->product;
             } else if ($propName == 'agent_id') {
+                $previousAgentId = (int) $prevValue;
                 $ticket->load('agent');
                 $updateData['agent'] = $ticket->agent;
                 $updateData['assigner'] = (new TicketService())->onAgentChange($ticket, $assigner);
                 if ($prevValue != $ticket->{$propName}) {
-                    do_action('fluent_support/agent_assigned_to_ticket', $ticket->agent, $ticket, $assigner);
+                    do_action('fluent_support/agent_assigned_to_ticket', $ticket->agent, $ticket, $assigner, $previousAgentId);
                 }
             }
 
@@ -791,6 +1033,7 @@ class TicketController extends Controller
                 $skippedCount = 0;
 
                 $tickets->each(function ($ticket) use ($assignAgent, $agent, &$assignedCount, &$skippedCount) {
+                    $previousAgentId = (int) $ticket->agent_id;
                     $restrictions = $assignAgent->getMeta('agent_restrictions', []);
 
                     //Skip ticket if mailbox is restricted for the agent
@@ -803,7 +1046,7 @@ class TicketController extends Controller
                     $ticket->save();
                     $assignedCount++;
 
-                    do_action('fluent_support/agent_assigned_to_ticket', $assignAgent, $ticket, $agent);
+                    do_action('fluent_support/agent_assigned_to_ticket', $assignAgent, $ticket, $agent, $previousAgentId);
                 });
 
                 $assignedMessage = sprintf(
@@ -842,6 +1085,7 @@ class TicketController extends Controller
                 $currentCounts = [];
 
                 foreach ($tickets as $ticket) {
+                    $previousAgentId = (int) $ticket->agent_id;
                     $selectedAgent = $group->getLeastLoadedAgent(
                         $ticket->mailbox_id, $currentCounts
                     );
@@ -857,7 +1101,7 @@ class TicketController extends Controller
                     $currentCounts[$selectedAgent->id]++;
 
                     as_enqueue_async_action('fluent_support/async_agent_assigned_to_ticket', [
-                        $selectedAgent->id, $ticket->id, $agent->id
+                        $selectedAgent->id, $ticket->id, $agent->id, $previousAgentId
                     ], 'fluent-support');
                 }
 
@@ -1032,7 +1276,9 @@ class TicketController extends Controller
     {
         try {
             $ticket = Ticket::findOrFail($ticket_id);
-            $response = Conversation::findOrFail($response_id);
+            $response = Conversation::where('id', $response_id)
+                ->where('ticket_id', $ticket_id)
+                ->firstOrFail();
             $agent = Helper::getAgentByUserId();
 
             if (!PermissionManager::currentUserCan('fst_delete_tickets') && $ticket->agent_id !== $agent->id) {
@@ -1066,7 +1312,9 @@ class TicketController extends Controller
     {
         try {
             $ticket = Ticket::findOrFail($ticket_id);
-            $response = Conversation::findOrFail($response_id);
+            $response = Conversation::where('id', $response_id)
+                ->where('ticket_id', $ticket_id)
+                ->firstOrFail();
             $agent = Helper::getAgentByUserId();
 
             if (!PermissionManager::currentUserCan('fst_manage_other_tickets') && $ticket->agent_id !== $agent->id) {
@@ -1075,19 +1323,20 @@ class TicketController extends Controller
                 );
             }
 
-            $response->content = wp_unslash(wp_kses_post($request->getSafe('content', 'wp_kses_post')));
+            $content = wp_unslash(wp_kses_post($request->getSafe('content', 'wp_kses_post')));
+            $response->content = $content;
 
-            //If updating a draft response by someone other than the author, check approval permission
-            if ($response->conversation_type == 'draft_response' && $response->person_id != $agent->id) {
+            if ($response->conversation_type == 'draft_response' && $response->person_id != $agent->id && PermissionManager::currentUserCan('fst_approve_draft_reply')) {
+                $response = $this->approveDraftConversation($ticket, $response, $agent, $content);
+            } else if ($response->conversation_type == 'draft_response' && $response->person_id != $agent->id) {
                 if (!PermissionManager::currentUserCan('fst_approve_draft_reply')) {
                     throw new \Exception(
                         esc_html__('Sorry, You do not have permission to approve this draft response', 'fluent-support')
                     );
                 }
-                $response->conversation_type = 'response';
+            } else {
+                $response->save();
             }
-
-            $response->save();
 
             return [
                 'message'  => __('Selected response has been updated', 'fluent-support'),
@@ -1118,31 +1367,12 @@ class TicketController extends Controller
 
             $person = Helper::getAgentByUserId();
 
-            $content = wp_unslash(wp_kses_post($request->getSafe('content', 'wp_kses_post')));
-            $resetWaitingSince = apply_filters('fluent_support/reset_waiting_since', true, $content);
-
-            $response->conversation_type = 'response';
-            $response->created_at = current_time('mysql');
-            $response->save();
-
-            if ($person->person_type == 'agent' && $ticket->status == 'new') {
-                $ticket->status = 'active';
-                if ($ticket->created_at) {
-                    $ticket->first_response_time = strtotime(current_time('mysql')) - strtotime($ticket->created_at);
-                } else {
-                    $ticket->first_response_time = 300;
-                }
-            }
-
-            if ($resetWaitingSince) {
-                $ticket->last_agent_response = current_time('mysql');
-                $ticket->waiting_since = current_time('mysql');
-            }
-
-            $ticket->response_count += 1;
-            $ticket->save();
-
-            do_action('fluent_support/response_added_by_' . $person->person_type, $response, $ticket, $person);
+            $response = $this->approveDraftConversation(
+                $ticket,
+                $response,
+                $person,
+                wp_unslash(wp_kses_post($request->getSafe('content', 'wp_kses_post')))
+            );
 
             return [
                 'message'  => __('Draft response has been successfully approved.', 'fluent-support'),
@@ -1153,6 +1383,37 @@ class TicketController extends Controller
                 'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
+    }
+
+    protected function approveDraftConversation($ticket, $response, $person, $content)
+    {
+        $resetWaitingSince = apply_filters('fluent_support/reset_waiting_since', true, $content);
+
+        $response->content = $content;
+        $response->conversation_type = 'response';
+        $response->created_at = current_time('mysql');
+        $response->save();
+
+        if ($person->person_type == 'agent' && $ticket->status == 'new') {
+            $ticket->status = 'active';
+            if ($ticket->created_at) {
+                $ticket->first_response_time = strtotime(current_time('mysql')) - strtotime($ticket->created_at);
+            } else {
+                $ticket->first_response_time = 300;
+            }
+        }
+
+        if ($resetWaitingSince) {
+            $ticket->last_agent_response = current_time('mysql');
+            $ticket->waiting_since = current_time('mysql');
+        }
+
+        $ticket->response_count += 1;
+        $ticket->save();
+
+        do_action('fluent_support/response_added_by_' . $person->person_type, $response, $ticket, $person);
+
+        return $response;
     }
 
     /**
@@ -1404,4 +1665,3 @@ class TicketController extends Controller
         }
     }
 }
-

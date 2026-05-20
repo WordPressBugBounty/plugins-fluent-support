@@ -42,6 +42,7 @@
                 </ul>
 
                 <ul class="fs_nav_menu fs_secondary_menu">
+                    <fs-notifications-pop></fs-notifications-pop>
                     <li class="fs_nav_item fs_item_color_mode">
                         <color-mode></color-mode>
                     </li>
@@ -64,6 +65,7 @@
             </div>
 
             <ul class="fs_nav_menu fs_secondary_menu fs_mobile_secondary_menu">
+                <fs-notifications-pop></fs-notifications-pop>
                 <li class="fs_nav_item fs_item_color_mode">
                     <color-mode></color-mode>
                 </li>

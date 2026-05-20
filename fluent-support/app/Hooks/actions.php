@@ -31,6 +31,9 @@ add_action('init', function () {
 //AI Activities
 (new \FluentSupport\App\Hooks\Handlers\AIActivityLogger())->init();
 
+// Internal notifications
+(new \FluentSupport\App\Hooks\Handlers\InternalNotificationHandler())->init();
+
 /*
  * Email Notification Hooks
  */
@@ -43,7 +46,7 @@ $app->addAction('fluent_support/agent_assigned_to_ticket', 'EmailNotificationHan
 $app->addAction('fluent_support/ticket_created_behalf_of_customer', 'EmailNotificationHandler@ticketCreatedByAgent', 10, 3);
 $app->addAction('fluent_support/agent_initiated_ticket_response', 'EmailNotificationHandler@ticketCreatedByAgentOnBehalf', 10, 3);
 
-$app->addAction('fluent_support/async_agent_assigned_to_ticket', 'AsyncActionHandler@resolveAgentAssigned', 10, 3);
+$app->addAction('fluent_support/async_agent_assigned_to_ticket', 'AsyncActionHandler@resolveAgentAssigned', 10, 4);
 
 // Cleanup
 $app->addAction('fluent_support_hourly_tasks', 'CleanupHandler@initHourlyTasks');
@@ -88,4 +91,3 @@ if(defined('LSCWP_V')){
 }
 
 $app->addAction('init', 'BlockEditorHandler@init');
-

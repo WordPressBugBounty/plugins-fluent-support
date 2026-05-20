@@ -2,6 +2,7 @@
 namespace FluentSupport\App\Services\Integrations\FluentBot;
 
 use FluentSupport\App\Models\Meta;
+use FluentSupport\App\Models\Conversation;
 use FluentSupport\App\Services\Integrations\FluentBot\FluentBotAPI;
 use FluentSupport\Framework\Support\Arr;
 use FluentSupport\App\Services\Helper;
@@ -15,16 +16,32 @@ class FluentBotHelper
         'ticket_reply' => '/chat/fs',
     ];
 
-    public function generateStreamResponse($prompt, $ticket, $productId, $conversationId = null)
+    public function generateStreamResponse($prompt, $ticket, $productId, $conversationId = null, $selectedConversations = null, $includeTicketContent = true, $seedMessages = null)
     {
         $prompt = apply_filters('fluent_support/generate_response', $prompt, $ticket);
+
+        $ticketMessages = [];
+        if ($selectedConversations !== null) {
+            $ticketMessages = $this->getSelectedTicketMessages($ticket, $selectedConversations, $includeTicketContent);
+        } else {
+            $ticketMessages = $this->getTicketMessages($ticket, $includeTicketContent);
+        }
+
         $payload = [
-            'ticket_conversation' => $this->getTicketMessages($ticket),
             'source' => 'fluent_support',
             'prompt' => $prompt,
             'stream' => true,
             'chat_id' => $conversationId ?? null,
         ];
+
+        if (!empty($ticketMessages)) {
+            $payload['ticket_conversation'] = $ticketMessages;
+        }
+
+        if (!empty($seedMessages)) {
+            $payload['seed_messages'] = $seedMessages;
+        }
+
         return $this->makeStreamAPICall($payload, $prompt, $ticket->id, 'ticket_reply', $productId);
     }
 
@@ -71,10 +88,80 @@ class FluentBotHelper
         }
 
         if ($type === 'createResponse') {
+            $customPresets = $this->getCustomPresets();
+            if (!empty($customPresets)) {
+                return $customPresets;
+            }
             return $this->getCreateResponsePresets();
         }
 
         return [];
+    }
+
+    public function getCustomPresets(): array
+    {
+        $meta = Meta::where([
+            'object_type' => 'fluent_bot_settings',
+            'object_id'   => 1,
+            'key'         => '_fs_fluent_bot_presets'
+        ])->orderByDesc('id')->first();
+
+        if (!$meta) {
+            return [];
+        }
+
+        $presets = Helper::safeUnserialize($meta->value);
+
+        return is_array($presets) ? $presets : [];
+    }
+
+    public function saveCustomPresets(array $presets): array
+    {
+        $sanitized = [];
+        foreach ($presets as $index => $preset) {
+            if (empty($preset['label']) || empty($preset['description'])) {
+                continue;
+            }
+            $sanitized[] = [
+                'label'       => sanitize_text_field($preset['label']),
+                'text'        => sanitize_text_field($preset['text'] ?? 'preset_' . $index),
+                'description' => sanitize_textarea_field($preset['description']),
+                'position'    => intval($preset['position'] ?? $index),
+            ];
+        }
+
+        usort($sanitized, function ($a, $b) {
+            return $a['position'] - $b['position'];
+        });
+
+        $where = [
+            'object_type' => 'fluent_bot_settings',
+            'object_id'   => 1,
+            'key'         => '_fs_fluent_bot_presets'
+        ];
+
+        $existing = Meta::where($where)->orderByDesc('id')->first();
+
+        if (empty($sanitized)) {
+            if ($existing) {
+                // Delete all rows for this key (including duplicates)
+                Meta::where($where)->delete();
+            }
+            return [];
+        }
+
+        $serialized = maybe_serialize($sanitized);
+
+        if ($existing) {
+            // Update the latest row; do not prune siblings — concurrent first-writes could
+            // race and delete each other's inserts, leaving zero rows (data loss).
+            // Reads use orderByDesc('id')->first() so duplicates are harmless at read time.
+            $existing->update(['value' => $serialized]);
+        } else {
+            Meta::create(array_merge($where, ['value' => $serialized]));
+        }
+
+        return $sanitized;
     }
 
     private function makeAPICall(array $payload, string $prompt, int $ticketId, string $type = 'default', $productId = null )
@@ -122,28 +209,163 @@ class FluentBotHelper
         $api->makeStreamRequest($ticketId, $prompt, $payload);
     }
 
+    public function getChatMessages($chatId, $productId = null, $cursor = null)
+    {
+        $credentials = $this->resolveApiCredentials($productId);
+
+        if (is_wp_error($credentials)) {
+            return $credentials;
+        }
+
+        $botId = $credentials['botId'];
+        $url = static::BASE_URL . '/bots/' . $botId . '/chats/' . $chatId . '/messages';
+
+        if ($cursor) {
+            $url .= '?cursor=' . urlencode($cursor);
+        }
+
+        $response = wp_remote_get($url, [
+            'headers' => ['Content-Type' => 'application/json'],
+            'timeout' => 30,
+        ]);
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true) ?: [];
+
+        if (wp_remote_retrieve_response_code($response) !== 200) {
+            return new \WP_Error(
+                'fluent_bot_messages_error',
+                $body['message'] ?? __('Failed to fetch chat messages.', 'fluent-support')
+            );
+        }
+
+        return $body;
+    }
+
+    public function createFeedback($messageId, $reaction, $comment, $productId = null, $chatId = null)
+    {
+        $credentials = $this->resolveApiCredentials($productId);
+
+        if (is_wp_error($credentials)) {
+            return $credentials;
+        }
+
+        $payload = [
+            'bot_id'     => $credentials['botId'],
+            'message_id' => $messageId,
+            'reaction'   => $reaction,
+            'comments'   => $comment,
+        ];
+
+        // Bind feedback to the ticket's chat so upstream can enforce message-to-chat ownership.
+        if (!empty($chatId)) {
+            $payload['chat_id'] = $chatId;
+        }
+
+        $response = wp_remote_post(static::BASE_URL . '/feedbacks', [
+            'headers' => ['Content-Type' => 'application/json'],
+            'body'    => wp_json_encode($payload),
+            'timeout' => 15,
+        ]);
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true) ?: [];
+        $code = wp_remote_retrieve_response_code($response);
+
+        if ($code >= 400) {
+            return new \WP_Error('feedback_error', $body['message'] ?? __('Failed to save feedback.', 'fluent-support'));
+        }
+
+        return $body;
+    }
+
+    public function deleteFeedback($feedbackId, $productId = null, $chatId = null)
+    {
+        $credentials = $this->resolveApiCredentials($productId);
+
+        if (is_wp_error($credentials)) {
+            return $credentials;
+        }
+
+        $payload = [
+            'bot_id' => $credentials['botId'],
+        ];
+
+        // Bind delete to the ticket's chat so upstream can enforce feedback-to-chat ownership.
+        if (!empty($chatId)) {
+            $payload['chat_id'] = $chatId;
+        }
+
+        $response = wp_remote_request(static::BASE_URL . '/feedbacks/' . $feedbackId, [
+            'method'  => 'DELETE',
+            'headers' => ['Content-Type' => 'application/json'],
+            'body'    => wp_json_encode($payload),
+            'timeout' => 15,
+        ]);
+
+        if (is_wp_error($response)) {
+            return $response;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true) ?: [];
+        $code = wp_remote_retrieve_response_code($response);
+
+        if ($code >= 400) {
+            return new \WP_Error('feedback_error', $body['message'] ?? __('Failed to delete feedback.', 'fluent-support'));
+        }
+
+        return $body;
+    }
+
     private function resolveApiCredentials($productId)
     {
         $meta = Meta::where([
             'object_type' => 'fluent_bot_settings',
             'object_id'   => 1,
             'key'         => '_fs_fluent_bot_config'
-        ])->first();
+        ])->orderByDesc('id')->first();
 
         $config = $meta ? Helper::safeUnserialize($meta->value) : [];
+        if (!is_array($config)) {
+            $config = [];
+        }
 
-        $botId = $config['generalBotId'] ?? '';
+        // Default true for backward compatibility with configs saved before this flag existed.
+        $generalBotEnabled = !array_key_exists('generalBotEnabled', $config)
+            || filter_var($config['generalBotEnabled'], FILTER_VALIDATE_BOOLEAN);
+
+        $generalBotId = $config['generalBotId'] ?? '';
+        $botId = $generalBotEnabled ? $generalBotId : '';
+        $matchedProductMapping = false;
 
         if ($productId && !empty($config['productMappings']) && is_array($config['productMappings'])) {
             foreach ($config['productMappings'] as $mapping) {
                 if ((int)$mapping['productId'] === (int)$productId) {
-                    $botId = $mapping['botId'] ?? $botId;
+                    $mappingBotId = trim((string)($mapping['botId'] ?? ''));
+                    if ($mappingBotId !== '') {
+                        $botId = $mappingBotId;
+                        $matchedProductMapping = true;
+                    }
                     break;
                 }
             }
         }
 
         if (!$botId) {
+            // Distinguish the "general bot disabled with no product mapping" case so admins
+            // see a clear reason rather than a generic missing-credentials error.
+            if (!$matchedProductMapping && !$generalBotEnabled) {
+                return new \WP_Error(
+                    'general_bot_disabled',
+                    __('General bot is disabled and no product-specific bot is configured for this product.', 'fluent-support')
+                );
+            }
             return new \WP_Error(
                 'missing_bot_credentials',
                 __('Bot ID is not set for this product.', 'fluent-support')
@@ -155,12 +377,12 @@ class FluentBotHelper
         ];
     }
 
-    private function getTicketMessages($ticket): array
+    private function getTicketMessages($ticket, $includeTicketContent = true): array
     {
         $messages = [];
         $ticketArray = $ticket->toArray();
 
-        if (!empty($ticketArray['content'])) {
+        if ($includeTicketContent && !empty($ticketArray['content'])) {
             $messages[] = [
                 'role' => 'customer',
                 'message' => $this->cleanText($ticketArray['content']),
@@ -173,6 +395,39 @@ class FluentBotHelper
                 'role' => $role,
                 'message' => $this->cleanText(Arr::get($response, 'content', '')),
             ];
+        }
+
+        return $messages;
+    }
+
+    private function getSelectedTicketMessages($ticket, array $selectedIds, $includeTicketContent = true): array
+    {
+        $messages = [];
+
+        if ($includeTicketContent && !empty($ticket->content)) {
+            $messages[] = [
+                'role' => 'customer',
+                'message' => $this->cleanText($ticket->content),
+            ];
+        }
+
+        $conversationIds = array_map('intval', array_filter($selectedIds, 'is_numeric'));
+
+        if (!empty($conversationIds)) {
+            $responses = Conversation::where('ticket_id', $ticket->id)
+                ->whereIn('id', $conversationIds)
+                ->where('conversation_type', 'response')
+                ->with('person:id,person_type')
+                ->orderBy('id', 'asc')
+                ->get();
+
+            foreach ($responses as $resp) {
+                $role = ($resp->person && $resp->person->person_type === 'customer') ? 'customer' : 'support_agent';
+                $messages[] = [
+                    'role' => $role,
+                    'message' => $this->cleanText($resp->content ?? ''),
+                ];
+            }
         }
 
         return $messages;
@@ -205,7 +460,7 @@ class FluentBotHelper
 
     private function cleanText(string $text): string
     {
-        return trim(strip_tags($text));
+        return trim(wp_strip_all_tags($text));
     }
 
     private function getModifyResponsePresets(): array

@@ -4,6 +4,7 @@ namespace FluentSupport\App\Services;
 
 use FluentSupport\App\App;
 use FluentSupport\App\Models\Agent;
+use FluentSupport\App\Models\Attachment;
 use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Models\Conversation;
 use FluentSupport\App\Models\Customer;
@@ -342,7 +343,8 @@ class Helper
     public static function getTicketViewUrl($ticket)
     {
         $baseUrl = self::getPortalBaseUrl();
-        return $baseUrl . '/#/ticket/' . $ticket->id . '/view';
+        $ticketNumber = $ticket->serial_number ?? $ticket->id;
+        return $baseUrl . '/#/ticket/' . $ticketNumber . '/view';
     }
 
     public static function getTicketViewSignedUrl($ticket)
@@ -352,14 +354,15 @@ class Helper
         }
 
         $baseUrl = self::getPortalBaseUrl();
+        $ticketNumber = $ticket->serial_number ?? $ticket->id;
 
         $baseUrl = add_query_arg([
             'fs_view'      => 'ticket',
             'support_hash' => $ticket->hash,
-            'ticket_id'    => $ticket->id,
+            'ticket_id'    => $ticketNumber,
         ], $baseUrl);
 
-        return $baseUrl . '#/ticket/' . $ticket->id . '/view';
+        return $baseUrl . '#/ticket/' . $ticketNumber . '/view';
     }
 
     public static function saveOpenAIData($objectType, $key, $data)
@@ -412,9 +415,44 @@ class Helper
     public static function getPortalBaseUrl()
     {
         $businessSettings = self::getBusinessSettings();
-        $baseUrl = get_permalink($businessSettings['portal_page_id']);
-        $baseUrl = rtrim($baseUrl, '/\\');
-        return apply_filters('fluent_support/portal_base_url', $baseUrl);
+        $portalType = Arr::get($businessSettings, 'ticket_link_portal', 'default');
+        $baseUrl = null;
+
+        if (self::isPortalActive($portalType)) {
+            if ($portalType === 'woocommerce' && function_exists('wc_get_endpoint_url') && function_exists('wc_get_page_permalink')) {
+                $accountUrl = wc_get_page_permalink('myaccount');
+                if ($accountUrl && $accountUrl !== '#') {
+                    $baseUrl = wc_get_endpoint_url('support-tickets', '', $accountUrl);
+                }
+            } elseif ($portalType === 'fluent_cart') {
+                $baseUrl = \FluentCart\App\Services\URL::getCustomerDashboardUrl('fluent-support') ?: null;
+            } elseif ($portalType === 'fluent_community') {
+                $baseUrl = \FluentCommunity\App\Services\Helper::baseUrl('support/') ?: null;
+            }
+        }
+
+        if (!$baseUrl) {
+            $baseUrl = get_permalink(absint(Arr::get($businessSettings, 'portal_page_id')));
+        }
+
+        return apply_filters('fluent_support/portal_base_url', rtrim((string) $baseUrl, '/\\'));
+    }
+
+    public static function isPortalActive($portalType)
+    {
+        if ($portalType === 'woocommerce') {
+            return defined('FLUENTSUPPORTPRO_PLUGIN_VERSION') && defined('WC_PLUGIN_FILE');
+        }
+
+        if ($portalType === 'fluent_cart') {
+            return defined('FLUENTCART_VERSION');
+        }
+
+        if ($portalType === 'fluent_community') {
+            return defined('FLUENT_COMMUNITY_PLUGIN_VERSION');
+        }
+
+        return false;
     }
 
     public static function getPortalAdminBaseUrl()
@@ -650,11 +688,18 @@ class Helper
 
     public static function fluentBotIntegrationStatus()
     {
-        $settings = static::safeUnserialize(
-            Meta::where('object_type', 'fluent_bot_settings')->value('value')
-        );
+        // Include object_id and order by id desc to always read the latest row; the
+        // write path (saveFluentBotSettings) does not prune siblings, so duplicates
+        // may exist and a non-deterministic read can return stale state.
+        $meta = Meta::where([
+            'object_type' => 'fluent_bot_settings',
+            'object_id'   => 1,
+            'key'         => '_fs_fluent_bot_config'
+        ])->orderByDesc('id')->first();
 
-        return !empty($settings['isEnabled']) && filter_var($settings['isEnabled'], FILTER_VALIDATE_BOOLEAN);
+        $settings = static::safeUnserialize($meta ? $meta->value : null);
+
+        return isset($settings['isEnabled']) && filter_var($settings['isEnabled'], FILTER_VALIDATE_BOOLEAN);
     }
 
 
@@ -1428,7 +1473,7 @@ class Helper
         return $businessEmailBoxes;
     }
 
-    public static function tempImageMoveUploadDir($ticketId, $contentType, $replyId = null)
+    public static function tempImageMoveUploadDir($ticketId, $contentType, $replyId = null, $personId = null)
     {
         // Fetch content based on the content type
         $content = self::getContentByType($ticketId, $contentType , $replyId);
@@ -1443,7 +1488,7 @@ class Helper
         }
 
         // Move images to the upload directory and update content
-        self::moveImagesAndUpdateContent($imageUrls, $ticketId, $contentType, $content, $replyId);
+        self::moveImagesAndUpdateContent($imageUrls, $ticketId, $contentType, $content, $replyId, $personId);
     }
 
     /**
@@ -1465,21 +1510,28 @@ class Helper
      */
     private static function extractImageUrls($content)
     {
-        preg_match_all('/<img[^>]+src="([^">]+)"/', $content, $matches);
-        return $matches[1] ?? [];
+        preg_match_all('/<img[^>]+src=(["\'])(.*?)\1/i', (string) $content, $matches);
+        return $matches[2] ?? [];
     }
 
     /**
      * Move images to the upload directory and update content.
      */
-    private static function moveImagesAndUpdateContent($imageUrls, $ticketId, $contentType, $content, $replyId)
+    private static function moveImagesAndUpdateContent($imageUrls, $ticketId, $contentType, $content, $replyId, $personId)
     {
         // Get the current site's upload directory
         $uploadDirInfo = wp_upload_dir();
         $uploadsDir = $uploadDirInfo['basedir'];
         $tempDir = $uploadsDir . '/fluent-support/temp_files/';
+        $signedAttachments = self::getSignedImageAttachments($imageUrls, $ticketId, $personId);
 
         foreach ($imageUrls as $imageUrl) {
+            $fileHash = self::extractAttachmentHashFromUrl($imageUrl);
+            if ($fileHash && isset($signedAttachments[$fileHash]) && ($referenceUrl = self::finalizeSignedTempImage($signedAttachments[$fileHash], $ticketId, $contentType, $replyId, $personId))) {
+                $content = str_replace($imageUrl, $referenceUrl, $content);
+                continue;
+            }
+
             // Build the absolute path for the temporary file
             $imageRelativePath = $tempDir . basename($imageUrl);
             $absolutePath = $imageRelativePath;
@@ -1501,6 +1553,164 @@ class Helper
 
         // Save the updated content
         self::saveUpdatedContent($ticketId, $contentType, $content, $replyId);
+    }
+
+    private static function getSignedImageAttachments($imageUrls, $ticketId, $personId)
+    {
+        $fileHashes = [];
+        foreach ($imageUrls as $imageUrl) {
+            $fileHash = self::extractAttachmentHashFromUrl($imageUrl);
+            if ($fileHash) {
+                $fileHashes[] = $fileHash;
+            }
+        }
+
+        $fileHashes = array_values(array_unique($fileHashes));
+        if (!$fileHashes) {
+            return [];
+        }
+
+        $attachments = Attachment::whereIn('file_hash', $fileHashes)
+            ->where(function ($query) use ($ticketId, $personId) {
+                $query->where('ticket_id', $ticketId);
+
+                if ($personId) {
+                    $query->orWhere(function ($query) use ($personId) {
+                        $query->whereNull('ticket_id')
+                            ->where('person_id', $personId);
+                    });
+                }
+            })
+            ->get();
+        $mappedAttachments = [];
+        foreach ($attachments as $attachment) {
+            $mappedAttachments[$attachment->file_hash] = $attachment;
+        }
+
+        return $mappedAttachments;
+    }
+
+    private static function finalizeSignedTempImage($attachment, $ticketId, $contentType, $replyId, $personId)
+    {
+        if (!$attachment || $attachment->driver !== 'local') {
+            return false;
+        }
+
+        if ($attachment->ticket_id && intval($attachment->ticket_id) !== intval($ticketId)) {
+            return false;
+        }
+
+        if (!$attachment->ticket_id && $personId && intval($attachment->person_id) !== intval($personId)) {
+            return false;
+        }
+
+        if ($attachment->conversation_id && $replyId && intval($attachment->conversation_id) !== intval($replyId)) {
+            return false;
+        }
+
+        if ($attachment->conversation_id && $contentType === 'ticket-create') {
+            return false;
+        }
+
+        if ($attachment->status !== 'in-active') {
+            return $attachment->ticket_id ? self::getAttachmentReferenceUrl($attachment) : false;
+        }
+
+        if (!$attachment->file_path || !file_exists($attachment->file_path)) {
+            return false;
+        }
+
+        $newFileInfo = UploadService::copyFileTicketFolder($attachment->file_path, $ticketId);
+        if (empty($newFileInfo['file_path'])) {
+            return false;
+        }
+
+        $attachment->file_path = $newFileInfo['file_path'];
+        $attachment->full_url = $newFileInfo['url'];
+        $attachment->ticket_id = $attachment->ticket_id ?: $ticketId;
+        $attachment->status = 'inline';
+
+        if ($contentType !== 'ticket-create' && $replyId) {
+            $attachment->conversation_id = $replyId;
+        }
+
+        $attachment->save();
+
+        return self::getAttachmentReferenceUrl($attachment);
+    }
+
+    private static function extractAttachmentHashFromUrl($imageUrl)
+    {
+        $decodedUrl = html_entity_decode($imageUrl, ENT_QUOTES, 'UTF-8');
+        $query = wp_parse_url($decodedUrl, PHP_URL_QUERY);
+
+        if (!$query) {
+            return '';
+        }
+
+        parse_str($query, $params);
+
+        return !empty($params['fst_file']) ? sanitize_text_field($params['fst_file']) : '';
+    }
+
+    private static function getAttachmentReferenceUrl($attachment)
+    {
+        return add_query_arg([
+            'fst_file' => $attachment->file_hash
+        ], site_url('/index.php'));
+    }
+
+    public static function refreshSignedAttachmentUrls($content, $ticketId = null)
+    {
+        $contents = self::refreshSignedAttachmentUrlsInContents([$content], $ticketId);
+
+        return $contents[0];
+    }
+
+    public static function refreshSignedAttachmentUrlsInContents($contents, $ticketId = null)
+    {
+        $fileHashes = [];
+
+        foreach ($contents as $content) {
+            foreach (self::extractImageUrls($content) as $imageUrl) {
+                $fileHash = self::extractAttachmentHashFromUrl($imageUrl);
+                if ($fileHash) {
+                    $fileHashes[] = $fileHash;
+                }
+            }
+        }
+
+        $fileHashes = array_values(array_unique($fileHashes));
+        if (!$fileHashes) {
+            return $contents;
+        }
+
+        $attachmentsQuery = Attachment::whereIn('file_hash', $fileHashes);
+        if ($ticketId) {
+            $attachmentsQuery->where('ticket_id', $ticketId);
+        }
+
+        $attachments = $attachmentsQuery->get();
+        $attachmentsByHash = [];
+
+        foreach ($attachments as $attachment) {
+            $attachmentsByHash[$attachment->file_hash] = $attachment;
+        }
+
+        foreach ($contents as $key => $content) {
+            foreach (self::extractImageUrls($content) as $imageUrl) {
+                $fileHash = self::extractAttachmentHashFromUrl($imageUrl);
+                if (!$fileHash || empty($attachmentsByHash[$fileHash])) {
+                    continue;
+                }
+
+                $content = str_replace($imageUrl, $attachmentsByHash[$fileHash]->secureUrl, $content);
+            }
+
+            $contents[$key] = $content;
+        }
+
+        return $contents;
     }
 
     /**

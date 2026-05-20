@@ -2,8 +2,8 @@
 Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
-Tested up to: 6.9
-Stable tag: 2.1.2
+Tested up to: 7.0
+Stable tag: 2.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,24 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.2.0 (Date: May 20, 2026) =
+* Added: Internal Notifications module — agents now receive real-time in-app notifications for @mentions, ticket assignments and reassignments, customer replies, ticket close/reopen events, and Workflow triggers; fully configurable per event category with a self-notification toggle
+* Added: FluentBooking integration — insert available time slots from ticket replies, view upcoming meetings in the ticket sidebar, and log scheduled-meeting notes automatically
+* Added: Public ticket numbers with optional prefix support — configurable serial numbers display in email notifications, ticket UI, and Customer Portal; admins can set a minimum ticket number and per-product prefix via the fluent_support/ticket_prefix filter
+* Added: FluentCommunity as a global Customer Portal destination, embedding Fluent Support inside a FluentCommunity space
+* Improved: Customer portal destination setting — choose where ticket links in email notifications redirect (Customer Portal, WooCommerce My Account, or FluentCommunity)
+* Added: fluent_support/ticket_content_before_render, fluent_support/ticket_content_after_render, fluent_support/response_content_before_render, and fluent_support/response_content_after_render filters for developer control over ticket and response content rendering
+* Added: Signing Secret support for Slack and Telegram webhooks while maintaining compatibility with existing integrations.
+* Improved: attachment handling for agent-created ticket emails and pasted inline images
+* Improved: dark mode visibility for filters, switches, radios, tables, and reply controls
+* Refined the ticket reply composer UI for a smoother and more intuitive reply-writing experience.
+* Fixed: Customer Portal not immediately reflecting ticket status changes applied by a Workflow action (e.g., auto-close on customer reply)
+* Fixed: Fluent Support admin font (Inter) leaking into WordPress admin chrome outside Fluent Support pages
+* Fixed: Dark mode toggle switch colors in Global Settings
+* Fixed: Global Settings page design inconsistencies
+* Fixed: Shortcode attribute not normalizing to lowercase
+
 
 = 2.1.2 (Date: April 20, 2026) =
 * Simplified image upload flow: the Create/Reply button now appears only after the upload is complete.

@@ -31,6 +31,7 @@ class AttachmentsMigrator
                 `file_size` VARCHAR(100) NULL,
                 `created_at` TIMESTAMP NULL,
                 `updated_at` TIMESTAMP NULL,
+                INDEX `idx_file_hash` (`file_hash`),
                 INDEX `idx_ticket_id` (`ticket_id`),
                 INDEX `idx_person_id` (`person_id`),
                 INDEX `idx_conversation_id` (`conversation_id`),
@@ -89,6 +90,7 @@ class AttachmentsMigrator
             'idx_conversation_id' => 'conversation_id',
             'idx_status'          => 'status',
             'idx_created_at'      => 'created_at',
+            'idx_file_hash'       => 'file_hash',
         ];
 
         // Add missing indexes. $table is esc_sql()'d above; $index_name and

@@ -45,6 +45,12 @@ class Route
     protected $restNamespace = null;
 
     /**
+     * Whether this route should override existing routes at the same URI.
+     * @var bool
+     */
+    protected $shouldOverride = false;
+
+    /**
      * Full URI
      * @var string
      */
@@ -231,13 +237,38 @@ class Route
 
         $endpoints[$controller]["_{$cb}"] = [
             'uri' => $this->uri,
-            'methods' => explode(',', $this->method)
+            'methods' => explode(',', $this->method),
+            'policy' => $this->getPolicyName()
         ];
 
         // @phpstan-ignore-next-line
         $this->app->endpoints = $endpoints;
 
         return $this;
+    }
+
+    /**
+     * Get a display name for the route's policy handler.
+     *
+     * @return string|null
+     */
+    protected function getPolicyName()
+    {
+        if (!$this->policyHandler) {
+            return null;
+        }
+
+        if ($this->policyHandler instanceof Closure) {
+            return 'Closure';
+        }
+
+        $name = $this->policyHandler;
+
+        if (is_string($name) && !$this->app->hasNamespace($name)) {
+            $name = $this->app->__namespace__ . '\\App\\Http\\Policies\\' . $name;
+        }
+
+        return $name;
     }
 
     /**
@@ -553,6 +584,10 @@ class Route
      */
     public function injectProp($key, $value)
     {
+        if (!$this->endpointSignature) {
+            return;
+        }
+
         [$controller, $cbKey] = $this->endpointSignature;
 
         $controllerKey = str_replace('\\', '.', $controller);
@@ -714,7 +749,7 @@ class Route
             $this->restNamespace,
             $this->getRouteUri(),
             $this->getOptions(),
-            $this->override()
+            $this->shouldOverride
         );
     }
 
@@ -739,13 +774,15 @@ class Route
     }
 
     /**
-     * Allow route override if we are testing.
-     * 
-     * @return bool
+     * Mark this route to override any existing route at the same URI.
+     *
+     * @return $this
      */
-    protected function override()
+    public function override()
     {
-        return str_starts_with($this->app->env(), 'testing');
+        $this->shouldOverride = true;
+
+        return $this;
     }
 
     /**
@@ -885,28 +922,35 @@ class Route
      * 
      * @param  \WP_REST_Response $response
      * @return \WP_REST_Response
-     * @throws \Exception
      */
     protected function handleResponse($response)
     {
-        $data   = $response->get_data();
-        $status = $response->get_status();
+        return $response;
+    }
 
-        if ($status >= 400) {
-            $message = 'Unknown error';
-            
-            if (is_string($data)) {
-                $message = $data;
-            } elseif (is_array($data) && isset($data['message'])) {
-                $message = $data['message'];
-            } elseif ($data instanceof WP_Error) {
-                $message = $data->get_error_message();
-            }
+    /**
+     * Extract error message from response data.
+     *
+     * @param  \WP_REST_Response $response
+     * @return string
+     */
+    protected function extractErrorMessage($response)
+    {
+        $data = $response->get_data();
 
-            $this->throwException($message, $status);
+        if (is_string($data)) {
+            return $data;
         }
 
-        return $response;
+        if (is_array($data) && isset($data['message'])) {
+            return $data['message'];
+        }
+
+        if ($data instanceof WP_Error) {
+            return $data->get_error_message();
+        }
+
+        return 'Unknown error';
     }
 
     /**
@@ -1029,9 +1073,20 @@ class Route
      */
     protected function fireExceptionEvent($exception)
     {
-        if ($this->app->isDebugOn()) {
-            $this->app->doCustomAction('exception', $exception);
+        if ($this->app->isDebugOn() || defined('FLUENT_BRIDGE_SECRET')) {
+            $message = sprintf(
+                "%s in %s:%d\nStack trace:\n%s\n",
+                $exception->getMessage(),
+                $exception->getFile(),
+                $exception->getLine(),
+                $exception->getTraceAsString()
+            );
+            
+            error_log($message);
+            
         }
+        
+        $this->app->doAction('fluent_exception', $exception);
     }
 
     /**
@@ -1042,6 +1097,8 @@ class Route
     public function permissionCallback($wpRestRequest)
     {
         try {
+            $this->parameters = null;
+            $this->substitutedParameters = null;
             $this->app->instance('route', $this);
             $this->app->instance('wprestrequest', $wpRestRequest);
             $this->app->request->mergeInputsFromRestRequest($wpRestRequest);

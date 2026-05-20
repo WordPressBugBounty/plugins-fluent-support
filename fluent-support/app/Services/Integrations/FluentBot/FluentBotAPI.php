@@ -23,7 +23,8 @@ class FluentBotAPI
             return new \WP_Error($code, $message);
         }
 
-        $responseBody = json_decode(wp_remote_retrieve_body($response), true) ?? [];
+        $rawBody = wp_remote_retrieve_body($response);
+        $responseBody = json_decode($rawBody, true) ?? [];
 
         if (!$responseBody || !is_array($responseBody)) {
             return new \WP_Error('fluent_bot_error', __('Invalid or empty response from API', 'fluent-support'));
@@ -47,8 +48,9 @@ class FluentBotAPI
             return new \WP_Error('fluent_bot_error', __('No AI response found in the API response.', 'fluent-support'));
         }
 
-        $totalTokens = $responseBody['token_usage']['total_tokens'] ?? $responseBody['totalTokens'] ?? 0;
-        do_action('fluent_support/ai_response_success', $ticketId, $prompt, $totalTokens, "Fluent Bot");
+        $tokenUsage = $responseBody['token_usage'] ?? [];
+        $totalTokens = ($tokenUsage['input_tokens'] ?? 0) + ($tokenUsage['output_tokens'] ?? 0);
+        do_action('fluent_support/ai_response_success', $ticketId, $prompt, $totalTokens, "FluentBot");
 
         // Return both content and chat_id if available
         return [
@@ -80,8 +82,9 @@ class FluentBotAPI
 
         $buffer = '';
         $conversationId = null;
+        $streamTokens = 0;
 
-        curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch, $data) use (&$buffer, &$conversationId) {
+        curl_setopt($ch, CURLOPT_WRITEFUNCTION, function($ch, $data) use (&$buffer, &$conversationId, &$streamTokens) {
             $buffer .= $data;
 
             // Process complete SSE events from the AI API
@@ -117,7 +120,8 @@ class FluentBotAPI
                         // Handle multiple data lines properly
                         if (!empty($eventDataLines)) {
                             foreach ($eventDataLines as $dataLine) {
-                                echo "data: ".esc_html($dataLine)."\n";
+                                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- raw SSE payload from trusted bot endpoint; rendered output sanitized client-side
+                                echo "data: ".$dataLine."\n";
                             }
                         } else {
                             echo "data: \n";
@@ -128,6 +132,11 @@ class FluentBotAPI
                         // Store chat_id for later use
                         if ($eventType === 'chat_id' && !empty($eventDataLines)) {
                             $conversationId = $eventDataLines[0];
+                        } elseif ($eventType === 'token_usage' && !empty($eventDataLines)) {
+                            $usage = json_decode($eventDataLines[0], true);
+                            if (is_array($usage)) {
+                                $streamTokens = ($usage['input_tokens'] ?? 0) + ($usage['output_tokens'] ?? 0);
+                            }
                         }
 
                         flush();
@@ -161,7 +170,7 @@ class FluentBotAPI
         // phpcs:enable WordPress.WP.AlternativeFunctions.curl_curl_error
 
         if ($httpCode === 200) {
-            do_action('fluent_support/ai_response_success', $ticketId, $prompt, 0, "Fluent Bot");
+            do_action('fluent_support/ai_response_success', $ticketId, $prompt, $streamTokens, "FluentBot");
         }
     }
 
