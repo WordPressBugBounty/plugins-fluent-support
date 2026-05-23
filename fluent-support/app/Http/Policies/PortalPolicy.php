@@ -92,7 +92,8 @@ class PortalPolicy extends Policy
         $ticketHash = $request->getSafe('intended_ticket_hash', 'sanitize_text_field');
 
         if ($ticketHash && Helper::isPublicSignedTicketEnabled()) {
-            $ticketId = $request->getSafe('ticket_id', 'intval');
+            $urlParams = (array) $request->get_url_params();
+            $ticketId  = isset($urlParams['ticket_id']) ? (int) $urlParams['ticket_id'] : $request->getSafe('ticket_id', 'intval');
             return !!Ticket::where('hash', $ticketHash)
                 ->wherePublicIdentifier($ticketId)
                 ->first();

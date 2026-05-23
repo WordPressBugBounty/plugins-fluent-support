@@ -77,9 +77,9 @@ class FluentBotController extends Controller
         ];
     }
 
-    public function generateResponse(Request $request)
+    public function generateResponse(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $productId = $request->getSafe('product_id', 'intval');
         $prompt = $request->getSafe('content', 'sanitize_text_field');
         $conversationId = $request->getSafe('chat_id', 'sanitize_text_field', '');
@@ -109,9 +109,9 @@ class FluentBotController extends Controller
 
 
 
-    public function generateStreamResponse(Request $request)
+    public function generateStreamResponse(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $productId = $request->getSafe('product_id', 'intval');
         $prompt = $request->getSafe('content', 'sanitize_text_field');
         $selectedText = $request->getSafe('selectedText', 'sanitize_text_field', '');
@@ -230,10 +230,10 @@ class FluentBotController extends Controller
         }
     }
 
-    public function getTicketSummary(Request $request)
+    public function getTicketSummary(Request $request, $id)
     {
         try {
-            $ticketId = $request->getSafe('id', 'intval');
+            $ticketId = intval($id);
             $ticket = Ticket::with('responses')->findOrFail($ticketId);
             $this->ensureCanAccessTicket($ticket);
 
@@ -245,10 +245,10 @@ class FluentBotController extends Controller
         }
     }
 
-    public function getTicketTone(Request $request)
+    public function getTicketTone(Request $request, $id)
     {
         try {
-            $ticketId = $request->getSafe('id', 'intval');
+            $ticketId = intval($id);
             $ticket = Ticket::with('responses')->findOrFail($ticketId);
             $this->ensureCanAccessTicket($ticket);
 
@@ -267,9 +267,9 @@ class FluentBotController extends Controller
         return $ticket;
     }
 
-    public function getChatId(Request $request)
+    public function getChatId(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
 
         $meta = $this->getTicketMeta($ticketId, '_fluent_bot_chat_id');
@@ -281,9 +281,9 @@ class FluentBotController extends Controller
         ];
     }
 
-    public function getChatMessages(Request $request)
+    public function getChatMessages(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
         $cursor = $request->getSafe('cursor', 'sanitize_text_field', '');
 
@@ -307,9 +307,9 @@ class FluentBotController extends Controller
         return $result;
     }
 
-    public function saveChatId(Request $request)
+    public function saveChatId(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
         $chatId = $request->getSafe('chat_id', 'sanitize_text_field');
         $productId = $request->getSafe('product_id', 'intval', 0);
@@ -396,9 +396,9 @@ class FluentBotController extends Controller
         ])->delete();
     }
 
-    public function deleteChatId(Request $request)
+    public function deleteChatId(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
 
         Meta::where('object_type', 'ticket_meta')
@@ -415,9 +415,9 @@ class FluentBotController extends Controller
         ];
     }
 
-    public function getContextSelection(Request $request)
+    public function getContextSelection(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
 
         $meta = $this->getTicketMeta($ticketId, '_fluent_bot_context_selection');
@@ -429,9 +429,9 @@ class FluentBotController extends Controller
         return ['data' => Helper::safeUnserialize($meta->value)];
     }
 
-    public function saveContextSelection(Request $request)
+    public function saveContextSelection(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
         $selectedIds = (array) $request->get('selected_ids', []);
         $knownIds = (array) $request->get('known_ids', []);
@@ -465,9 +465,9 @@ class FluentBotController extends Controller
         ];
     }
 
-    public function createFeedback(Request $request)
+    public function createFeedback(Request $request, $id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
 
         $messageId = $request->getSafe('message_id', 'intval');
@@ -497,12 +497,12 @@ class FluentBotController extends Controller
         return $result;
     }
 
-    public function deleteFeedback(Request $request)
+    public function deleteFeedback(Request $request, $id, $feedback_id)
     {
-        $ticketId = $request->getSafe('id', 'intval');
+        $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
 
-        $feedbackId = $request->getSafe('feedback_id', 'intval');
+        $feedbackId = intval($feedback_id);
 
         if (!$feedbackId || $feedbackId < 1) {
             return $this->sendError(['message' => __('Invalid feedback_id', 'fluent-support')], 422);

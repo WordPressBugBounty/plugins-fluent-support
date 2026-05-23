@@ -143,67 +143,61 @@ class Menu
         }
     }
 
-    public function renderApp()
+    public function getMenuItems()
     {
-        $app = App::getInstance();
-
-        $assets = $app['url.assets'];
-
         $baseUrl = apply_filters('fluent_support/base_url', admin_url('admin.php?page=fluent-support#/'));
 
         $menuItems = [
-            [
+            'dashboard' => [
                 'key'       => 'dashboard',
                 'label'     => __('Dashboard', 'fluent-support'),
-                'permalink' => $baseUrl
+                'permalink' => $baseUrl,
             ],
-            [
+            'tickets'   => [
                 'key'       => 'tickets',
                 'label'     => __('Tickets', 'fluent-support'),
                 'permalink' => $baseUrl . 'tickets',
             ],
-            [
+            'reports'   => [
                 'key'       => 'reports',
                 'label'     => __('Reports', 'fluent-support'),
-                'permalink' => $baseUrl . 'reports'
+                'permalink' => $baseUrl . 'reports',
             ],
         ];
 
         $canManageSettings = PermissionManager::currentUserCan('fst_manage_settings');
 
         if ($canManageSettings) {
-            $menuItems[] = [
+            $menuItems['mailboxes'] = [
                 'key'       => 'mailboxes',
                 'label'     => __('Business Inboxes', 'fluent-support'),
-                'permalink' => $baseUrl . 'mailboxes'
+                'permalink' => $baseUrl . 'mailboxes',
             ];
         }
 
         if (PermissionManager::currentUserCan('fst_view_activity_logs')) {
-            $menuItems[] = [
+            $menuItems['activity'] = [
                 'key'       => 'activity',
                 'label'     => __('Activities', 'fluent-support'),
-                'permalink' => $baseUrl . 'activity'
+                'permalink' => $baseUrl . 'activity',
             ];
         }
 
-        $hasSensitiveAccess = PermissionManager::currentUserCan('fst_sensitive_data');
-        if ($hasSensitiveAccess) {
-            $menuItems[] = [
+        if (PermissionManager::currentUserCan('fst_sensitive_data')) {
+            $menuItems['customers'] = [
                 'key'       => 'customers',
                 'label'     => __('Customers', 'fluent-support'),
-                'permalink' => $baseUrl . 'customers'
+                'permalink' => $baseUrl . 'customers',
             ];
         }
 
-        // Build the "More" dropdown children
         $moreChildren = [];
 
         if (PermissionManager::currentUserCan('fst_manage_saved_replies')) {
             $moreChildren['saved_replies'] = [
                 'key'       => 'saved_replies',
                 'label'     => __('Saved Replies', 'fluent-support'),
-                'permalink' => $baseUrl . 'saved-replies'
+                'permalink' => $baseUrl . 'saved-replies',
             ];
         }
 
@@ -211,49 +205,52 @@ class Menu
             $moreChildren['workflows'] = [
                 'key'       => 'workflows',
                 'label'     => __('Workflows', 'fluent-support'),
-                'permalink' => $baseUrl . 'workflows'
+                'permalink' => $baseUrl . 'workflows',
             ];
         }
 
-        // Add the "More" dropdown if there are children
         if (!empty($moreChildren)) {
-            $menuItems[] = [
-                'key'       => 'more',
-                'label'     => __('More', 'fluent-support'),
+            $menuItems['more'] = [
+                'key'      => 'more',
+                'label'    => __('More', 'fluent-support'),
                 'permalink' => '#',
-                'children'  => $moreChildren
+                'children' => $moreChildren,
             ];
         }
-
-        $secondaryItems = [];
 
         if ($canManageSettings) {
-            $secondaryItems[] = [
+            $menuItems['settings'] = [
                 'key'       => 'settings',
                 'label'     => __('Global Settings', 'fluent-support'),
-                'permalink' => $baseUrl . 'settings'
+                'permalink' => $baseUrl . 'settings',
             ];
         }
 
-        /*
-         * Filter Fluent Support dashboard top-left menu items
-         *
-         * @since v1.0.0
-         *
-         * @param array $menuItems
-         */
+        return apply_filters('fluent_support/menu_items', $menuItems);
+    }
+
+    public function renderApp()
+    {
+        $app = App::getInstance();
+
+        $assets = $app['url.assets'];
+
+        $allItems = $this->getMenuItems();
+
+        $secondaryKeys = ['settings'];
+        $menuItems     = [];
+        $secondaryItems = [];
+
+        foreach ($allItems as $key => $item) {
+            if (in_array($key, $secondaryKeys, true)) {
+                $secondaryItems[] = $item;
+            } else {
+                $menuItems[] = $item;
+            }
+        }
+
         $menuItems = apply_filters('fluent_support/primary_menu_items', $menuItems);
-
-        /*
-         * Filter Fluent Support dashboard top-right menu items
-         *
-         * @since v1.0.0
-         *
-         * @param array $secondaryItems
-         */
         $secondaryItems = apply_filters('fluent_support/secondary_menu_items', $secondaryItems);
-
-
 
         if (!defined('FLUENT_SUPPORT_PRO_DIR_FILE')) {
             $secondaryItems[] = [
@@ -263,7 +260,8 @@ class Menu
             ];
         }
 
-        $app = App::getInstance();
+        $baseUrl = apply_filters('fluent_support/base_url', admin_url('admin.php?page=fluent-support#/'));
+
         $this->enqueueAssets();
 
         do_action('fluent_support/admin_app_loaded', $app);

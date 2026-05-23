@@ -265,7 +265,11 @@ class CustomerPortalService
      */
     public function getCustomer($customerAdditionalData, $ticket)
     {
-        if (Arr::get($customerAdditionalData, 'intended_ticket_hash') && Helper::isPublicSignedTicketEnabled()) {
+        $intendedHash = Arr::get($customerAdditionalData, 'intended_ticket_hash');
+        if ($intendedHash && Helper::isPublicSignedTicketEnabled()) {
+            if ($ticket->hash !== $intendedHash) {
+                throw new \Exception(esc_html__('Sorry, You do not have permission to this support ticket', 'fluent-support'));
+            }
             $customer = $ticket->customer;
         } else {
             $customer = $this->resolveCustomer(Arr::get($customerAdditionalData, 'on_behalf'), Arr::get($customerAdditionalData, 'user_ip'));

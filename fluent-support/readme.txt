@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,12 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.2.1 (Date: May 23, 2026) =
+* Added: Grid view layout for the ticket list
+* Fixed issue with time tracking where working minutes were showing as null
+* Unified and improved dynamic support menu UI structure
+* Security: Hardened ticket ID resolution in Customer Portal policy
 
 = 2.2.0 (Date: May 20, 2026) =
 * Added: Internal Notifications module — agents now receive real-time in-app notifications for @mentions, ticket assignments and reassignments, customer replies, ticket close/reopen events, and Workflow triggers; fully configurable per event category with a self-notification toggle

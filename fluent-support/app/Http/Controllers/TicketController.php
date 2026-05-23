@@ -1499,9 +1499,9 @@ class TicketController extends Controller
      * @param Request $request
      * @return array
      */
-    public function changeTicketCustomer(Request $request)
+    public function changeTicketCustomer(Request $request, $ticket_id)
     {
-        $ticketId = $request->getSafe('ticket_id', 'intval');
+        $ticketId = (int) $ticket_id;
         $newCustomerId = $request->getSafe('customer', 'intval');
 
         if (!$newCustomerId) {
