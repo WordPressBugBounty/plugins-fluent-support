@@ -126,6 +126,8 @@ class FluentBotController extends Controller
             )
             : null;
         $includeTicketContent = filter_var($request->get('include_ticket_content', true), FILTER_VALIDATE_BOOLEAN);
+        $webSearch = filter_var($request->get('web_search', false), FILTER_VALIDATE_BOOLEAN);
+        $temperature = max(0, min(2, floatval($request->get('temperature', 0))));
 
         // Cap and sanitize seed messages: only allowed roles, bounded content length, count capped.
         $seedMessagesRaw = array_slice((array) $request->get('conversation_history', []), -self::MAX_SEED_MESSAGES);
@@ -209,7 +211,7 @@ class FluentBotController extends Controller
                 flush();
 
                 // Start streaming response
-                $customAI->generateStreamResponse($prompt, $ticket, $productId, $conversationId ?: null, $selectedConversations, $includeTicketContent, $seedMessages ?: null);
+                $customAI->generateStreamResponse($prompt, $ticket, $productId, $conversationId ?: null, $selectedConversations, $includeTicketContent, $seedMessages ?: null, $webSearch, $temperature);
 
                 // Send end event
                 echo "event: end\n";
@@ -313,6 +315,7 @@ class FluentBotController extends Controller
         $this->authorizeTicketAccess($ticketId);
         $chatId = $request->getSafe('chat_id', 'sanitize_text_field');
         $productId = $request->getSafe('product_id', 'intval', 0);
+        $title = $request->getSafe('title', 'sanitize_text_field', '');
 
         // Validate UUID format
         if (!$chatId || !preg_match(self::CHAT_ID_PATTERN, $chatId)) {
@@ -349,6 +352,10 @@ class FluentBotController extends Controller
         if ($result) {
             return $this->sendError(['message' => $result['error']], 409);
         }
+
+        // Track the conversation so it appears in the ticket's "Past conversations"
+        // list. Idempotent per chat_id — repeated saves of the same id are no-ops.
+        $this->appendChatHistory($ticketId, $chatId, $productId, $title);
 
         return [
             'success' => true,
@@ -415,6 +422,95 @@ class FluentBotController extends Controller
         ];
     }
 
+    /**
+     * List the ticket's past FluentBot conversations (newest first) plus the
+     * currently-active chat_id, for the "Past conversations" switcher.
+     */
+    public function getConversations(Request $request, $id)
+    {
+        $ticketId = intval($id);
+        $this->authorizeTicketAccess($ticketId);
+
+        $active = $this->getTicketMeta($ticketId, '_fluent_bot_chat_id');
+
+        return [
+            'conversations'  => $this->readChatHistory($ticketId),
+            'active_chat_id' => $active ? $active->value : null,
+        ];
+    }
+
+    /**
+     * Make a past conversation the active one so the next message continues it.
+     * Only a chat_id already recorded in THIS ticket's history may be selected —
+     * the stream endpoint trusts the stored chat_id, so this is the ownership gate.
+     */
+    public function switchConversation(Request $request, $id)
+    {
+        $ticketId = intval($id);
+        $this->authorizeTicketAccess($ticketId);
+        $chatId = $request->getSafe('chat_id', 'sanitize_text_field');
+
+        if (!$chatId || !preg_match(self::CHAT_ID_PATTERN, $chatId)) {
+            return $this->sendError(['message' => __('Invalid chat_id format', 'fluent-support')], 422);
+        }
+
+        $entry = null;
+        foreach ($this->readChatHistory($ticketId) as $h) {
+            if (isset($h['chat_id']) && $h['chat_id'] === $chatId) {
+                $entry = $h;
+                break;
+            }
+        }
+
+        if (!$entry) {
+            return $this->sendError(['message' => __('Conversation not found for this ticket.', 'fluent-support')], 404);
+        }
+
+        $productId = (int) ($entry['product_id'] ?? 0);
+        $this->upsertTicketMeta($ticketId, '_fluent_bot_chat_id', $chatId);
+        $this->upsertTicketMeta($ticketId, '_fluent_bot_chat_product', $productId);
+
+        return [
+            'success'    => true,
+            'chat_id'    => $chatId,
+            'product_id' => $productId,
+        ];
+    }
+
+    private function readChatHistory($ticketId): array
+    {
+        $meta = $this->getTicketMeta($ticketId, '_fluent_bot_chat_history');
+        $history = ($meta && $meta->value) ? json_decode($meta->value, true) : [];
+
+        return is_array($history) ? array_values($history) : [];
+    }
+
+    /**
+     * Prepend a conversation to the ticket's history. Idempotent per chat_id;
+     * capped so ticket meta cannot grow unbounded.
+     */
+    private function appendChatHistory($ticketId, $chatId, $productId, $title = '')
+    {
+        $history = $this->readChatHistory($ticketId);
+
+        foreach ($history as $entry) {
+            if (isset($entry['chat_id']) && $entry['chat_id'] === $chatId) {
+                return;
+            }
+        }
+
+        array_unshift($history, [
+            'chat_id'    => $chatId,
+            'product_id' => (int) $productId,
+            'title'      => $title !== '' ? $title : __('Conversation', 'fluent-support'),
+            'created_at' => time(),
+        ]);
+
+        $history = array_slice($history, 0, 20);
+
+        $this->upsertTicketMeta($ticketId, '_fluent_bot_chat_history', wp_json_encode($history));
+    }
+
     public function getContextSelection(Request $request, $id)
     {
         $ticketId = intval($id);
@@ -470,11 +566,12 @@ class FluentBotController extends Controller
         $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
 
-        $messageId = $request->getSafe('message_id', 'intval');
+        // fluent-bot Message PKs are UUIDs — sanitize as text, not intval.
+        $messageId = $request->getSafe('message_id', 'sanitize_text_field');
         $reaction = $request->getSafe('reaction', 'sanitize_text_field');
         $comment = $request->getSafe('comments', 'sanitize_textarea_field', '');
 
-        if (!$messageId || $messageId < 1) {
+        if (!$messageId || !wp_is_uuid($messageId)) {
             return $this->sendError(['message' => __('Invalid message_id', 'fluent-support')], 422);
         }
 
@@ -502,6 +599,7 @@ class FluentBotController extends Controller
         $ticketId = intval($id);
         $this->authorizeTicketAccess($ticketId);
 
+        // fluent-bot Feedback PKs are integers (unlike message ids, which are UUIDs).
         $feedbackId = intval($feedback_id);
 
         if (!$feedbackId || $feedbackId < 1) {

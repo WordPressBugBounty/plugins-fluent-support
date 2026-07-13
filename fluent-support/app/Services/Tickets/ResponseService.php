@@ -236,14 +236,16 @@ class ResponseService
         ];
     }
 
-    private function maybeAppendSignature($content, $person)
+    public function maybeAppendSignature($content, $person)
     {
         if ($person->getMeta('agent_signature_enabled', 'no') !== 'yes') {
             return $content;
         }
 
         $signature = $person->getMeta('agent_signature', '');
-        if (empty(trim(strip_tags($signature)))) {
+        $hasText = !empty(trim(strip_tags($signature)));
+        $hasImage = (bool) preg_match('/<img[\s>]/i', $signature);
+        if (!$hasText && !$hasImage) {
             return $content;
         }
 

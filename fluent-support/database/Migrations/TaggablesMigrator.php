@@ -26,7 +26,8 @@ class TaggablesMigrator
                 `created_at` TIMESTAMP NULL,
                 `updated_at` TIMESTAMP NULL,
                 INDEX `idx_created_by` (`created_by`),
-                INDEX `idx_tag_type` (`tag_type`)
+                INDEX `idx_tag_type` (`tag_type`),
+                INDEX `idx_title` (`title`)
             ) $charsetCollate;";
             $created = dbDelta($sql);
             return $created;
@@ -61,16 +62,17 @@ class TaggablesMigrator
 
         // Desired indexes — keys and values are all hardcoded string literals.
         $indexes = [
-            'idx_created_by' => 'created_by',
-            'idx_tag_type'   => 'tag_type',
+            'idx_created_by' => '`created_by`',
+            'idx_tag_type'   => '`tag_type`',
+            'idx_title'      => '`title`',
         ];
 
         // Add missing indexes. $table is esc_sql()'d above; $index_name and
-        // $column_name are hardcoded array literals — no user input reaches this query.
-        foreach ($indexes as $index_name => $column_name) {
+        // $columns are hardcoded array literals — no user input reaches this query.
+        foreach ($indexes as $index_name => $columns) {
             if (!in_array($index_name, $existing_index_names)) {
                 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- all identifiers are either esc_sql()'d or hardcoded literals.
-                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` (`{$column_name}`)");
+                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` ({$columns})");
             }
         }
     }

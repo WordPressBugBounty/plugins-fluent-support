@@ -8,6 +8,7 @@ use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Models\Product;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\Helper;
+use FluentSupport\App\Services\Integrations\AI\AIProviderFactory;
 use FluentSupport\Database\Migrations\AIActivityLogsMigrator;
 use FluentSupport\Framework\Http\Request\Request;
 use FluentSupport\App\Hooks\Handlers\ReCaptchaHandler;
@@ -361,125 +362,99 @@ class SettingsController extends Controller
         ]);
     }
 
-    public function saveOpenAISettings(Request $request)
+    public function saveAIProviderSettings(Request $request)
     {
+        $allowedProviders = AIProviderFactory::getAllowedProviders();
+        $provider         = $request->getSafe('provider', 'sanitize_text_field', 'openai');
+
+        if (!in_array($provider, $allowedProviders, true)) {
+            return $this->sendError([
+                'message' => __('Invalid AI provider selected.', 'fluent-support'),
+            ]);
+        }
+
+        $enabled = $request->getSafe('enabled', 'sanitize_text_field', 'yes');
+        $apiKey  = $request->getSafe('api_key', 'sanitize_text_field', '');
+        $model   = $request->getSafe('model', 'sanitize_text_field', '');
+
+        if (empty($apiKey) || strpos($apiKey, '****') === 0) {
+            $existing = Helper::getAIProviderSettings();
+            if (($existing['provider'] ?? '') === $provider) {
+                $apiKey = $existing['api_key'] ?? '';
+            } else {
+                $apiKey = '';
+            }
+        }
+
         $data = [
-            'api_key' => $request->getSafe('api_key', 'sanitize_text_field', ''),
-            'model' => $request->getSafe('model', 'sanitize_text_field', ''),
+            'enabled'  => $enabled,
+            'provider' => $provider,
+            'api_key'  => $apiKey,
+            'model'    => $model,
         ];
 
-        $response = Helper::authorizeChatGPTAPIKey($data);
-
-        if (is_wp_error($response)) {
-            return $this->sendError([
-                'message' => __('There was an error verifying the API key.', 'fluent-support'),
-            ]);
-        }
-
-        $body = json_decode(wp_remote_retrieve_body($response), true);
-
-        if (isset($body['error'])) {
-            return $this->sendError([
-                'message' => __('Invalid API key. Please provide a valid ChatGPT API key.', 'fluent-support'),
-            ]);
-        }
-
         try {
-            $isDataSaved = Helper::saveOpenAIData('_fs_openai_settings', '_fs_openai_data', $data);
-            if ($isDataSaved) {
-                AIActivityLogsMigrator::migrate();
-            }
+            Helper::saveAIProviderSettings($data);
+            AIProviderFactory::clearCache();
+            AIActivityLogsMigrator::migrate();
+
             return $this->sendSuccess([
-                'message' => __('OpenAI settings have been successfully saved.', 'fluent-support'),
+                'message' => __('AI settings have been successfully saved.', 'fluent-support'),
             ]);
         } catch (\Exception $e) {
-            // translators: %s is the error message from the exception
-            $translatedMessage = __('An error occurred while saving the settings: %s', 'fluent-support');
-            $errorMessage = sprintf($translatedMessage, Helper::getSafeErrorMessage($e));
-
             return $this->sendError([
-                'message' => $errorMessage,
+                'message' => sprintf(
+                    __('An error occurred while saving the settings: %s', 'fluent-support'),
+                    Helper::getSafeErrorMessage($e)
+                ),
             ]);
         }
     }
 
-
-    public function disconnectOpenAI()
+    public function disconnectAIProvider()
     {
-        $deletedRecords = Meta::where([
+        Meta::where('object_type', '_fs_ai_provider_settings')->delete();
+        Meta::where([
             'object_type' => '_fs_openai_settings',
             'key'         => '_fs_openai_data',
         ])->delete();
 
-        if ($deletedRecords) {
-            return $this->sendSuccess([
-                'message' => __('OpenAI settings have been successfully disconnected.', 'fluent-support'),
-            ]);
-        } else {
-            return $this->sendError([
-                'message' => __('Failed to disconnect OpenAI settings. No matching records found or an error occurred.', 'fluent-support'),
-            ]);
-        }
+        AIProviderFactory::clearCache();
+
+        return $this->sendSuccess([
+            'message' => __('AI provider settings have been successfully disconnected.', 'fluent-support'),
+        ]);
     }
 
-    public function getOpenAISettings()
+    public function getAIProviderSettings()
     {
-        $modelOptions = $this->getOpenAIModelOptions();
-        $supportedModels = array_column($modelOptions, 'value');
+        $settings = Helper::getAIProviderSettings();
 
-        $settings = [
-            'api_key' => '',
-            'model'   => 'gpt-5.2',
-        ];
+        $provider     = $settings['provider'] ?? 'openai';
+        $apiKey       = $settings['api_key'] ?? '';
+        $model        = $settings['model'] ?? '';
+        $defaultEnabled = !empty($apiKey) ? 'yes' : 'no';
+        $enabled        = $settings['enabled'] ?? $defaultEnabled;
 
-        $chatGPTSettingsData = Meta::where('object_type', '_fs_openai_settings')->first();
-        if ($chatGPTSettingsData) {
-            $settings = Helper::safeUnserialize($chatGPTSettingsData->value);
-
-            if (!empty($settings['model']) && !in_array($settings['model'], $supportedModels, true)) {
-                $previousModel = $settings['model'];
-                $settings['model'] = 'gpt-5.2';
-                Helper::saveOpenAIData('_fs_openai_settings', '_fs_openai_data', $settings);
-                $settings['previous_model'] = $previousModel;
-                $settings['model_migrated'] = true;
+        $availableModels = [];
+        foreach (['openai', 'gemini', 'anthropic'] as $p) {
+            $instance = AIProviderFactory::make($p, '', '');
+            if (!is_wp_error($instance)) {
+                $availableModels[$p] = $instance->getAvailableModels();
             }
         }
 
-        $settings['model_options'] = $modelOptions;
+        if (empty($model) && !empty($availableModels[$provider])) {
+            $model = $availableModels[$provider][0]['value'];
+        }
 
-        return $this->sendSuccess($settings);
-    }
-
-    private function getOpenAIModelOptions()
-    {
-        $models = [
-            ['value' => 'gpt-5.2', 'label' => 'GPT-5.2'],
-            ['value' => 'gpt-5.2-chat-latest', 'label' => 'GPT-5.2 Chat'],
-            ['value' => 'gpt-4.1', 'label' => 'GPT-4.1'],
-            ['value' => 'gpt-4.1-mini', 'label' => 'GPT-4.1 Mini'],
-            ['value' => 'gpt-4.1-nano', 'label' => 'GPT-4.1 Nano'],
-            ['value' => 'gpt-4o', 'label' => 'GPT-4o'],
-            ['value' => 'gpt-4o-mini', 'label' => 'GPT-4o Mini'],
-            ['value' => 'gpt-4o-2024-08-06', 'label' => 'GPT-4o (2024-08-06)'],
-            ['value' => 'gpt-4o-2024-05-13', 'label' => 'GPT-4o (2024-05-13)'],
-            ['value' => 'gpt-4o-mini-2024-07-18', 'label' => 'GPT-4o Mini (2024-07-18)'],
-            ['value' => 'gpt-4-turbo', 'label' => 'GPT-4 Turbo'],
-            ['value' => 'gpt-4-turbo-2024-04-09', 'label' => 'GPT-4 Turbo (2024-04-09)'],
-            ['value' => 'gpt-4-turbo-preview', 'label' => 'GPT-4 Turbo Preview'],
-            ['value' => 'gpt-4', 'label' => 'GPT-4'],
-            ['value' => 'gpt-4-0613', 'label' => 'GPT-4 (0613)'],
-            ['value' => 'gpt-3.5-turbo', 'label' => 'GPT-3.5 Turbo'],
-            ['value' => 'gpt-3.5-turbo-0125', 'label' => 'GPT-3.5 Turbo (0125)'],
-            ['value' => 'o3', 'label' => 'o3'],
-            ['value' => 'o3-mini', 'label' => 'o3-mini'],
-            ['value' => 'o4-mini', 'label' => 'o4-mini'],
-            ['value' => 'o1', 'label' => 'o1'],
-            ['value' => 'gpt-4-0314', 'label' => 'GPT-4 (0314) - Deprecated soon'],
-            ['value' => 'gpt-4-1106-preview', 'label' => 'GPT-4 (1106 Preview) - Deprecated soon'],
-            ['value' => 'gpt-4-0125-preview', 'label' => 'GPT-4 (0125 Preview) - Deprecated soon'],
-        ];
-
-        return apply_filters('fluent_support/supported_openai_models', $models);
+        return $this->sendSuccess([
+            'enabled'          => $enabled,
+            'provider'         => $provider,
+            'api_key'          => !empty($apiKey) ? '****' . substr($apiKey, -4) : '',
+            'model'            => $model,
+            'available_models' => $availableModels,
+        ]);
     }
 
     public function getReCaptchaSettings()
@@ -843,8 +818,14 @@ class SettingsController extends Controller
             $settings = [];
         }
 
+        // Write-only secret: never return the raw team API key to the browser
+        // (it authenticates the FluentBot API and would leak to logs/extensions/
+        // XSS). Expose only whether a key is stored so the form can show a
+        // "saved" hint; the input stays blank and only overwrites on a new key.
+        $hasApiKey = !empty($settings['generalApiKey']);
         unset($settings['generalApiKey']);
 
+        // Per-mapping apiKey is unused (the key is team-wide).
         if (!empty($settings['productMappings']) && is_array($settings['productMappings'])) {
             $settings['productMappings'] = array_map(function ($mapping) {
                 if (!is_array($mapping)) {
@@ -866,6 +847,7 @@ class SettingsController extends Controller
         // before this flag existed — existing installs expect general bot to work on GET.
         $defaults = [
             'generalBotId'      => '',
+            'generalApiKey'     => '',
             'generalBotEnabled' => true,
             'isEnabled'         => false,
             'productMappings'   => [],
@@ -873,14 +855,33 @@ class SettingsController extends Controller
         ];
 
         return array_merge($defaults, $settings, [
-            'products' => $productItems
+            'products'  => $productItems,
+            'hasApiKey' => $hasApiKey,
         ]);
     }
 
     public function saveFluentBotSettings(Request $request)
     {
+        $where = [
+            'object_type' => 'fluent_bot_settings',
+            'object_id'   => 1,
+            'key'         => '_fs_fluent_bot_config'
+        ];
+
+        $existing = Meta::where($where)->orderByDesc('id')->first();
+        $existingConfig = $existing ? Helper::safeUnserialize($existing->value) : [];
+        if (!is_array($existingConfig)) {
+            $existingConfig = [];
+        }
+
+        // Write-only key: a blank submission means "keep the stored key" (the form
+        // never round-trips the secret), so only overwrite when a new key is sent.
+        $submittedApiKey = trim($request->getSafe('generalApiKey', 'sanitize_text_field'));
+        $apiKey = $submittedApiKey !== '' ? $submittedApiKey : ($existingConfig['generalApiKey'] ?? '');
+
         $data = [
             'generalBotId'      => $request->getSafe('generalBotId', 'sanitize_text_field'),
+            'generalApiKey'     => $apiKey,
             'generalBotEnabled' => filter_var($request->get('generalBotEnabled', true), FILTER_VALIDATE_BOOLEAN),
             'isEnabled'         => $request->getSafe('isEnabled', 'rest_sanitize_boolean'),
             'productMappings'  => []
@@ -918,14 +919,6 @@ class SettingsController extends Controller
 
         $serialized = maybe_serialize($data);
 
-        $where = [
-            'object_type' => 'fluent_bot_settings',
-            'object_id'   => 1,
-            'key'         => '_fs_fluent_bot_config'
-        ];
-
-        $existing = Meta::where($where)->orderByDesc('id')->first();
-
         if ($existing) {
             // Update the latest row; do not prune siblings — concurrent first-writes could
             // race and delete each other's inserts, leaving zero rows (data loss).
@@ -936,10 +929,15 @@ class SettingsController extends Controller
             AIActivityLogsMigrator::migrate();
         }
 
+        // Write-only: never echo the raw key back to the browser.
+        $responseData = $data;
+        unset($responseData['generalApiKey']);
+        $responseData['hasApiKey'] = $apiKey !== '';
+
         return [
             'success' => true,
             'message' => 'Settings saved successfully',
-            'data'    => $data
+            'data'    => $responseData
         ];
     }
 

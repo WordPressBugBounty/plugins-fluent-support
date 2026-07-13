@@ -425,6 +425,8 @@ class Menu
 
         $i18ns = TranslationStrings::getAdminStrings();
         $i18ns['allowed_files_and_size'] = Helper::getFileUploadMessage();
+        $i18ns['open']                   = __('Open', 'fluent-support');
+        $i18ns['all']                    = __('All', 'fluent-support');
 
         /*
          * Filter agent portal localize javascript data

@@ -91,3 +91,9 @@ if(defined('LSCWP_V')){
 }
 
 $app->addAction('init', 'BlockEditorHandler@init');
+
+// MCP — toolkit discovery runs unconditionally so FluentHub can list Fluent
+// Support even on WP < 6.9. The Abilities API / server hooks inside init()
+// fire only when wp_register_ability / mcp_adapter_init are available.
+\FluentSupport\App\Modules\MCP\MCPInit::boot();
+

@@ -16,7 +16,21 @@ class FluentBotHelper
         'ticket_reply' => '/chat/fs',
     ];
 
-    public function generateStreamResponse($prompt, $ticket, $productId, $conversationId = null, $selectedConversations = null, $includeTicketContent = true, $seedMessages = null)
+    /**
+     * Resolve the FluentBot API base URL. Defaults to production; overridable
+     * for local/staging via the `FLUENTBOT_API_BASE_URL` constant (wp-config)
+     * or the `fluent_support/fluentbot_api_base_url` filter.
+     */
+    private function apiBaseUrl(): string
+    {
+        if (defined('FLUENTBOT_API_BASE_URL') && FLUENTBOT_API_BASE_URL) {
+            return rtrim((string) FLUENTBOT_API_BASE_URL, '/');
+        }
+
+        return rtrim((string) apply_filters('fluent_support/fluentbot_api_base_url', static::BASE_URL), '/');
+    }
+
+    public function generateStreamResponse($prompt, $ticket, $productId, $conversationId = null, $selectedConversations = null, $includeTicketContent = true, $seedMessages = null, $webSearch = false, $temperature = 0)
     {
         $prompt = apply_filters('fluent_support/generate_response', $prompt, $ticket);
 
@@ -32,6 +46,8 @@ class FluentBotHelper
             'prompt' => $prompt,
             'stream' => true,
             'chat_id' => $conversationId ?? null,
+            'enable_web_search' => (bool) $webSearch,
+            'temperature' => (float) $temperature,
         ];
 
         if (!empty($ticketMessages)) {
@@ -166,7 +182,7 @@ class FluentBotHelper
 
     private function makeAPICall(array $payload, string $prompt, int $ticketId, string $type = 'default', $productId = null )
     {
-        $apiUrl = static::BASE_URL . static::ENDPOINTS[$type];
+        $apiUrl = $this->apiBaseUrl() . static::ENDPOINTS[$type];
 
         $credentials = $this->resolveApiCredentials($productId);
 
@@ -177,7 +193,7 @@ class FluentBotHelper
         // Use bot_id instead of botId for the new API
         $payload['bot_id'] = $credentials['botId'];
 
-        $api = new FluentBotAPI($apiUrl);
+        $api = new FluentBotAPI($apiUrl, $credentials['apiKey']);
         $result = $api->makeRequest($ticketId, $prompt, $payload);
 
         // For ticket_reply endpoint, return the full result with chat_id
@@ -193,11 +209,14 @@ class FluentBotHelper
 
     private function makeStreamAPICall(array $payload, string $prompt, int $ticketId, string $type = 'default', $productId = null)
     {
-        $apiUrl = static::BASE_URL . static::ENDPOINTS[$type];
+        $apiUrl = $this->apiBaseUrl() . static::ENDPOINTS[$type];
 
         $credentials = $this->resolveApiCredentials($productId);
 
         if (is_wp_error($credentials)) {
+            // Emit as an SSE `error` event (not a bare `data:` frame) so the client
+            // shows a proper error state instead of rendering the JSON as AI text.
+            echo "event: error\n";
             echo "data: " . json_encode(['error' => $credentials->get_error_message()]) . "\n\n";
             return;
         }
@@ -205,7 +224,7 @@ class FluentBotHelper
         // Use bot_id instead of botId for the new API
         $payload['bot_id'] = $credentials['botId'];
 
-        $api = new FluentBotAPI($apiUrl);
+        $api = new FluentBotAPI($apiUrl, $credentials['apiKey']);
         $api->makeStreamRequest($ticketId, $prompt, $payload);
     }
 
@@ -218,14 +237,14 @@ class FluentBotHelper
         }
 
         $botId = $credentials['botId'];
-        $url = static::BASE_URL . '/bots/' . $botId . '/chats/' . $chatId . '/messages';
+        $url = $this->apiBaseUrl() . '/bots/' . $botId . '/chats/' . $chatId . '/messages';
 
         if ($cursor) {
             $url .= '?cursor=' . urlencode($cursor);
         }
 
         $response = wp_remote_get($url, [
-            'headers' => ['Content-Type' => 'application/json'],
+            'headers' => $this->requestHeaders($credentials['apiKey']),
             'timeout' => 30,
         ]);
 
@@ -265,8 +284,8 @@ class FluentBotHelper
             $payload['chat_id'] = $chatId;
         }
 
-        $response = wp_remote_post(static::BASE_URL . '/feedbacks', [
-            'headers' => ['Content-Type' => 'application/json'],
+        $response = wp_remote_post($this->apiBaseUrl() . '/feedbacks', [
+            'headers' => $this->requestHeaders($credentials['apiKey']),
             'body'    => wp_json_encode($payload),
             'timeout' => 15,
         ]);
@@ -302,9 +321,9 @@ class FluentBotHelper
             $payload['chat_id'] = $chatId;
         }
 
-        $response = wp_remote_request(static::BASE_URL . '/feedbacks/' . $feedbackId, [
+        $response = wp_remote_request($this->apiBaseUrl() . '/feedbacks/' . $feedbackId, [
             'method'  => 'DELETE',
-            'headers' => ['Content-Type' => 'application/json'],
+            'headers' => $this->requestHeaders($credentials['apiKey']),
             'body'    => wp_json_encode($payload),
             'timeout' => 15,
         ]);
@@ -372,9 +391,37 @@ class FluentBotHelper
             );
         }
 
+        // The FluentBot API is team-scoped: a single API key authenticates every
+        // bot in the team, so one general key covers both the general and any
+        // product-specific bot. It is now required — the API rejects anonymous
+        // calls — so surface a clear config error instead of a raw 401.
+        $apiKey = trim((string)($config['generalApiKey'] ?? ''));
+        if ($apiKey === '') {
+            return new \WP_Error(
+                'missing_api_key',
+                __('FluentBot API key is not set. Add it in the FluentBot integration settings.', 'fluent-support')
+            );
+        }
+
         return [
-            'botId' => $botId
+            'botId'  => $botId,
+            'apiKey' => $apiKey,
         ];
+    }
+
+    /**
+     * Build the outbound request headers, attaching the team API key as a
+     * Bearer token so upstream can authenticate + team-scope the call.
+     */
+    private function requestHeaders(string $apiKey): array
+    {
+        $headers = ['Content-Type' => 'application/json'];
+
+        if ($apiKey !== '') {
+            $headers['Authorization'] = 'Bearer ' . $apiKey;
+        }
+
+        return $headers;
     }
 
     private function getTicketMessages($ticket, $includeTicketContent = true): array

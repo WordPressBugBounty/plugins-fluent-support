@@ -28,7 +28,7 @@ class Common
         return [
             'first_name' => $name[0] ?? '',
             'last_name' => $name[1] ?? '',
-            'email' => $personData->email ?? $personData->address,
+            'email' => $personData->email ?? $personData->address ?? null,
             'person_type' => $type
         ];
     }

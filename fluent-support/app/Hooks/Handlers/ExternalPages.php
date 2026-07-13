@@ -102,9 +102,10 @@ class ExternalPages
             wp_die('Invalid Attachment Hash', 'Not Found', ['response' => 404]);
         }
 
-        // For public endpoints, verify security using signature validation instead of nonces
-        // This is appropriate for public endpoints that must work without user authentication
-        if (!$this->validateAttachmentSignature($attachment)) {
+        // Inline attachments (paste images embedded in ticket/email content) are publicly accessible
+        // without a signature because they are already shared with customers via email.
+        // Other attachments require HMAC signature validation.
+        if ($attachment->status !== 'inline' && !$this->validateAttachmentSignature($attachment)) {
             $dieMessage = esc_html__('Sorry, Your secure sign is invalid, Please reload the previous page and get new signed url', 'fluent-support');
             wp_die(esc_html($dieMessage), 'Forbidden', ['response' => 403]);
         }

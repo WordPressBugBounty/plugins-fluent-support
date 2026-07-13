@@ -220,6 +220,39 @@ class Ticket extends Model
     }
 
     /**
+     * Who replied last on this ticket, derived from the already-loaded
+     * last_agent_response / last_customer_response timestamp columns.
+     *
+     * Returns 'agent', 'customer', or null. This is the per-ticket value behind
+     * the `waiting_for_reply` filter and mirrors the timestamp comparison in
+     * scopeWaitingOnly() (which lives in SQL, so it can't share this PHP code).
+     *
+     * Note: boot() seeds last_customer_response on creation, so a brand-new
+     * ticket with no agent reply correctly resolves to 'customer' (awaiting an
+     * agent). null is reserved for the rare case where neither timestamp is set.
+     *
+     * @return string|null
+     */
+    public function getLastReplyByAttribute()
+    {
+        $agentAt    = $this->last_agent_response;
+        $customerAt = $this->last_customer_response;
+
+        if (!$agentAt && !$customerAt) {
+            return null;
+        }
+        if (!$agentAt) {
+            return 'customer';
+        }
+        if (!$customerAt) {
+            return 'agent';
+        }
+
+        // Tie (same second) resolves to 'customer' — the waiting bias used by scopeWaitingOnly.
+        return strtotime($customerAt) >= strtotime($agentAt) ? 'customer' : 'agent';
+    }
+
+    /**
      * Local scope to filter tickets by not response by agent
      * @param $query
      * @return mixed

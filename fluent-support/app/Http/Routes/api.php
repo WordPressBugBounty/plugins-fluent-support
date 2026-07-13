@@ -138,14 +138,19 @@ $router->prefix('settings')->withPolicy('AdminSettingsPolicy')->group(function (
     $router->get('/remote-upload-settings', 'SettingsController@getRemoteUploadSettings');
     $router->post('/update-remote-upload-driver', 'SettingsController@updateRemoteUploadDriver');
 
-    $router->get('/openai-integration', 'SettingsController@getOpenAISettings');
-    $router->post('/openai-integration', 'SettingsController@saveOpenAISettings');
-    $router->post('/openai-integration/disconnect', 'SettingsController@disconnectOpenAI');
+    $router->get('/ai-integration', 'SettingsController@getAIProviderSettings');
+    $router->post('/ai-integration', 'SettingsController@saveAIProviderSettings');
+    $router->post('/ai-integration/disconnect', 'SettingsController@disconnectAIProvider');
     $router->get('/settings-menu', 'SettingsController@getSettingsMenu');
     $router->get('/fluent-bot-integration', 'SettingsController@getFluentBotSettings');
     $router->post('/fluent-bot-integration', 'SettingsController@saveFluentBotSettings');
     $router->get('/fluent-bot-presets', 'SettingsController@getFluentBotPresets');
     $router->post('/fluent-bot-presets', 'SettingsController@saveFluentBotPresets');
+
+    $router->get('/mcp', 'McpSettingsController@getStatus');
+    $router->post('/mcp/toggle', 'McpSettingsController@toggle');
+    $router->post('/mcp/install-adapter', 'McpSettingsController@installAdapter');
+    $router->get('/mcp/config-snippets', 'McpSettingsController@getConfigSnippets');
 });
 
 $router->prefix('agents')->withPolicy('AdminSensitivePolicy')->group(function ($router) {
@@ -262,6 +267,8 @@ $router->prefix('fluent-bot')->withPolicy('AgentTicketPolicy')->group(function (
     $router->post('/{id}/chat-id', 'FluentBotController@saveChatId')->int('id');
     $router->delete('/{id}/chat-id', 'FluentBotController@deleteChatId')->int('id');
     $router->get('/{id}/chat-messages', 'FluentBotController@getChatMessages')->int('id');
+    $router->get('/{id}/conversations', 'FluentBotController@getConversations')->int('id');
+    $router->post('/{id}/conversations/switch', 'FluentBotController@switchConversation')->int('id');
     $router->get('/{id}/context-selection', 'FluentBotController@getContextSelection')->int('id');
     $router->post('/{id}/context-selection', 'FluentBotController@saveContextSelection')->int('id');
 });

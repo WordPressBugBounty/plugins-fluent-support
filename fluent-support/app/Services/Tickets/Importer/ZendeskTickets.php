@@ -184,11 +184,14 @@ class ZendeskTickets extends BaseImporter
                     || strpos($errorMsg, 'invalid') !== false
                     || strpos($errorMsg, 'pagination') !== false;
 
-                if ($this->afterCursor && $this->includeArchived && $isCursorError) {
+                if ($isCursorError && ($this->afterCursor || $this->nextPageUrl)) {
                     $this->afterCursor = null;
                     $this->nextPageUrl = null;
 
-                    $url = $this->buildSearchExportUrl();
+                    $url = $this->includeArchived
+                        ? $this->buildSearchExportUrl()
+                        : "{$this->domain}/api/v2/tickets?page[size]={$this->limit}";
+
                     $tickets = $this->makeRequest($url);
                 } else {
                     throw $e;

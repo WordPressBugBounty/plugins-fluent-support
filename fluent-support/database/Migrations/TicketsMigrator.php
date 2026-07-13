@@ -52,18 +52,21 @@ class TicketsMigrator
                 INDEX `idx_mailbox_id` (`mailbox_id`),
                 INDEX `idx_product_id` (`product_id`),
                 INDEX `idx_priority` (`priority`),
+                INDEX `idx_client_priority` (`client_priority`),
                 INDEX `idx_status` (`status`),
                 INDEX `idx_created_at` (`created_at`),
                 INDEX `idx_resolved_at` (`resolved_at`),
                 INDEX `idx_status_resolved_at` (`status`, `resolved_at`),
                 INDEX `idx_ticket_number` (`ticket_number`(191)),
+                INDEX `idx_waiting_since_id` (`waiting_since`, `id`),
+                INDEX `idx_updated_at_id` (`updated_at`, `id`),
+                INDEX `idx_response_count_id` (`response_count`, `id`),
                 UNIQUE KEY `uniq_serial_number` (`serial_number`)
             ) $charsetCollate;";
             $created = dbDelta($sql);
             return $created;
         } else {
-            static::alterTable($table);
-        }
+            static::alterTable($table);        }
 
         return false;
     }
@@ -138,14 +141,17 @@ class TicketsMigrator
             'idx_mailbox_id'       => '`mailbox_id`',
             'idx_product_id'       => '`product_id`',
             'idx_priority'         => '`priority`',
+            'idx_client_priority'  => '`client_priority`',
             'idx_status'           => '`status`',
             'idx_created_at'       => '`created_at`',
             'idx_resolved_at'      => '`resolved_at`',
             'idx_status_resolved_at' => '`status`, `resolved_at`',
             'idx_ticket_number'    => '`ticket_number`(191)',
             'uniq_serial_number'   => '`serial_number`',
+            'idx_waiting_since_id'  => '`waiting_since`, `id`',
+            'idx_updated_at_id'     => '`updated_at`, `id`',
+            'idx_response_count_id' => '`response_count`, `id`',
         ];
-
         // Add missing indexes. $table is esc_sql()'d above; $index_name and
         // $columns are hardcoded array literals — no user input reaches this query.
         foreach ($indexes as $index_name => $columns) {

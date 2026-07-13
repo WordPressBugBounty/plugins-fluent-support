@@ -8,9 +8,12 @@ class FluentBotAPI
 {
     protected $apiUrl;
 
-    public function __construct(string $apiUrl)
+    protected $apiKey;
+
+    public function __construct(string $apiUrl, string $apiKey = '')
     {
         $this->apiUrl = $apiUrl;
+        $this->apiKey = $apiKey;
     }
 
     public function makeRequest(int $ticketId, $prompt, array $args = [])
@@ -76,9 +79,11 @@ class FluentBotAPI
         curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, wp_json_encode($args));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-        ]);
+        $streamHeaders = ['Content-Type: application/json'];
+        if ($this->apiKey !== '') {
+            $streamHeaders[] = 'Authorization: Bearer ' . $this->apiKey;
+        }
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $streamHeaders);
 
         $buffer = '';
         $conversationId = null;
@@ -179,6 +184,10 @@ class FluentBotAPI
         $headers = [
             'Content-Type' => 'application/json',
         ];
+
+        if ($this->apiKey !== '') {
+            $headers['Authorization'] = 'Bearer ' . $this->apiKey;
+        }
 
         $timeout = apply_filters('fs_ai_request_timeout', 60);
 

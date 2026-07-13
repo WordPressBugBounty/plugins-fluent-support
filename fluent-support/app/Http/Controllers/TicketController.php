@@ -338,7 +338,11 @@ class TicketController extends Controller
                     $ticket
                 );
 
-                $responseContent = links_add_target(make_clickable(wpautop($responseContent, false)));
+                if ($response->conversation_type === 'note') {
+                    $responseContent = wpautop($responseContent, false);
+                } else {
+                    $responseContent = links_add_target(make_clickable(wpautop($responseContent, false)));
+                }
 
 
                 $response->content = apply_filters(
@@ -810,7 +814,7 @@ class TicketController extends Controller
      * @param $ticket_id
      * @return array
      */
-    public function getTicketWidgets($ticket_id)
+    public function getTicketWidgets(Request $request, $ticket_id)
     {
         try {
             //Get ticket with customer by ticket id
@@ -818,20 +822,35 @@ class TicketController extends Controller
 
             $this->ensureCanAccessTicket($ticket);
 
-            //Get last N tickets of this customer except this
-            $limit = apply_filters('fluent_support/previous_ticket_widgets_limit', 10);
+            $perPage = max(1, absint(apply_filters('fluent_support/previous_ticket_widgets_limit', 5)));
+            $page    = max(1, absint($request->get('page', 1)));
+            $offset  = ($page - 1) * $perPage;
 
-            $otherTickets = Ticket::where('id', '!=', $ticket_id)
+            $baseQuery = Ticket::where('id', '!=', $ticket_id)
+                ->where('customer_id', $ticket->customer_id);
+
+            (new AgentTicketAccess())->applyAccessScope($baseQuery);
+
+            $total = $baseQuery->count();
+
+            $otherTickets = (clone $baseQuery)
                 ->select(['id', 'title', 'status', 'created_at'])
-                ->where('customer_id', $ticket->customer_id)
                 ->latest('id')
-                ->limit($limit)
+                ->limit($perPage)
+                ->offset($offset)
                 ->get();
 
-            return [
-                'other_tickets' => $otherTickets,
-                'extra_widgets' => ProfileInfoService::getProfileExtraWidgets($ticket->customer)
+            $response = [
+                'other_tickets'       => $otherTickets,
+                'other_tickets_total' => $total,
+                'other_tickets_more'  => ($offset + $perPage) < $total,
             ];
+
+            if (in_array('extra_widgets', $request->get('with', []))) {
+                $response['extra_widgets'] = ProfileInfoService::getProfileExtraWidgets($ticket->customer);
+            }
+
+            return $response;
         } catch (\Exception $e) {
             return $this->sendError([
                 'message' => Helper::getSafeErrorMessage($e)
@@ -878,6 +897,28 @@ class TicketController extends Controller
             if ($propName && $propValue && $prevValue != $propValue) {
                 $ticket->{$propName} = $propValue;
                 $ticket->save();
+
+                // Log an internal note for status changes so the activity is
+                // traceable, mirroring the close/reopen flows.
+                if ($propName === 'status') {
+                    $statuses = Helper::ticketStatuses();
+                    $fromLabel = isset($statuses[$prevValue]) ? $statuses[$prevValue] : $prevValue;
+                    $toLabel = isset($statuses[$propValue]) ? $statuses[$propValue] : $propValue;
+
+                    $internalNote = sprintf(
+                        /* translators: 1: previous status, 2: new status */
+                        __('Ticket status changed from %1$s to %2$s', 'fluent-support'),
+                        esc_html($fromLabel),
+                        esc_html($toLabel)
+                    );
+
+                    Conversation::create([
+                        'ticket_id'         => $ticket->id,
+                        'person_id'         => $assigner->id,
+                        'conversation_type' => 'internal_info',
+                        'content'           => $internalNote
+                    ]);
+                }
             }
 
             $updateData = [];

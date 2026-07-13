@@ -577,16 +577,16 @@ class Settings
             ],
             'ticket_created_by_agent_email_to_customer' => [
                 'key' => 'ticket_created_by_agent_email_to_customer',
-                'title' => __('Ticket Created by Agent (To Customer)', 'fluent-support'),
-                'description' => __('This email will be sent when an agent create a ticket for a customer', 'fluent-support'),
+                'title' => __('Ticket Logged by Agent (To Customer)', 'fluent-support'),
+                'description' => __('This email will be sent when an agent logs a ticket on behalf of a customer (e.g. from a phone call or email received outside the system)', 'fluent-support'),
                 'email_subject' => 'Re: {{ticket.title}} #{{ticket.id}}',
                 'default_status' => 'no',
                 'send_attachments'=> 'no'
             ],
             'ticket_created_by_agent_on_behalf_email_to_customer' => [
                 'key' => 'ticket_created_by_agent_on_behalf_email_to_customer',
-                'title' => __('Agent Initiated Ticket (To Customer)', 'fluent-support'),
-                'description' => __('This email will be sent when an agent creates a ticket on behalf of a customer using the initiated by agent option', 'fluent-support'),
+                'title' => __('Agent Outreach Ticket (To Customer)', 'fluent-support'),
+                'description' => __('This email will be sent when an agent creates a ticket using the "Agent Initiated" option to proactively reach out to a customer — includes the agent\'s message content', 'fluent-support'),
                 'email_subject' => 'Your ticket has been created (#{{ticket.id}})',
                 'default_status' => 'yes',
                 'send_attachments'=> 'no'

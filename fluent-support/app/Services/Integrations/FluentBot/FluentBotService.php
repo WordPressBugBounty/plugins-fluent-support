@@ -21,9 +21,9 @@ class FluentBotService
         return (new FluentBotHelper())->generateResponse($responseContent, $ticket, $productId, $chatId);
     }
 
-    public function generateStreamResponse(string $responseContent, $ticket, $productId, $chatId = null, $selectedConversations = null, $includeTicketContent = true, $seedMessages = null)
+    public function generateStreamResponse(string $responseContent, $ticket, $productId, $chatId = null, $selectedConversations = null, $includeTicketContent = true, $seedMessages = null, $webSearch = false, $temperature = 0)
     {
-        return (new FluentBotHelper())->generateStreamResponse($responseContent, $ticket, $productId, $chatId, $selectedConversations, $includeTicketContent, $seedMessages);
+        return (new FluentBotHelper())->generateStreamResponse($responseContent, $ticket, $productId, $chatId, $selectedConversations, $includeTicketContent, $seedMessages, $webSearch, $temperature);
     }
 
     public function getTicketSummary($ticket)

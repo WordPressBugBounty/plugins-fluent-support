@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 2.2.1
+Stable tag: 2.3.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,29 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+= 2.3.0 (Date: July 13, 2026) =
+* Added: MCP (Model Context Protocol) server integration — AI agents can now connect directly to Fluent Support tickets, conversations, and customer data via a standards-based MCP interface; configurable from a new MCP Settings page
+* Added: Multi-provider AI support — choose between OpenAI, Gemini, and Anthropic as your AI backend from the new AI Model Setup settings page; provider and model are independently configurable
+* Added: FluentCart workflow conditions (Pro) — branch automations on customer purchase history with three new conditions: Customer Purchased Product, Customer Purchased Package (Variation), and Customer Has Active License; enables product-tier routing and SLA enforcement automatically
+* Added: Easy Digital Downloads workflow conditions (Pro) — same set of commerce conditions (Purchased Product, Purchased Variation, Has Active License) now available for EDD customers
+* Added: Change Priority workflow action (Pro) — set a ticket's priority automatically as a workflow action step
+* Added: CLI migration support for Zendesk and HelpScout — import tickets, customers, and conversations via WP-CLI
+* Added: Load-more pagination for Previous Conversations sidebar widget
+* Added: Remote product search in Workflow commerce conditions — searchable product/variation picker for large catalogs
+* Improved: AI response content now renders markdown (bold, lists, code blocks) correctly when inserted into the reply editor
+* Improved: Workflow trigger fires an internal notification to assigned agents when an automation runs
+* Improved: Previous ticket query scoped to agent visibility, preventing data leakage in the sidebar widget
+* Improved: Redesign ticket watchers widget with collapsible toggle
+* Improved: Redesign customer/agent ticket list thread, label with role icon badge
+* Fixed: Agent @mention search failing with large agent lists — search is now server-side
+* Fixed: Inline pasted images not appearing correctly in sent email notifications
+* Fixed: Email addresses in internal notes being auto-converted to clickable hyperlinks
+* Fixed: Repeated replies closing tickets due to sticky close_ticket flag persisting across responses
+* Fixed: Attachment limit error message now shows the configured maximum instead of a generic message
+* Fixed: Agent signature and shortcode not applied in agent-initiated ticket notification emails
+* Fixed: Mailbox Settings error notification not displaying (wrong $notify call signature)
+* Fixed: Active navigation link using incorrect background color design token
+* Security: Restricted saved reply access and sanitized agent AI guidelines input
 
 = 2.2.1 (Date: May 23, 2026) =
 * Added: Grid view layout for the ticket list

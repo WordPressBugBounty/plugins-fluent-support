@@ -11,11 +11,11 @@ class ComposerStaticInitcef8a62a26e2e43e6d3efc5a3d6e4d83
     );
 
     public static $prefixLengthsPsr4 = array (
-        'W' =>
+        'W' => 
         array (
             'WPFluent\\' => 9,
         ),
-        'F' =>
+        'F' => 
         array (
             'FluentSupport\\Framework\\' => 24,
             'FluentSupport\\App\\' => 18,
@@ -23,15 +23,15 @@ class ComposerStaticInitcef8a62a26e2e43e6d3efc5a3d6e4d83
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPFluent\\' =>
+        'WPFluent\\' => 
         array (
             0 => __DIR__ . '/..' . '/wpfluent/framework/src/WPFluent',
         ),
-        'FluentSupport\\Framework\\' =>
+        'FluentSupport\\Framework\\' => 
         array (
             0 => __DIR__ . '/..' . '/wpfluent/framework/src/WPFluent',
         ),
-        'FluentSupport\\App\\' =>
+        'FluentSupport\\App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app',
         ),
@@ -88,6 +88,7 @@ class ComposerStaticInitcef8a62a26e2e43e6d3efc5a3d6e4d83
         'FluentSupport\\App\\Http\\Controllers\\FluentBotController' => __DIR__ . '/../..' . '/app/Http/Controllers/FluentBotController.php',
         'FluentSupport\\App\\Http\\Controllers\\IntegrationController' => __DIR__ . '/../..' . '/app/Http/Controllers/IntegrationController.php',
         'FluentSupport\\App\\Http\\Controllers\\MailBoxController' => __DIR__ . '/../..' . '/app/Http/Controllers/MailBoxController.php',
+        'FluentSupport\\App\\Http\\Controllers\\McpSettingsController' => __DIR__ . '/../..' . '/app/Http/Controllers/McpSettingsController.php',
         'FluentSupport\\App\\Http\\Controllers\\NotificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/NotificationController.php',
         'FluentSupport\\App\\Http\\Controllers\\OptionsController' => __DIR__ . '/../..' . '/app/Http/Controllers/OptionsController.php',
         'FluentSupport\\App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
@@ -137,6 +138,18 @@ class ComposerStaticInitcef8a62a26e2e43e6d3efc5a3d6e4d83
         'FluentSupport\\App\\Models\\Traits\\AgentTrait' => __DIR__ . '/../..' . '/app/Models/Traits/AgentTrait.php',
         'FluentSupport\\App\\Models\\Traits\\CustomerTrait' => __DIR__ . '/../..' . '/app/Models/Traits/CustomerTrait.php',
         'FluentSupport\\App\\Modules\\IntegrationSettingsModule' => __DIR__ . '/../..' . '/app/Modules/IntegrationSettingsModule.php',
+        'FluentSupport\\App\\Modules\\MCP\\AbilitiesRegistrar' => __DIR__ . '/../..' . '/app/Modules/MCP/AbilitiesRegistrar.php',
+        'FluentSupport\\App\\Modules\\MCP\\Helpers\\MCPHelper' => __DIR__ . '/../..' . '/app/Modules/MCP/Helpers/MCPHelper.php',
+        'FluentSupport\\App\\Modules\\MCP\\MCPInit' => __DIR__ . '/../..' . '/app/Modules/MCP/MCPInit.php',
+        'FluentSupport\\App\\Modules\\MCP\\Resources\\ResourceProvider' => __DIR__ . '/../..' . '/app/Modules/MCP/Resources/ResourceProvider.php',
+        'FluentSupport\\App\\Modules\\MCP\\Support\\AbilityGuard' => __DIR__ . '/../..' . '/app/Modules/MCP/Support/AbilityGuard.php',
+        'FluentSupport\\App\\Modules\\MCP\\Support\\CustomerMetaEnricher' => __DIR__ . '/../..' . '/app/Modules/MCP/Support/CustomerMetaEnricher.php',
+        'FluentSupport\\App\\Modules\\MCP\\Support\\PermissionGate' => __DIR__ . '/../..' . '/app/Modules/MCP/Support/PermissionGate.php',
+        'FluentSupport\\App\\Modules\\MCP\\Support\\TicketAccessGuard' => __DIR__ . '/../..' . '/app/Modules/MCP/Support/TicketAccessGuard.php',
+        'FluentSupport\\App\\Modules\\MCP\\Tools\\CustomerTools' => __DIR__ . '/../..' . '/app/Modules/MCP/Tools/CustomerTools.php',
+        'FluentSupport\\App\\Modules\\MCP\\Tools\\ManagementTools' => __DIR__ . '/../..' . '/app/Modules/MCP/Tools/ManagementTools.php',
+        'FluentSupport\\App\\Modules\\MCP\\Tools\\ResponseTools' => __DIR__ . '/../..' . '/app/Modules/MCP/Tools/ResponseTools.php',
+        'FluentSupport\\App\\Modules\\MCP\\Tools\\TicketTools' => __DIR__ . '/../..' . '/app/Modules/MCP/Tools/TicketTools.php',
         'FluentSupport\\App\\Modules\\PermissionManager' => __DIR__ . '/../..' . '/app/Modules/PermissionManager.php',
         'FluentSupport\\App\\Modules\\Reporting\\Reporting' => __DIR__ . '/../..' . '/app/Modules/Reporting/Reporting.php',
         'FluentSupport\\App\\Modules\\Reporting\\ReportingHelperTrait' => __DIR__ . '/../..' . '/app/Modules/Reporting/ReportingHelperTrait.php',
@@ -154,6 +167,11 @@ class ComposerStaticInitcef8a62a26e2e43e6d3efc5a3d6e4d83
         'FluentSupport\\App\\Services\\Includes\\CountryNames' => __DIR__ . '/../..' . '/app/Services/Includes/CountryNames.php',
         'FluentSupport\\App\\Services\\Includes\\FileSystem' => __DIR__ . '/../..' . '/app/Services/Includes/FileSystem.php',
         'FluentSupport\\App\\Services\\Includes\\UploadService' => __DIR__ . '/../..' . '/app/Services/Includes/UploadService.php',
+        'FluentSupport\\App\\Services\\Integrations\\AI\\AIProviderFactory' => __DIR__ . '/../..' . '/app/Services/Integrations/AI/AIProviderFactory.php',
+        'FluentSupport\\App\\Services\\Integrations\\AI\\BaseAIProvider' => __DIR__ . '/../..' . '/app/Services/Integrations/AI/BaseAIProvider.php',
+        'FluentSupport\\App\\Services\\Integrations\\AI\\Providers\\AnthropicProvider' => __DIR__ . '/../..' . '/app/Services/Integrations/AI/Providers/AnthropicProvider.php',
+        'FluentSupport\\App\\Services\\Integrations\\AI\\Providers\\GeminiProvider' => __DIR__ . '/../..' . '/app/Services/Integrations/AI/Providers/GeminiProvider.php',
+        'FluentSupport\\App\\Services\\Integrations\\AI\\Providers\\OpenAIProvider' => __DIR__ . '/../..' . '/app/Services/Integrations/AI/Providers/OpenAIProvider.php',
         'FluentSupport\\App\\Services\\Integrations\\FluentBooking\\BookingAvailabilityHelper' => __DIR__ . '/../..' . '/app/Services/Integrations/FluentBooking/BookingAvailabilityHelper.php',
         'FluentSupport\\App\\Services\\Integrations\\FluentBooking\\BookingLinkManager' => __DIR__ . '/../..' . '/app/Services/Integrations/FluentBooking/BookingLinkManager.php',
         'FluentSupport\\App\\Services\\Integrations\\FluentBooking\\FluentBookingService' => __DIR__ . '/../..' . '/app/Services/Integrations/FluentBooking/FluentBookingService.php',

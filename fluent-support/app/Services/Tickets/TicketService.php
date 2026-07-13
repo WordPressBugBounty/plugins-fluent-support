@@ -56,6 +56,7 @@ class TicketService
         if ($ticket->status == 'closed') {
             $ticket->status = 'active';
             $ticket->waiting_since = current_time('mysql');
+            $ticket->resolved_at = null;
             $ticket->save();
 
             /*
@@ -185,6 +186,7 @@ class TicketService
         $createdTicket = Ticket::create($ticketData);
 
         $disabledFields = apply_filters('fluent_support/disabled_ticket_fields', []);
+        $disabledFields = array_diff($disabledFields, ['file_upload']);
         self::addTicketAttachments($ticketData, $disabledFields, $createdTicket, $customer);
 
         if (defined('FLUENTSUPPORTPRO') && !empty($ticketData['custom_fields'])) {
@@ -207,12 +209,21 @@ class TicketService
 
                 $initializedMessage = $agent->full_name . __(' initialized this ticket', 'fluent-support');
 
+                $responseContent = apply_filters('fluent_support/parse_smartcode_data', $createdTicket->content, [
+                    'customer' => $customer,
+                    'agent'    => $agent,
+                    'ticket'   => $createdTicket,
+                ]);
+
+                $responseContent = (new ResponseService())->maybeAppendSignature($responseContent, $agent);
+                $responseContent = wp_kses_post($responseContent);
+
                 // Agent response: actual ticket content — sends reply email to customer
                 $agentResponse = Conversation::create([
                     'ticket_id'         => $createdTicket->id,
                     'person_id'         => $agent->id,
                     'conversation_type' => 'response',
-                    'content'           => $createdTicket->content
+                    'content'           => $responseContent
                 ]);
 
                 if ($attachmentHashes = Arr::get($ticketData, 'attachments', [])) {

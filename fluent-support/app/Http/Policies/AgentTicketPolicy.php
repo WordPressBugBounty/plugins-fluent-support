@@ -211,6 +211,11 @@ class AgentTicketPolicy extends Policy
         return PermissionManager::canAccessTicketRoutes();
     }
 
+    public function getConversations(Request $request)
+    {
+        return PermissionManager::canAccessTicketRoutes();
+    }
+
     public function saveChatId(Request $request)
     {
         return PermissionManager::canManageTickets()
@@ -224,6 +229,12 @@ class AgentTicketPolicy extends Policy
     }
 
     public function saveContextSelection(Request $request)
+    {
+        return PermissionManager::canManageTickets()
+            || PermissionManager::currentUserCan('fst_draft_reply');
+    }
+
+    public function switchConversation(Request $request)
     {
         return PermissionManager::canManageTickets()
             || PermissionManager::currentUserCan('fst_draft_reply');

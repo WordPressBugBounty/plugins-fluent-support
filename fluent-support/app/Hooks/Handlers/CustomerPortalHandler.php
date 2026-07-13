@@ -197,6 +197,7 @@ class CustomerPortalHandler
         $data = [
             'rest' => $restInfo,
             'nonce' => wp_create_nonce($slug),
+            'ticket_statuses' => Helper::ticketStatuses(),
             'support_products' => Product::select(['id', 'title'])->get(),
             'product_field_required' => Helper::isProductRequired(),
             'customer_ticket_priorities' => Helper::customerTicketPriorities(),

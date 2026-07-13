@@ -22,12 +22,21 @@ class BlockEditorHandler
             true
         );
 
+        wp_register_style(
+            'fluent-support/customer-portal-block-style',
+            $assets . 'block-editor/css/fs_block.css',
+            array(),
+            FLUENT_SUPPORT_VERSION
+        );
+
         wp_localize_script('fluent-support/customer-portal', 'fluent_support_vars', [
             'rest' => $this->getRestInfo(),
         ]);
 
         register_block_type('fluent-support/customer-portal', array(
+            'api_version'     => 3,
             'editor_script'   => 'fluent-support/customer-portal',
+            'editor_style'    => 'fluent-support/customer-portal-block-style',
             'render_callback' => array($this, 'renderBlock'),
             'attributes'      => BlockAttributes::CustomerPortalAttributes(),
         ));

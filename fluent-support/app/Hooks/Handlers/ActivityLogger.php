@@ -176,6 +176,10 @@ class ActivityLogger
         }, 20, 3);
 
         add_action('fluent_support/ticket_deleted', function($agent, $ticketData) {
+            if (!$agent || !$agent->id) {
+                return;
+            }
+
             $description = sprintf('%s deleted %s(#%d) at %s', $this->getPersonMarkup($agent), $ticketData['title'], $ticketData['id'], current_time('mysql'));
             $log = [
                 'event_type' => 'fluent_support/ticket_deleted',
@@ -212,6 +216,10 @@ class ActivityLogger
      */
     public function getPersonMarkup($person)
     {
+        if (!$person) {
+            return '';
+        }
+
         $route = 'view_agent';
         if (isset($person->person_type) && $person->person_type == 'customer') {
             $route = 'view_customer';
