@@ -343,14 +343,19 @@ class ZendeskTickets extends BaseImporter
 
     private function makeRequest($url, $retryCount = 0)
     {
+        if (!Common::isSafeRemoteUrl($url)) {
+            throw new \Exception(esc_html__('Zendesk API URL is not allowed.', 'fluent-support'));
+        }
+
         $token = base64_encode($this->email . '/token:' . $this->accessToken);
 
-        $request = wp_remote_get($url, [
+        $request = wp_safe_remote_get($url, [
             'headers' => [
                 'Authorization' => "Basic {$token}",
                 'Content-Type' => 'application/json'
             ],
-            'timeout' => 60
+            'timeout' => 60,
+            'redirection' => 0
         ]);
 
         if (is_wp_error($request)) {
@@ -455,12 +460,20 @@ class ZendeskTickets extends BaseImporter
     private function getAttachments($attachments)
     {
         $wpUploadDir = wp_upload_dir();
-        $baseDir = $wpUploadDir['basedir'] . '/fluent-support/zendesk-ticket-' . $this->originId . '/';
+        $safeOriginId = (int) $this->originId;
+        $baseDir = $wpUploadDir['basedir'] . '/fluent-support/zendesk-ticket-' . $safeOriginId . '/';
 
         $formattedAttachments = [];
         foreach ($attachments as $attachment) {
             $filePath = Common::downloadFile($attachment->content_url, $baseDir, $attachment->file_name);
-            $fileUrl = $wpUploadDir['baseurl'] . '/fluent-support/zendesk-ticket-' . $this->originId . '/' . $attachment->file_name;
+
+            // Skip attachments that fail to download/validate rather than aborting the whole ticket;
+            // callers of getAttachments() don't check for WP_Error, so never return one here.
+            if (is_wp_error($filePath) || !$filePath) {
+                continue;
+            }
+
+            $fileUrl = $wpUploadDir['baseurl'] . '/fluent-support/zendesk-ticket-' . $safeOriginId . '/' . basename($filePath);
             $formattedAttachments[] = [
                 'full_url' => $fileUrl,
                 'title' => $attachment->file_name,
@@ -481,6 +494,15 @@ class ZendeskTickets extends BaseImporter
 
     public function setDomain($domain)
     {
+        $domain = is_string($domain) ? rtrim(trim($domain), '/') : '';
+
+        // Not locked to *.zendesk.com: Zendesk's host mapping feature lets tenants
+        // run the help center and REST API on their own domain. We still require
+        // https and reject any loopback/private/link-local target.
+        if (!Common::isSafeRemoteUrl($domain)) {
+            throw new \InvalidArgumentException(__('Invalid Zendesk domain. Use a https:// URL pointing to your Zendesk instance.', 'fluent-support'));
+        }
+
         $this->domain = $domain;
     }
 

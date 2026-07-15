@@ -11,6 +11,8 @@ use FluentSupport\Framework\Support\Arr;
 use FluentSupport\App\Http\Requests\TicketRequest;
 use FluentSupport\App\Http\Requests\TicketResponseRequest;
 use FluentSupport\App\Models\Conversation;
+use FluentSupport\App\Models\MailBox;
+use FluentSupport\App\Models\Product;
 use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Services\FluentCRMServices;
 use FluentSupport\App\Services\Helper;
@@ -787,6 +789,12 @@ class TicketController extends Controller
                 ]);
             }
 
+            // Authorize the ticket this draft belongs to (closes the mailbox/visibility
+            // dimension for managers deleting other agents' drafts).
+            $ticket = Ticket::findOrFail($draft->object_id);
+
+            $this->ensureCanAccessTicket($ticket);
+
             // Verify ownership: draft key contains agent_id, only managers can delete others' drafts
             $isOwnDraft = strpos($draft->key, '_agent_id_' . $agent->id . '_') !== false;
 
@@ -875,26 +883,23 @@ class TicketController extends Controller
 
             $propName = $request->getSafe('prop_name', 'sanitize_text_field');
             $propValue = $request->getSafe('prop_value', 'sanitize_text_field');
-            $prevValue = $ticket->{$propName};
 
-            //Validate agent assignment restrictions
-            if ($propName === 'agent_id') {
-                if (!PermissionManager::currentUserCan('fst_assign_agents')) {
-                    throw new \Exception(esc_html__('Permission denied to assign agent', 'fluent-support'), 403);
-                }
-
-                $agent = Agent::findOrFail($propValue);
-                $restrictions = $agent->getMeta('agent_restrictions', []);
-
-                if (!empty($restrictions['restrictedBusinessBoxes'])) {
-                    $mailboxId = (int) $ticket->mailbox_id;
-                    if (in_array($mailboxId, $restrictions['restrictedBusinessBoxes'], true)) {
-                        throw new \Exception(esc_html__('Agent is restricted for this mailbox ticket', 'fluent-support'), 403);
-                    }
-                }
+            // FS-SEC-007: this generic endpoint may only touch a fixed set of
+            // ticket columns. Previously prop_name was assigned straight onto the
+            // model ($ticket->{$propName} = $propValue), letting a caller rewrite
+            // ownership, mailbox, privacy, hash, serial_number, created_by and
+            // other sensitive columns and bypass $fillable entirely. Every
+            // property is now allowlisted and its value validated/capability-
+            // gated below; anything else is rejected outright.
+            if (!in_array($propName, $this->updatableTicketProperties(), true)) {
+                throw new \Exception(esc_html__('This ticket property cannot be updated.', 'fluent-support'), 403);
             }
 
-            if ($propName && $propValue && $prevValue != $propValue) {
+            $propValue = $this->sanitizeTicketProperty($ticket, $propName, $propValue);
+
+            $prevValue = $ticket->{$propName};
+
+            if ($propName && $propValue !== null && $prevValue != $propValue) {
                 $ticket->{$propName} = $propValue;
                 $ticket->save();
 
@@ -951,6 +956,140 @@ class TicketController extends Controller
                 'message' => Helper::getSafeErrorMessage($e)
             ]);
         }
+    }
+
+    /**
+     * The only ticket columns that may be changed through updateTicketProperty.
+     * This mirrors exactly what the admin UI edits (agent, title, mailbox,
+     * product, status and the two priority fields). Ownership, audit,
+     * public-identifier and other sensitive columns are intentionally absent
+     * and must go through their dedicated workflows (FS-SEC-007).
+     *
+     * @return array
+     */
+    protected function updatableTicketProperties()
+    {
+        return [
+            'agent_id',
+            'title',
+            'mailbox_id',
+            'product_id',
+            'status',
+            'priority',
+            'client_priority',
+        ];
+    }
+
+    /**
+     * Validate and normalize a single ticket-property update. Each allowlisted
+     * property is checked against its own value domain and capability, so a
+     * caller can neither set an out-of-range value nor perform a change the UI
+     * gates behind a stronger permission (FS-SEC-007).
+     *
+     * @param Ticket $ticket
+     * @param string $propName  Already confirmed to be in the allowlist.
+     * @param string $propValue Raw (text-sanitized) value from the request.
+     * @return mixed Normalized value ready to assign to the model.
+     * @throws \Exception When the value is invalid or the caller lacks permission.
+     */
+    protected function sanitizeTicketProperty(Ticket $ticket, $propName, $propValue)
+    {
+        switch ($propName) {
+            case 'title':
+                $propValue = trim(sanitize_text_field($propValue));
+                if ($propValue === '') {
+                    throw new \Exception(esc_html__('Ticket title cannot be empty.', 'fluent-support'), 422);
+                }
+                return $propValue;
+
+            case 'status':
+                // Mirror the ticket-view status dropdown, which is built from
+                // changeable_ticket_statuses. The dropdown submits the group
+                // KEY as the status value (getTicketStatus in ViewTicket.vue
+                // keys the options by group name and el-option binds :value to
+                // that key), and only groups with a non-empty value list are
+                // shown. Validate against those same keys so the endpoint honors
+                // the fluent_support/changeable_ticket_statuses filter exactly.
+                $allowedStatuses = [];
+                foreach (Helper::changeableTicketStatuses() as $statusKey => $statusGroup) {
+                    if (!empty($statusGroup)) {
+                        $allowedStatuses[] = $statusKey;
+                    }
+                }
+
+                if (!in_array($propValue, $allowedStatuses, true)) {
+                    throw new \Exception(esc_html__('Invalid ticket status.', 'fluent-support'), 422);
+                }
+                return $propValue;
+
+            case 'priority':
+                if (!array_key_exists($propValue, Helper::adminTicketPriorities())) {
+                    throw new \Exception(esc_html__('Invalid ticket priority.', 'fluent-support'), 422);
+                }
+                return $propValue;
+
+            case 'client_priority':
+                if (!array_key_exists($propValue, Helper::customerTicketPriorities())) {
+                    throw new \Exception(esc_html__('Invalid client priority.', 'fluent-support'), 422);
+                }
+                return $propValue;
+
+            case 'product_id':
+                $productId = (int) $propValue;
+                if (!$productId || !Product::where('id', $productId)->exists()) {
+                    throw new \Exception(esc_html__('Invalid product.', 'fluent-support'), 422);
+                }
+                return $productId;
+
+            case 'agent_id':
+                if (!PermissionManager::currentUserCan('fst_assign_agents')) {
+                    throw new \Exception(esc_html__('Permission denied to assign agent', 'fluent-support'), 403);
+                }
+
+                $agentId = (int) $propValue;
+                $agent = Agent::findOrFail($agentId);
+                $restrictedBoxes = (new AgentTicketAccess())->getRestrictedMailboxIds($agent);
+
+                if (in_array((int) $ticket->mailbox_id, $restrictedBoxes, true)) {
+                    throw new \Exception(esc_html__('Agent is restricted for this mailbox ticket', 'fluent-support'), 403);
+                }
+                return $agentId;
+
+            case 'mailbox_id':
+                // The admin UI only exposes the mailbox switcher to agents with
+                // fst_manage_settings; enforce the same gate on the API so the
+                // permission can't be bypassed by calling the endpoint directly.
+                if (!PermissionManager::currentUserCan('fst_manage_settings')) {
+                    throw new \Exception(esc_html__('Permission denied to move this ticket to another mailbox.', 'fluent-support'), 403);
+                }
+
+                $mailboxId = (int) $propValue;
+                $restrictedBoxes = array_map('intval', PermissionManager::getRestrictedMailboxIds());
+
+                if (!MailBox::where('id', $mailboxId)->exists() || in_array($mailboxId, $restrictedBoxes, true)) {
+                    throw new \Exception(esc_html__('Invalid or restricted mailbox.', 'fluent-support'), 422);
+                }
+
+                // Preserve the agent/mailbox compatibility invariant that the
+                // agent_id branch enforces on assignment: a ticket must not be
+                // moved into a mailbox its currently assigned agent is restricted
+                // from, which would otherwise persist an assignment the assign
+                // flow would have rejected.
+                if ($ticket->agent_id) {
+                    $assignedAgent = Agent::find($ticket->agent_id);
+                    if ($assignedAgent) {
+                        $agentRestrictedBoxes = (new AgentTicketAccess())->getRestrictedMailboxIds($assignedAgent);
+                        if (in_array($mailboxId, $agentRestrictedBoxes, true)) {
+                            throw new \Exception(esc_html__('The assigned agent is restricted from the selected mailbox. Reassign the ticket before moving it.', 'fluent-support'), 403);
+                        }
+                    }
+                }
+                return $mailboxId;
+        }
+
+        // Unreachable: updateTicketProperty already rejected non-allowlisted
+        // properties before calling this method. Fail closed regardless.
+        throw new \Exception(esc_html__('This ticket property cannot be updated.', 'fluent-support'), 403);
     }
 
     /**
@@ -1019,14 +1158,12 @@ class TicketController extends Controller
             $action = $request->getSafe('bulk_action', 'sanitize_text_field');
             $ticketIds = array_map('intval', $request->get('ticket_ids', null, []));
 
-            $hasAllPermission = PermissionManager::currentUserCan('fst_manage_other_tickets');
             $agent = Helper::getAgentByUserId();
             $query = Ticket::whereIn('id', $ticketIds);
 
-            //If agent do not have permission to manage other tickets
-            if (!$hasAllPermission) {
-                $query->where('agent_id', $agent->id);
-            }
+            //Scope selected tickets to what the agent can access, matching the
+            //per-ticket ensureCanAccessTicket() check on the single-ticket routes
+            (new AgentTicketAccess())->applyAccessScope($query, $agent);
 
             //If bulk action is close tickets
             if ($action == 'close_tickets') {
@@ -1073,12 +1210,13 @@ class TicketController extends Controller
                 $assignedCount = 0;
                 $skippedCount = 0;
 
-                $tickets->each(function ($ticket) use ($assignAgent, $agent, &$assignedCount, &$skippedCount) {
+                $restrictedBoxes = (new AgentTicketAccess())->getRestrictedMailboxIds($assignAgent);
+
+                $tickets->each(function ($ticket) use ($assignAgent, $agent, $restrictedBoxes, &$assignedCount, &$skippedCount) {
                     $previousAgentId = (int) $ticket->agent_id;
-                    $restrictions = $assignAgent->getMeta('agent_restrictions', []);
 
                     //Skip ticket if mailbox is restricted for the agent
-                    if (!empty($restrictions) && in_array($ticket->mailbox_id, $restrictions['restrictedBusinessBoxes'])) {
+                    if (!empty($ticket->mailbox_id) && in_array((int) $ticket->mailbox_id, $restrictedBoxes, true)) {
                         $skippedCount++;
                         return;
                     }
@@ -1188,6 +1326,8 @@ class TicketController extends Controller
         try {
             $ticket = Ticket::findOrFail($ticket_id);
 
+            $this->ensureCanAccessTicket($ticket);
+
             (new TicketService())->deleteTicket($ticket);
 
             return [
@@ -1237,13 +1377,10 @@ class TicketController extends Controller
             $agent = Helper::getAgentByUserId();
             $ticketIds = array_filter($data['ticket_ids'], 'absint');
 
-            $hasAllPermission = PermissionManager::currentUserCan('fst_manage_other_tickets');
             $query = Ticket::whereIn('id', $ticketIds)->where('status', '!=', 'closed');
 
-            //If the agent does not have permission
-            if (!$hasAllPermission) {
-                $query->where('agent_id', $agent->id);
-            }
+            // Scope to tickets the agent may access (visibility + mailbox restrictions).
+            (new AgentTicketAccess())->applyAccessScope($query, $agent);
 
             $tickets = $query->get();
 
@@ -1317,16 +1454,26 @@ class TicketController extends Controller
     {
         try {
             $ticket = Ticket::findOrFail($ticket_id);
-            $response = Conversation::where('id', $response_id)
-                ->where('ticket_id', $ticket_id)
-                ->firstOrFail();
-            $agent = Helper::getAgentByUserId();
 
-            if (!PermissionManager::currentUserCan('fst_delete_tickets') && $ticket->agent_id !== $agent->id) {
+            if (in_array($ticket->mailbox_id, PermissionManager::getRestrictedMailboxIds())) {
+                throw new \Exception(esc_html__('Ticket cannot be fetched due to restricted mailbox', 'fluent-support'));
+            }
+
+            // The caller must have access to this specific ticket (visibility +
+            // ownership + mailbox), not merely a global manage capability.
+            $this->ensureCanAccessTicket($ticket);
+
+            // Deleting a response always requires the explicit delete capability,
+            // mirroring deleteTicket(). Assignment alone is not sufficient.
+            if (!PermissionManager::currentUserCan('fst_delete_tickets')) {
                 throw new \Exception(
                     esc_html__('Sorry, you do not have permission to delete this response.', 'fluent-support')
                 );
             }
+
+            $response = Conversation::where('id', $response_id)
+                ->where('ticket_id', $ticket_id)
+                ->firstOrFail();
 
             $response->delete();
             $response->ccinfo()->delete();
@@ -1353,12 +1500,51 @@ class TicketController extends Controller
     {
         try {
             $ticket = Ticket::findOrFail($ticket_id);
+
+            if (in_array($ticket->mailbox_id, PermissionManager::getRestrictedMailboxIds())) {
+                throw new \Exception(esc_html__('Ticket cannot be fetched due to restricted mailbox', 'fluent-support'));
+            }
+
+            // The caller must have access to this specific ticket (visibility +
+            // ownership + mailbox), not merely a global manage capability.
+            $this->ensureCanAccessTicket($ticket);
+
             $response = Conversation::where('id', $response_id)
                 ->where('ticket_id', $ticket_id)
+                ->with('person')
                 ->firstOrFail();
             $agent = Helper::getAgentByUserId();
 
-            if (!PermissionManager::currentUserCan('fst_manage_other_tickets') && $ticket->agent_id !== $agent->id) {
+            // Only agent-authored conversation types may be edited here. Customer
+            // replies and system entries must not be rewritten via this endpoint.
+            $editableTypes = ['response', 'draft_response', 'note', 'internal_info'];
+            if (!in_array($response->conversation_type, $editableTypes, true)) {
+                throw new \Exception(
+                    esc_html__('This response type cannot be edited.', 'fluent-support')
+                );
+            }
+
+            // Customer messages share the 'response' type but are authored by a
+            // customer person; they are never editable by an agent.
+            if ($response->person && $response->person->person_type !== 'agent') {
+                throw new \Exception(
+                    esc_html__('Sorry, you do not have permission to update this response.', 'fluent-support')
+                );
+            }
+
+            $isDraft = $response->conversation_type == 'draft_response';
+            $isAuthor = (int) $response->person_id === (int) $agent->id;
+            $canApproveDraft = PermissionManager::currentUserCan('fst_approve_draft_reply');
+
+            if ($isDraft && !$isAuthor) {
+                // Another agent's draft can only be edited/approved by an approver.
+                if (!$canApproveDraft) {
+                    throw new \Exception(
+                        esc_html__('Sorry, You do not have permission to approve this draft response', 'fluent-support')
+                    );
+                }
+            } elseif (!$isAuthor && !PermissionManager::currentUserCan('fst_manage_other_tickets')) {
+                // Editing another agent's response requires manage-others capability.
                 throw new \Exception(
                     esc_html__('Sorry, you do not have permission to update this response.', 'fluent-support')
                 );
@@ -1367,14 +1553,8 @@ class TicketController extends Controller
             $content = wp_unslash(wp_kses_post($request->getSafe('content', 'wp_kses_post')));
             $response->content = $content;
 
-            if ($response->conversation_type == 'draft_response' && $response->person_id != $agent->id && PermissionManager::currentUserCan('fst_approve_draft_reply')) {
+            if ($isDraft && !$isAuthor && $canApproveDraft) {
                 $response = $this->approveDraftConversation($ticket, $response, $agent, $content);
-            } else if ($response->conversation_type == 'draft_response' && $response->person_id != $agent->id) {
-                if (!PermissionManager::currentUserCan('fst_approve_draft_reply')) {
-                    throw new \Exception(
-                        esc_html__('Sorry, You do not have permission to approve this draft response', 'fluent-support')
-                    );
-                }
             } else {
                 $response->save();
             }
@@ -1400,6 +1580,8 @@ class TicketController extends Controller
             }
 
             $ticket = Ticket::findOrFail($ticket_id);
+
+            $this->ensureCanAccessTicket($ticket);
 
             $response = Conversation::where('id', $response_id)
                 ->where('ticket_id', $ticket_id)
@@ -1465,11 +1647,21 @@ class TicketController extends Controller
      */
     public function getLiveActivity(Request $request, $ticket_id)
     {
-        $agent = Helper::getAgentByUserId();
+        try {
+            $ticket = Ticket::findOrFail($ticket_id);
 
-        return [
-            'live_activity' => TicketHelper::getActivity($ticket_id, $agent->id)
-        ];
+            $this->ensureCanAccessTicket($ticket);
+
+            $agent = Helper::getAgentByUserId();
+
+            return [
+                'live_activity' => TicketHelper::getActivity($ticket_id, $agent->id)
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
     }
 
     /**
@@ -1480,12 +1672,22 @@ class TicketController extends Controller
      */
     public function removeLiveActivity(Request $request, $ticket_id)
     {
-        $agent = Helper::getAgentByUserId();
+        try {
+            $ticket = Ticket::findOrFail($ticket_id);
 
-        return [
-            'result'   => TicketHelper::removeFromActivities($ticket_id, $agent->id),
-            'agent_id' => $agent->id
-        ];
+            $this->ensureCanAccessTicket($ticket);
+
+            $agent = Helper::getAgentByUserId();
+
+            return [
+                'result'   => TicketHelper::removeFromActivities($ticket_id, $agent->id),
+                'agent_id' => $agent->id
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
     }
 
     /**
@@ -1498,6 +1700,9 @@ class TicketController extends Controller
     {
         try {
             $ticket = Ticket::findOrFail($ticket_id);
+
+            $this->ensureCanAccessTicket($ticket);
+
             $ticket->applyTags($request->getSafe('tag_id', 'intval'));
 
             return [
@@ -1521,6 +1726,9 @@ class TicketController extends Controller
     {
         try {
             $ticket = Ticket::findOrFail($ticket_id);
+
+            $this->ensureCanAccessTicket($ticket);
+
             $ticket->detachTags($tag_id);
 
             return [
@@ -1549,14 +1757,34 @@ class TicketController extends Controller
             return $this->sendError(__('Invalid customer selected.', 'fluent-support'));
         }
 
-        try {
-            $updated = Ticket::where('id', $ticketId)
-                ->where('customer_id', '!=', $newCustomerId)
-                ->update(['customer_id' => $newCustomerId]);
+        // Rebinding a ticket to another customer exposes that customer's private
+        // data (profile, custom fields) through the ticket, so it requires the same
+        // sensitive-data capability that gates the customer routes.
+        if (!PermissionManager::currentUserCan('fst_sensitive_data')) {
+            return $this->sendError(__('You do not have permission to change the ticket customer.', 'fluent-support'));
+        }
 
-            return $updated
-                ? ['message' => __('Customer has been updated', 'fluent-support')]
-                : $this->sendError(__('Ticket not found or customer already assigned.', 'fluent-support'));
+        try {
+            $ticket = Ticket::findOrFail($ticketId);
+
+            $this->ensureCanAccessTicket($ticket);
+
+            $targetCustomer = Customer::where('id', $newCustomerId)
+                ->where('person_type', 'customer')
+                ->first();
+
+            if (!$targetCustomer) {
+                return $this->sendError(__('Invalid customer selected.', 'fluent-support'));
+            }
+
+            if ($ticket->customer_id == $newCustomerId) {
+                return $this->sendError(__('Customer already assigned to this ticket.', 'fluent-support'));
+            }
+
+            $ticket->customer_id = $newCustomerId;
+            $ticket->save();
+
+            return ['message' => __('Customer has been updated', 'fluent-support')];
 
         } catch (\Exception $e) {
             return $this->sendError([
@@ -1580,12 +1808,20 @@ class TicketController extends Controller
             ];
         }
 
-        $ticket = Ticket::findOrFail($ticket_id);
+        try {
+            $ticket = Ticket::findOrFail($ticket_id);
 
-        return [
-            'custom_data'     => (object)$ticket->customData(),
-            'rendered_fields' => \FluentSupportPro\App\Services\CustomFieldsService::getRenderedPublicFields($ticket->customer, 'admin')
-        ];
+            $this->ensureCanAccessTicket($ticket);
+
+            return [
+                'custom_data'     => (object)$ticket->customData(),
+                'rendered_fields' => \FluentSupportPro\App\Services\CustomFieldsService::getRenderedPublicFields($ticket->customer, 'admin')
+            ];
+        } catch (\Exception $e) {
+            return $this->sendError([
+                'message' => Helper::getSafeErrorMessage($e)
+            ]);
+        }
     }
 
     /**

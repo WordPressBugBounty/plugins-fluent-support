@@ -8,6 +8,7 @@ use FluentSupport\App\Models\MailBox;
 use FluentSupport\App\Models\Meta;
 use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Services\EmailNotification\Settings;
+use FluentSupport\App\Services\Tickets\AgentTicketAccess;
 use FluentSupport\Framework\Support\Arr;
 use Exception;
 
@@ -253,13 +254,10 @@ class MailBoxService
                 continue;
             }
 
-            $restrictions = $agent->getMeta('agent_restrictions', []);
-            if (!empty($restrictions['restrictedBusinessBoxes'])) {
-                $restrictedBoxes = array_map('intval', $restrictions['restrictedBusinessBoxes']);
+            $restrictedBoxes = (new AgentTicketAccess())->getRestrictedMailboxIds($agent);
 
-                if (in_array($newMailBoxId, $restrictedBoxes)) {
-                    throw new \Exception(esc_html__('Agent is restricted for this mailbox ticket', 'fluent-support'));
-                }
+            if (in_array($newMailBoxId, $restrictedBoxes, true)) {
+                throw new \Exception(esc_html__('Agent is restricted for this mailbox ticket', 'fluent-support'));
             }
         }
         return true;

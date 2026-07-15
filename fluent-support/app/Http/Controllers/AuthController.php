@@ -97,6 +97,21 @@ class AuthController extends Controller
                 ], 422);
             }
 
+            // the code must still be unused and must not have been consumed by a prior request
+            if (($logHash['status'] ?? '') !== 'issued') {
+                wp_send_json([
+                    'message' => __('Your verification code has already been used. Please try again', 'fluent-support')
+                ], 422);
+            }
+
+            // records created before the email-binding fix (or any other legacy/malformed record)
+            // have no bound email; treat them as invalid rather than proceeding with a null email
+            if (empty($logHash['email'])) {
+                wp_send_json([
+                    'message' => __('Your verification code has expired. Please request a new one', 'fluent-support')
+                ], 422);
+            }
+
             // check if it got expired or not
             $validTill = $logHash['valid_till'] ?? '';
             if (($logHash['used_count'] ?? 0) > 5 || ($validTill && strtotime($validTill) < current_time('timestamp'))) {
@@ -117,12 +132,28 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $logHash['used_count'] +=  1;
-            $logHash['status'] = 'used';
+            // atomically consume the code: only succeeds if the record is still in the exact
+            // state we just read, closing the race where two requests both pass the checks above
+            $consumed = Meta::where('key', $logHash['login_hash'])
+                ->where('object_type', 'fs_login_hashes')
+                ->where('value', $logHashMeta->value)
+                ->update([
+                    'value' => maybe_serialize(array_merge($logHash, [
+                        'used_count' => ($logHash['used_count'] ?? 0) + 1,
+                        'status'     => 'used',
+                    ]))
+                ]);
 
-            Meta::where('key', $logHash['login_hash'])->update([
-                'value' => maybe_serialize($logHash)
-            ]);
+            if (!$consumed) {
+                wp_send_json([
+                    'message' => __('Your verification code has already been used. Please try again', 'fluent-support')
+                ], 422);
+            }
+
+            // the email is now server-verified for this code; ignore whatever the client
+            // submitted and use the address the code was actually issued to, so the signup
+            // can never be completed against a different (e.g. victim's) email address
+            $formData['email'] = $logHash['email'];
         }
 
         /*
@@ -246,7 +277,7 @@ class AuthController extends Controller
         }
 
         if (!$user) {
-            $user = new \WP_Error('authentication_failed', __('<strong>Error</strong>: Invalid username, email address or incorrect password.', 'fluent-support'));
+            $user = new \WP_Error('authentication_failed', __('Invalid username, email address or incorrect password.', 'fluent-support'));
 
             do_action('wp_login_failed', $email, $user);
             $this->incrementLoginAttempts($ipKey);
@@ -260,6 +291,15 @@ class AuthController extends Controller
 
         $twoFactorEnabled = Helper::getBusinessSettings('enable_two_fa');
         if ('yes' === $twoFactorEnabled) {
+            if (!wp_check_password($password, $user->user_pass, $user->ID)) {
+                $this->incrementLoginAttempts($ipKey);
+                $this->incrementLoginAttempts($accountKey);
+
+                return $this->response([
+                    'message' => __('Invalid username, email address or incorrect password.', 'fluent-support')
+                ], 403);
+            }
+
             (new TwoFaHandler)->maybe2FaRedirect($user);
         }
 
@@ -296,7 +336,7 @@ class AuthController extends Controller
         $this->incrementLoginAttempts($accountKey);
 
         return $this->response([
-            'message' => __('<strong>Error</strong>: Invalid username, email address or incorrect password.', 'fluent-support')
+            'message' => __('Invalid username, email address or incorrect password.', 'fluent-support')
         ], 403);
     }
 
@@ -451,6 +491,16 @@ class AuthController extends Controller
             ]);
         }
 
+        // IP bucket is a generous volumetric backstop (shared office/NAT IPs can have many
+        // unrelated users). It runs before the account lookup so that probes for accounts
+        // that don't exist are throttled too. Keyed on the IP only, so a 429 here reveals
+        // nothing about whether any given account exists.
+        if (Helper::hitRateLimit('fs_reset_pass_ip_' . wp_hash(Helper::getIp()), 20)) {
+            return $this->sendError([
+                'message' => __('Too many password reset requests. Please try again after 15 minutes.', 'fluent-support')
+            ], 429);
+        }
+
         $user_data = get_user_by('email', $usernameOrEmail);
 
         if (!$user_data) {
@@ -477,14 +527,14 @@ class AuthController extends Controller
 
         if (!$user_data) {
             return $this->sendError([
-                'message' => __('<strong>Error</strong>: There is no account with that username or email address.', 'fluent-support')
+                'message' => __('There is no account with that username or email address.', 'fluent-support')
             ]);
         }
 
         if (is_multisite() && !is_user_member_of_blog($user_data->ID, get_current_blog_id())) {
 
             return $this->sendError([
-                'message' => __('<strong>Error</strong>: Invalid username or email', 'fluent-support')
+                'message' => __('Invalid username or email', 'fluent-support')
             ]);
         }
 
@@ -516,6 +566,21 @@ class AuthController extends Controller
          */
         // translators: %s is the site name
         $linkText = apply_filters("fluent_support/reset_password_link", sprintf(__('Reset your password for %s', 'fluent-support'), get_bloginfo('name')));
+
+        // Issuance cooldown. get_password_reset_key() rotates the stored key, invalidating
+        // any link already sitting in the account owner's inbox, so an unthrottled caller
+        // could deny password recovery indefinitely. Suppressing the duplicate issuance is
+        // safe: reset mail only ever goes to the account owner, so whoever triggered the
+        // first send has already put a working link in that inbox.
+        $cooldownKey = 'fs_reset_pass_sent_' . wp_hash($user_data->ID);
+
+        if (get_transient($cooldownKey)) {
+            return $this->sendError([
+                'message' => __('A password reset link was already sent to this account recently. Please check your email, including the spam folder, or try again in a few minutes.', 'fluent-support')
+            ], 429);
+        }
+
+        set_transient($cooldownKey, 1, 5 * MINUTE_IN_SECONDS);
 
         $resetUrl = add_query_arg([
             'action' => 'rp',

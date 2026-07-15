@@ -120,10 +120,9 @@ class UploadService
      */
     public function requestContent($contentUrl, $acceptedMimes = [])
     {
-        $response = wp_remote_request($contentUrl, [
-            'sslverify' => false,
-            'method'    => 'GET',
-            'timeout'   => 30
+        $response = wp_safe_remote_request($contentUrl, [
+            'method'  => 'GET',
+            'timeout' => 30
         ]);
 
         if (is_wp_error($response)) {

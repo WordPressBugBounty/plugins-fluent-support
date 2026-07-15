@@ -25,7 +25,8 @@ class MetaMigrator
                 `updated_at` TIMESTAMP NULL,
                 INDEX `idx_object_type` (`object_type`),
                 INDEX `idx_object_id` (`object_id`),
-                INDEX `idx_key` (`key`)
+                INDEX `idx_key` (`key`),
+                INDEX `idx_object_type_created_at` (`object_type`, `created_at`)
             ) $charsetCollate;";
             $created = dbDelta($sql);
             return $created;
@@ -60,17 +61,21 @@ class MetaMigrator
 
         // Desired indexes — keys and values are all hardcoded string literals.
         $indexes = [
-            'idx_object_type' => 'object_type',
-            'idx_object_id'   => 'object_id',
-            'idx_key'         => 'key',
+            'idx_object_type' => ['object_type'],
+            'idx_object_id'   => ['object_id'],
+            'idx_key'         => ['key'],
+            // Serves CleanupHandler::cleanExpiredAuthChallenges(), which purges
+            // rows by object_type + created_at on every hourly cron run.
+            'idx_object_type_created_at' => ['object_type', 'created_at'],
         ];
 
         // Add missing indexes. $table is esc_sql()'d above; $index_name and
-        // $column_name are hardcoded array literals — no user input reaches this query.
-        foreach ($indexes as $index_name => $column_name) {
+        // $columns are hardcoded array literals — no user input reaches this query.
+        foreach ($indexes as $index_name => $columns) {
             if (!in_array($index_name, $existing_index_names)) {
+                $columnList = '`' . implode('`, `', $columns) . '`';
                 // phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter,WordPress.DB.PreparedSQL.NotPrepared -- all identifiers are either esc_sql()'d or hardcoded literals.
-                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` (`{$column_name}`)");
+                $wpdb->query("ALTER TABLE `{$table}` ADD INDEX `{$index_name}` ({$columnList})");
             }
         }
     }

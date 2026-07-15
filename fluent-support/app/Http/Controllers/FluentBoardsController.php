@@ -2,6 +2,7 @@
 
 namespace FluentSupport\App\Http\Controllers;
 
+use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Services\FluentBoardsService;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\Framework\Http\Request\Request;
@@ -63,8 +64,14 @@ class FluentBoardsController extends Controller
         }
 
         try {
+            $sourceId = $request->getSafe('source_id', 'intval');
+
+            $ticket = Ticket::findOrFail($sourceId);
+
+            $this->ensureCanAccessTicket($ticket);
+
             $taskData = [
-                'source_id'      => $request->getSafe('source_id', 'intval'),
+                'source_id'      => $sourceId,
                 'board_id'       => $request->getSafe('board_id', 'intval'),
                 'stage_id'       => $request->getSafe('stage_id', 'intval'),
                 'crm_contact_id' => $request->getSafe('crm_contact_id', 'intval') ?: null,

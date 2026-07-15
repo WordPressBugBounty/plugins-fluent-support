@@ -57,10 +57,9 @@ abstract class NotificationIntegrationBase
     public function sendRequest($url, $params = [], $method = 'GET', $extraHeaders = [])
     {
         $request = wp_remote_request($url, [
-            'sslverify' => false,
-            'method'    => $method,
-            'body'      => $params,
-            'headers'   => $extraHeaders
+            'method'  => $method,
+            'body'    => $params,
+            'headers' => $extraHeaders
         ]);
 
         if (is_wp_error($request)) {

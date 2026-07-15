@@ -51,16 +51,34 @@ class CsvWriter
 
     public function insertOne($row){
         $this->file = fopen($this->filePath, 'a+');
-        fputcsv($this->file, $row, $this->delimiter, $this->enclosure);
+        fputcsv($this->file, array_map([$this, 'sanitizeCell'], $row), $this->delimiter, $this->enclosure);
         fclose($this->file);
     }
 
     public function insertAll($data){
         $this->file = fopen($this->filePath, 'a+');
         foreach ($data as $row) {
-            fputcsv($this->file, $row, $this->delimiter, $this->enclosure);
+            fputcsv($this->file, array_map([$this, 'sanitizeCell'], $row), $this->delimiter, $this->enclosure);
         }
         fclose($this->file);
+    }
+
+    /**
+     * Neutralize spreadsheet formula injection (CWE-1236) by prefixing an
+     * apostrophe onto any string cell that starts with a character a
+     * spreadsheet application would interpret as the start of a formula.
+     */
+    public function sanitizeCell($value)
+    {
+        if (!is_string($value) || $value === '') {
+            return $value;
+        }
+
+        if (preg_match('/^[=+\-@\t\r]/', $value)) {
+            return "'" . $value;
+        }
+
+        return $value;
     }
 
     public function output($filename)

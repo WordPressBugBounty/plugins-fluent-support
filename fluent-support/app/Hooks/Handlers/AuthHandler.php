@@ -146,7 +146,7 @@ class AuthHandler
             $registrationForm .= $this->renderField($fieldName, $registrationField);
         }
 
-        $registrationForm .= '<input type="hidden" name="__redirect_to" value="' . $attributes['redirect-to'] . '">';
+        $registrationForm .= '<input type="hidden" name="__redirect_to" value="' . esc_url($attributes['redirect-to']) . '">';
         $registrationForm .= '<input type="hidden" name="_fsupport_signup_nonce" value="' . wp_create_nonce('fluent_support_signup_nonce') . '">';
         $registrationForm .= '<button type="submit" id="fst_submit">' . $this->submitBtnLoadingSvg() . '<span>' . __('Signup', 'fluent-support') . '</span></button>';
 
@@ -198,7 +198,7 @@ class AuthHandler
             $restePasswordForm .= $this->renderField($fieldName, $resetPasswordField);
         }
 
-        $restePasswordForm .= '<input type="hidden" name="__redirect_to" value="' . $attributes['redirect-to'] . '">';
+        $restePasswordForm .= '<input type="hidden" name="__redirect_to" value="' . esc_url($attributes['redirect-to']) . '">';
         $restePasswordForm .= '<input type="hidden" name="_fsupport_reset_pass_nonce" value="' . wp_create_nonce('fluent_support_reset_pass_nonce') . '">';
         $restePasswordForm .= '<button type="submit" id="fst_reset_pass">' . $this->submitBtnLoadingSvg() . '<span>' . __('Reset Password', 'fluent-support') . '</span></button>';
 
@@ -379,7 +379,9 @@ class AuthHandler
         $customFields = $this->allCustomFields();
 
         foreach ($customFieldsKey as $key) {
-            $fields[$key] = $customFields[$key];
+            if (isset($customFields[$key])) {
+                $fields[$key] = $customFields[$key];
+            }
         }
 
         return $fields;
@@ -500,6 +502,7 @@ class AuthHandler
         $attributes = shortcode_atts($shortCodeDefaults, $attributes);
 
         if (isset($attributes['redirect-to'])) {
+            $attributes['redirect-to'] = esc_url_raw($attributes['redirect-to']);
             $attributes['redirect_to'] = $attributes['redirect-to'];
         }
 

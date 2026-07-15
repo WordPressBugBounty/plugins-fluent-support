@@ -3,7 +3,7 @@ Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
 Tested up to: 7.0
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,10 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+= 2.3.1 (Date: July 15, 2026) =
+* Fixed: Security through ongoing audits and hardening.
+* Fixed: Low-contrast text and input fields in the "Generate Responses with AI" popover when using dark mode
+
 = 2.3.0 (Date: July 13, 2026) =
 * Added: MCP (Model Context Protocol) server integration — AI agents can now connect directly to Fluent Support tickets, conversations, and customer data via a standards-based MCP interface; configurable from a new MCP Settings page
 * Added: Multi-provider AI support — choose between OpenAI, Gemini, and Anthropic as your AI backend from the new AI Model Setup settings page; provider and model are independently configurable

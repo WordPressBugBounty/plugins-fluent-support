@@ -9,12 +9,37 @@ use FluentSupport\Framework\Support\Arr;
 
 class TwoFaHandler
 {
+    /**
+     * How long an issued 2FA code stays valid, in seconds. Kept as a single
+     * constant so the "valid_till" value, the email copy, and the expiry
+     * check in verify2FaEmailCode() can never drift apart again.
+     */
+    const CODE_TTL_SECONDS = 10 * MINUTE_IN_SECONDS;
+
     public function maybe2FaRedirect($user = null)
     {
+        // IP bucket is a generous volumetric backstop (shared office/NAT IPs can have
+        // many unrelated accounts logging in); the account bucket is the primary throttle.
+        $ipKey = 'fs_2fa_send_ip_' . wp_hash(Helper::getIp());
+        $accountKey = 'fs_2fa_send_act_' . wp_hash($user->ID);
+
+        $ipExceeded = Helper::hitRateLimit($ipKey, 20);
+        $accountExceeded = Helper::hitRateLimit($accountKey, 10);
+
+        if ($ipExceeded || $accountExceeded) {
+            wp_send_json([
+                'message' => __('Too many verification code requests. Please try again after 15 minutes.', 'fluent-support')
+            ], 429);
+        }
+
         $return = $this->sendAndGet2FaConfirmFormUrl($user, 'both');
 
         if (!$return) {
-            return false;
+            // Fail closed: if the OTP couldn't be issued/persisted, do not let the
+            // caller fall through to a normal (non-2FA) login with the already-verified password.
+            wp_send_json([
+                'message' => __('Unable to send verification code. Please try again later.', 'fluent-support')
+            ], 500);
         }
 
         $getForm = $this->get2faForm($return);
@@ -46,28 +71,26 @@ class TwoFaHandler
             'use_type' => 'email_2_fa',
             'user_email' => $user->user_email,
             'two_fa_code_hash' => wp_hash_password($twoFaCode),
-            'valid_till' => gmdate('Y-m-d H:i:s', current_time('timestamp') + 10 * 30),
+            'valid_till' => gmdate('Y-m-d H:i:s', current_time('timestamp') + self::CODE_TTL_SECONDS),
             'created_at' => current_time('mysql'),
             'updated_at' => current_time('mysql'),
             'used_count' => 0
         );
 
-        $existingRecord = Meta::where('key', $hash)->first();
+        // Only one outstanding 2FA challenge per account: invalidate any previous
+        // issued codes before minting a new one, instead of letting them pile up.
+        Meta::where('object_type', 'fs_2fa')
+            ->where('object_id', $user->ID)
+            ->delete();
 
-        if ($existingRecord) {
-            $saveSettingsData = Meta::where('key', $hash)->update([
-                'value' => maybe_serialize($data)
-            ]);
-        } else {
-            $saveSettingsData = Meta::updateOrInsert([
-                'object_type' => 'fs_2fa',
-                'key' => $hash,
-            ], [
-                'value' => maybe_serialize($data)
-            ]);
-        }
+        $savedRecord = Meta::create([
+            'object_type' => 'fs_2fa',
+            'object_id' => $user->ID,
+            'key' => $hash,
+            'value' => maybe_serialize($data),
+        ]);
 
-        if (!$saveSettingsData) {
+        if (!$savedRecord || !$savedRecord->exists) {
             return false;
         }
         $data['twoFaCode'] = $twoFaCode;
@@ -96,6 +119,13 @@ class TwoFaHandler
             ], 423);
         }
 
+        $ipKey = 'fs_2fa_verify_ip_' . wp_hash(Helper::getIp());
+        if (Helper::hitRateLimit($ipKey, 20)) {
+            wp_send_json([
+                'message' => __('Too many verification attempts. Please try again after 15 minutes.', 'fluent-support')
+            ], 429);
+        }
+
         $logHashMeta = Meta::where('key', $hash)->first();
 
         if (!$logHashMeta) {
@@ -111,36 +141,59 @@ class TwoFaHandler
                 'message' => __('Your provided code or url is not valid', 'fluent-support')
             ], 423);
         }
-        if (!wp_check_password($code, $logHash['two_fa_code_hash'])) {
 
-            $logHash['used_count'] += 1;
-
-            Meta::where('key', $hash)->update([
-                'value' => maybe_serialize($logHash)
-            ]);
-
-            return false;
+        $accountKey = 'fs_2fa_verify_act_' . wp_hash($logHash['user_id'] ?? '');
+        if (Helper::hitRateLimit($accountKey, 10)) {
+            wp_send_json([
+                'message' => __('Too many verification attempts. Please try again after 15 minutes.', 'fluent-support')
+            ], 429);
         }
 
         $createdAt = $logHash['created_at'] ?? '';
-        if (($createdAt && strtotime($createdAt) < current_time('timestamp') - 600) || ($logHash['used_count'] ?? 0) > 5 || ($logHash['status'] ?? '') != 'issued') {
+        if (($createdAt && strtotime($createdAt) < current_time('timestamp') - self::CODE_TTL_SECONDS) || ($logHash['used_count'] ?? 0) > 5 || ($logHash['status'] ?? '') != 'issued') {
             wp_send_json([
                 'message' => __('Sorry, your login code has been expired. Please try to login again', 'fluent-support')
             ], 423);
         }
+
+        if (!wp_check_password($code, $logHash['two_fa_code_hash'])) {
+
+            $logHash['used_count'] += 1;
+
+            // Atomic conditional update: only applies if the row hasn't changed since we read it,
+            // preventing concurrent requests from racing past the attempt limit.
+            Meta::where('key', $hash)->where('value', $logHashMeta->value)->update([
+                'value' => maybe_serialize($logHash)
+            ]);
+
+            wp_send_json([
+                'message' => __('Invalid verification code', 'fluent-support')
+            ], 423);
+        }
+        // Consume the code atomically before logging in: only one concurrent request
+        // can win this update, so only one can ever log in with this code.
+        $logHash['status'] = 'used';
+        $consumed = Meta::where('key', $hash)->where('value', $logHashMeta->value)->update([
+            'value' => maybe_serialize($logHash)
+        ]);
+
+        if (!$consumed) {
+            wp_send_json([
+                'message' => __('Your provided code or url is not valid', 'fluent-support')
+            ], 423);
+        }
+
         $user = get_user_by('email', $logHash['user_email']);
+
+        if (!$user) {
+            wp_send_json([
+                'message' => __('Your provided code or url is not valid', 'fluent-support')
+            ], 423);
+        }
 
         wp_clear_auth_cookie();
         wp_set_current_user($user->ID);
         wp_set_auth_cookie($user->ID);
-
-        if (is_user_logged_in()) {
-            $logHash['status'] = 'used';
-
-            Meta::where('key', $hash)->update([
-                'value' => maybe_serialize($logHash)
-            ]);
-        }
 
         wp_send_json([
             'redirect' => $redirectUrl

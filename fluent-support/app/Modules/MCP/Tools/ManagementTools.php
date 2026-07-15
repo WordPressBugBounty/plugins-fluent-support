@@ -72,8 +72,7 @@ class ManagementTools
                 return ['id' => $p->id, 'title' => $p->title, 'description' => $p->description ?: ''];
             })->toArray();
 
-        $mailboxes = MailBox::select(['id', 'name', 'email'])
-            ->get()
+        $mailboxes = MailBox::getAccessibleBoxes($canSeeSensitive)
             ->map(function ($mb) use ($canSeeSensitive) {
                 $entry = ['id' => $mb->id, 'name' => $mb->name];
                 if ($canSeeSensitive) {

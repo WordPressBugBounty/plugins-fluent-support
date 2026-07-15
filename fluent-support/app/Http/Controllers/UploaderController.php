@@ -27,18 +27,32 @@ class UploaderController extends Controller
     {
         $settings = (new Settings())->globalBusinessSettings();
         $maxFileSize = floatval($settings['max_file_size']);
+        $maxFileUpload = intval($settings['max_file_upload']);
         $mimeHeadings = Helper::getAcceptedMimeHeadings();
         $maxSizeBytes = $maxFileSize * 1024;
         $imageType = $request->type ? $request->type : null;
 
-        $this->validateUploadedFiles($request->files(), $maxSizeBytes, $mimeHeadings, $maxFileSize);
+        $files = $request->files();
+
+        if ($partsError = $this->rejectUnexpectedFileParts($files)) {
+            return $partsError;
+        }
+
         $ticketId = $this->resolveTicketId($request);
         $person = $this->resolvePerson($ticketId, $request);
 
-        $this->checkPermissionToUploadFile($person);
+        if ($permissionError = $this->checkPermissionToUploadFile($person)) {
+            return $permissionError;
+        }
+
+        if ($quotaError = $this->checkAttachmentQuota($files, $person, $ticketId, $maxFileUpload)) {
+            return $quotaError;
+        }
+
+        $this->validateUploadedFiles($files, $maxSizeBytes, $mimeHeadings, $maxFileSize);
 
         try {
-            $uploadedFiles = UploadService::handleTempFileUpload($request->files());
+            $uploadedFiles = UploadService::handleTempFileUpload($files);
         } catch (\Exception $e) {
             return $this->sendError([
                 'message' => Helper::getSafeErrorMessage($e),
@@ -56,6 +70,49 @@ class UploaderController extends Controller
         return [
             'attachments' => $attachmentHashes,
         ];
+    }
+
+    /**
+     * Only the "file" multipart part is validated and processed downstream
+     * (UploadService/FileSystem::put() loops every top-level part it is given), so
+     * any other part name must be rejected here rather than silently passed through.
+     */
+    private function rejectUnexpectedFileParts($files)
+    {
+        $files = (array) $files;
+        $unexpectedKeys = array_diff(array_keys($files), ['file']);
+
+        if ($unexpectedKeys || empty($files['file'])) {
+            return $this->sendError([
+                'message' => __('Invalid file upload request.', 'fluent-support'),
+            ]);
+        }
+
+        return null;
+    }
+
+    private function checkAttachmentQuota($files, $person, $ticketId, $maxFileUpload)
+    {
+        if ($maxFileUpload <= 0) {
+            return null;
+        }
+
+        $newFiles = isset($files['file']) ? $files['file'] : null;
+        $newFilesCount = is_array($newFiles) ? count($newFiles) : 1;
+
+        $existingCount = Attachment::where('person_id', $person->id)
+            ->where('ticket_id', $ticketId)
+            ->where('status', 'in-active')
+            ->count();
+
+        if (($existingCount + $newFilesCount) > $maxFileUpload) {
+            return $this->sendError([
+                // translators: %d is the maximum number of files allowed per ticket
+                'message' => sprintf(__('You can upload a maximum of %d files.', 'fluent-support'), $maxFileUpload),
+            ]);
+        }
+
+        return null;
     }
 
     private function validateUploadedFiles($files, $maxSizeBytes, $mimeHeadings, $maxFileSize)

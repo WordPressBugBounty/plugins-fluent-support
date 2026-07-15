@@ -69,6 +69,8 @@ class CustomerPortalService
     {
         $this->validateCustomer($customer);
 
+        $data = $this->onlyAllowedPortalTicketFields($data);
+
         $data['title'] = sanitize_text_field(wp_unslash($data['title']));
         $data['content'] = wp_specialchars_decode(wp_unslash(wp_kses_post($data['content'])));
         $data['customer_id'] = $customer->id;
@@ -80,6 +82,29 @@ class CustomerPortalService
         $this->validateDisabledFields($data, $disabledFields);
 
         return $this->storeTicket($data, $customer, $disabledFields);
+    }
+
+    /**
+     * Restricts customer-submitted ticket data to the fields a portal customer is allowed to set.
+     * The framework validator returns the entire request payload, and several Ticket fillable
+     * columns (agent_id, status, privacy, created_by, closed_by, serial_number, ticket_number, etc.)
+     * are agent/system-controlled, so they must never pass through from raw request input.
+     * @param array $data
+     * @return array
+     */
+    private function onlyAllowedPortalTicketFields($data)
+    {
+        $allowedKeys = [
+            'title',
+            'content',
+            'product_id',
+            'client_priority',
+            'custom_data',
+            'attachments',
+            'message_id',
+        ];
+
+        return array_intersect_key($data, array_flip($allowedKeys));
     }
 
 
@@ -578,11 +603,32 @@ class CustomerPortalService
         return $ticket;
     }
 
-    public function addUserFeedback($approvalStatus, $conversationID)
+    /**
+     * @param string $approvalStatus
+     * @param int    $conversationID
+     * @param int    $ticketId The authorized ticket ID the conversation must belong to
+     * @throws Exception
+     */
+    public function addUserFeedback($approvalStatus, $conversationID, $ticketId)
     {
+        if (!in_array($approvalStatus, ['like', 'dislike'], true)) {
+            throw new Exception(esc_html__('Invalid feedback value provided', 'fluent-support'));
+        }
+
+        $conversation = Conversation::with('person')
+            ->where('id', $conversationID)
+            ->where('ticket_id', $ticketId)
+            ->where('conversation_type', 'response')
+            ->first();
+
+        if (!$conversation || !$conversation->person || $conversation->person->person_type !== 'agent') {
+            throw new Exception(esc_html__('Invalid conversation for feedback', 'fluent-support'));
+        }
+
         $existingAgentFeedback = Meta::where([
-            'object_id' => $conversationID,
-            'key' => 'agent_feedback_ratings',
+            'object_id'   => $conversationID,
+            'object_type' => 'conversation_meta',
+            'key'         => 'agent_feedback_ratings',
         ])->first();
 
         if ($existingAgentFeedback) {

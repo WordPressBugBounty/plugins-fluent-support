@@ -153,7 +153,7 @@ $router->prefix('settings')->withPolicy('AdminSettingsPolicy')->group(function (
     $router->get('/mcp/config-snippets', 'McpSettingsController@getConfigSnippets');
 });
 
-$router->prefix('agents')->withPolicy('AdminSensitivePolicy')->group(function ($router) {
+$router->prefix('agents')->withPolicy('AgentPolicy')->group(function ($router) {
     $router->get('/', 'AgentController@index');
     $router->post('/', 'AgentController@addAgent');
     $router->put('/{agent_id}', 'AgentController@updateAgent')->int('agent_id');

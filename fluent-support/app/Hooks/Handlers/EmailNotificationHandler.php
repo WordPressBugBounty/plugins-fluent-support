@@ -3,11 +3,14 @@
 namespace FluentSupport\App\Hooks\Handlers;
 
 use FluentSupport\App\App;
+use FluentSupport\App\Models\Agent;
 use FluentSupport\App\Models\Meta;
+use FluentSupport\App\Models\Ticket;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\Emogrifier;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\App\Services\Mailer;
+use FluentSupport\App\Services\Tickets\AgentTicketAccess;
 use FluentSupport\Framework\Support\Arr;
 
 class EmailNotificationHandler
@@ -294,8 +297,16 @@ class EmailNotificationHandler
         }
     }
 
-    public function onAgentAssign($agent, $ticket, $assigner)
+    public function onAgentAssign(Agent $agent, Ticket $ticket, ?Agent $assigner = null)
     {
+        if ($agent->status !== 'active' || (int) $ticket->agent_id !== (int) $agent->id) {
+            return;
+        }
+
+        if (!(new AgentTicketAccess())->canAccess($agent, $ticket)) {
+            return;
+        }
+
         $currentUser = Helper::getAgentByUserId();
 
         if ($currentUser && $currentUser->user_id == $agent->user_id) {
@@ -477,7 +488,8 @@ class EmailNotificationHandler
             $businessName = get_bloginfo('name');
         }
 
-        $footerText = apply_filters('fluent_support/email_footer_credit', 'This email is a service from ' . $businessName . '. Support Plugin is Powered by <a href="https://fluentsupport.com/?utm_source=user&utm_medium=wp&utm_campaign=mail_footer" style="color:#9e9e9e;" target="_new">FluentSupport</a>.');
+        $footerCreditUrl = Helper::getUpgradeUrl('mail_footer', ['base_url' => 'https://fluentsupport.com/']);
+        $footerText = apply_filters('fluent_support/email_footer_credit', 'This email is a service from ' . $businessName . '. Support Plugin is Powered by <a href="' . esc_url($footerCreditUrl) . '" style="color:#9e9e9e;" target="_new">FluentSupport</a>.');
 
         $data['email_footer'] = $footerText;
 

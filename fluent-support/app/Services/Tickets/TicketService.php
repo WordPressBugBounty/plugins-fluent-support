@@ -253,6 +253,7 @@ class TicketService
         return $createdTicket;
     }
 
+    // Callers own authorization — this also runs in system contexts (developer API, GDPR erasure, cron) with no current user.
     public function deleteTicket($ticket, $agent = null)
     {
         if (!$agent) {

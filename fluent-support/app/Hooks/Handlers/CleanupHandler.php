@@ -19,6 +19,8 @@ class CleanupHandler
     {
         $this->cleanLiveActivities();
         $this->maybeDeleteOldTempFiles();
+        $this->cleanAbandonedTempAttachments();
+        $this->cleanExpiredAuthChallenges();
     }
 
     public function initDailyTasks()
@@ -38,6 +40,25 @@ class CleanupHandler
         Meta::where('key', '_live_activity')
             ->where('object_type', 'ticket_meta')
             ->where('updated_at', '<', $oldDateTime)
+            ->delete();
+    }
+
+    protected function cleanExpiredAuthChallenges()
+    {
+        // Signup/2FA verification codes are only ever valid for a few minutes (see
+        // EmailVerificationHandler::CODE_TTL_SECONDS and TwoFaHandler::CODE_TTL_SECONDS);
+        // an hour is a generous margin so this never races a still-valid code.
+        $oldDateTime = gmdate('Y-m-d H:i:s', current_time('timestamp') - HOUR_IN_SECONDS);
+
+        // Challenges issued by earlier versions were written with the query builder,
+        // which does not stamp created_at, so those rows are NULL and can never match
+        // the range check. They pre-date this upgrade and are long past their TTL, so
+        // they are purged alongside the expired ones.
+        Meta::whereIn('object_type', ['fs_login_hashes', 'fs_2fa'])
+            ->where(function ($query) use ($oldDateTime) {
+                $query->where('created_at', '<', $oldDateTime)
+                    ->orWhereNull('created_at');
+            })
             ->delete();
     }
 
@@ -166,6 +187,46 @@ class CleanupHandler
                 wp_delete_file($filename); // delete file
             }
         }
+    }
+
+    /**
+     * An upload stays 'in-active' until its hash is submitted with a ticket or reply,
+     * at which point TicketService/ResponseService flip it to 'active' (or 'inline' for
+     * pasted images). A hash that is never submitted keeps its row forever, and
+     * UploaderController::checkAttachmentQuota() counts those rows against the
+     * per-ticket upload limit — so abandoned uploads permanently consume the quota.
+     *
+     * maybeDeleteOldTempFiles() already deletes the underlying file at 2 hours, so
+     * these rows point at files that no longer exist. The same window is used here to
+     * keep the row lifetime aligned with the file lifetime.
+     *
+     * Rows with a NULL created_at are skipped rather than swept in: unlike the auth
+     * challenges above, they are not necessarily expired. TicketController's bulk reply
+     * writes clones with the query builder, which does not stamp created_at, and those
+     * rows are flipped to 'active' moments later in the same request. They also carry a
+     * ticket_id and no person_id, so they can never match the quota check anyway.
+     */
+    protected function cleanAbandonedTempAttachments()
+    {
+        $oldDateTime = gmdate('Y-m-d H:i:s', current_time('timestamp') - 7200); // 2 hours
+
+        // Bounded per run: purging touches the filesystem (and remote storage) per row,
+        // so a large first-run backlog drains over several hourly passes instead of
+        // stalling one cron tick.
+        $attachments = Attachment::where('status', 'in-active')
+            ->where('created_at', '<', $oldDateTime)
+            ->limit(500)
+            ->get();
+
+        if ($attachments->isEmpty()) {
+            return;
+        }
+
+        // Removes the local temp file, or fires the remote-driver hook when the
+        // abandoned upload was already pushed to Dropbox/GDrive/etc.
+        Attachment::purgeAttachments($attachments);
+
+        Attachment::whereIn('id', $attachments->pluck('id')->toArray())->delete();
     }
 
 

@@ -274,7 +274,13 @@ class CustomerController extends Controller
 
     public function searchContact(Request $request)
     {
-        $search = $request->getSafe('search', 'sanitize_text_field');
+        $search = trim($request->getSafe('search', 'sanitize_text_field'));
+
+        // '*' is a WP_User_Query wildcard and survives sanitize_text_field, so a
+        // lone '*' would list every user on the site (FS-SEC-014). Stripping it
+        // leaves WP_User_Query doing an exact match.
+        $search = trim(str_replace('*', '', $search));
+
         if (!$search) {
             return $this->sendError([
                 'message' => __('Please provide search string', 'fluent-support')
@@ -283,6 +289,25 @@ class CustomerController extends Controller
 
         $isEmail = is_email($search);
 
+        // Require a meaningful prefix so the endpoint can't be walked one letter
+        // at a time. Emails are matched exactly, so they need no minimum.
+        if (!$isEmail && mb_strlen($search) < 3) {
+            return $this->sendError([
+                'message' => __('Please provide at least 3 characters to search', 'fluent-support')
+            ]);
+        }
+
+        if (Helper::hitRateLimit('fs_contact_search_' . get_current_user_id(), 60, 5 * MINUTE_IN_SECONDS)) {
+            return $this->sendError([
+                'message' => __('Too many contact searches. Please try again in a few minutes.', 'fluent-support')
+            ], 429);
+        }
+
+        // '%' and '_' are LIKE wildcards for the customer and CRM scopes below.
+        // Escape rather than strip: underscores are legitimate in emails.
+        global $wpdb;
+        $likeSearch = $wpdb->esc_like($search);
+
         // search the existing customers first
         if ($isEmail) {
             $customers = Customer::select(['first_name', 'last_name', 'email', 'id', 'user_id'])
@@ -290,7 +315,7 @@ class CustomerController extends Controller
                 ->get();
         } else {
             $customers = Customer::select(['first_name', 'last_name', 'email', 'id', 'user_id'])
-                ->searchBy($search)
+                ->searchBy($likeSearch)
                 ->limit(10)
                 ->get();
         }
@@ -314,7 +339,7 @@ class CustomerController extends Controller
                     ->get();
             } else {
 
-                $contacts = \FluentCrm\App\Models\Subscriber::searchBy($search)
+                $contacts = \FluentCrm\App\Models\Subscriber::searchBy($likeSearch)
                      ->select(['first_name', 'last_name', 'email', 'id', 'user_id'])
                     ->limit(10)
                     ->get();

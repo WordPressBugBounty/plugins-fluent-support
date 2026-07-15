@@ -71,7 +71,7 @@ class ResourceProvider
                 return Product::select(['id', 'title'])->get()->toArray();
 
             case 'fluentsupport://mailboxes':
-                return MailBox::select(['id', 'name', 'email'])->get()->toArray();
+                return MailBox::getAccessibleBoxes(PermissionManager::userCan('fst_sensitive_data'))->toArray();
 
             case 'fluentsupport://tags':
                 return TicketTag::select(['id', 'title'])->get()->toArray();

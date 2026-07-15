@@ -200,13 +200,18 @@ class FreshDeskTickets extends BaseImporter
 
     private function makeRequest($url)
     {
+        if (!Common::isSafeRemoteUrl($url)) {
+            return new \WP_Error('import_unsafe_url', __('Freshdesk API URL is not allowed.', 'fluent-support'));
+        }
+
         $token = base64_encode($this->accessToken . ':X');
-        $request = wp_remote_get($url, [
+        $request = wp_safe_remote_get($url, [
             'headers' => [
                 'Authorization' => "Bearer {$token}",
                 'Content-Type' => 'application/json'
             ],
-            'timeout' => 600
+            'timeout' => 600,
+            'redirection' => 0
         ]);
 
         if (is_wp_error($request)) {
@@ -283,18 +288,22 @@ class FreshDeskTickets extends BaseImporter
     {
         try {
             $wpUploadDir = wp_upload_dir();
-            $baseDir = $wpUploadDir['basedir'] . '/fluent-support/freshdesk-ticket-' . $this->originId . '/';
+            $safeOriginId = (int) $this->originId;
+            $baseDir = $wpUploadDir['basedir'] . '/fluent-support/freshdesk-ticket-' . $safeOriginId . '/';
 
             $formattedAttachments = [];
             foreach ($attachments as $attachment) {
                 $filePath = Common::downloadFile($attachment->attachment_url, $baseDir, $attachment->name);
 
                 // Check if downloadFile returned an error
-                if (is_wp_error($filePath)) {
-                    return $filePath; // Return the WP_Error object
+                if (is_wp_error($filePath) || !$filePath) {
+                    if (is_wp_error($filePath)) {
+                        return $filePath; // Return the WP_Error object
+                    }
+                    return new \WP_Error('attachment_download_failed', 'Could not download attachment: ' . $attachment->name);
                 }
 
-                $fileUrl = $wpUploadDir['baseurl'] . '/fluent-support/freshdesk-ticket-' . $this->originId . '/' . $attachment->name;
+                $fileUrl = $wpUploadDir['baseurl'] . '/fluent-support/freshdesk-ticket-' . $safeOriginId . '/' . basename($filePath);
                 $formattedAttachments[] = [
                     'full_url' => $fileUrl,
                     'title' => $attachment->name,
@@ -318,6 +327,15 @@ class FreshDeskTickets extends BaseImporter
 
     public function setDomain($domain)
     {
+        $domain = is_string($domain) ? rtrim(trim($domain), '/') : '';
+
+        // Not locked to *.freshdesk.com: Freshdesk supports custom/white-labeled
+        // portal domains, and the API is reachable through them too. We still
+        // require https and reject any loopback/private/link-local target.
+        if (!Common::isSafeRemoteUrl($domain)) {
+            throw new \InvalidArgumentException(__('Invalid Freshdesk domain. Use a https:// URL pointing to your Freshdesk portal.', 'fluent-support'));
+        }
+
         $this->domain = $domain;
     }
 

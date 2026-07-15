@@ -2,6 +2,8 @@
 
 namespace FluentSupport\App\Models;
 
+use FluentSupport\App\Services\Tickets\AgentTicketAccess;
+
 class AgentGroup extends Tag
 {
     protected static $type = 'agent_group';
@@ -67,11 +69,12 @@ class AgentGroup extends Tag
 
         $selectedAgent = null;
         $minCount = PHP_INT_MAX;
+        $ticketAccess = new AgentTicketAccess();
 
         foreach ($agents as $agent) {
             if ($mailboxId) {
-                $restrictions = $agent->getMeta('agent_restrictions', []);
-                if (!empty($restrictions['restrictedBusinessBoxes']) && in_array($mailboxId, $restrictions['restrictedBusinessBoxes'])) {
+                $restrictedBoxes = $ticketAccess->getRestrictedMailboxIds($agent);
+                if (in_array((int) $mailboxId, $restrictedBoxes, true)) {
                     continue;
                 }
             }

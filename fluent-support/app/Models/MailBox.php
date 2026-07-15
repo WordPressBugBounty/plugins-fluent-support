@@ -3,6 +3,7 @@
 namespace FluentSupport\App\Models;
 
 use Exception;
+use FluentSupport\App\Modules\PermissionManager;
 use FluentSupport\App\Services\EmailNotification\Settings;
 use FluentSupport\App\Services\Helper;
 use FluentSupport\Framework\Support\Arr;
@@ -55,6 +56,37 @@ class MailBox extends Model
         }
 
         return [];
+    }
+
+    /**
+     * Returns the mailboxes the current agent is allowed to know about.
+     *
+     * Restricted inboxes are filtered out, so the `settings` blob only ever describes
+     * an inbox the agent already works in. Note that the restriction list is the only
+     * gate here: an agent with no restrictions receives `settings` — including
+     * `admin_email_address` — for every inbox, regardless of their other permissions.
+     *
+     * @param bool $withEmail Include the inbox address. Only pass true once the caller
+     *                        has confirmed the current user holds `fst_sensitive_data`.
+     * @return \FluentSupport\Framework\Database\Orm\Collection
+     */
+    public static function getAccessibleBoxes($withEmail = false)
+    {
+        $columns = ['id', 'name', 'settings'];
+
+        if ($withEmail) {
+            $columns[] = 'email';
+        }
+
+        $query = MailBox::select($columns);
+
+        $restrictedBoxes = PermissionManager::getRestrictedMailboxIds();
+
+        if ($restrictedBoxes) {
+            $query->whereNotIn('id', $restrictedBoxes);
+        }
+
+        return $query->get();
     }
 
     public static function slugify($title)

@@ -9,8 +9,49 @@ use FluentSupport\Framework\Support\Arr;
 
 class EmailVerificationHandler
 {
+    /**
+     * How long an issued signup verification code stays valid, in seconds.
+     * Matches the "valid for 10 minutes" copy in the verification email below.
+     */
+    const CODE_TTL_SECONDS = 10 * MINUTE_IN_SECONDS;
+
     public static function sendSignupEmailVerificationHtml($formData)
     {
+        $email = strtolower(trim($formData['email']));
+
+        // IP bucket is a generous volumetric backstop (shared office/NAT IPs can have
+        // many unrelated signups); the email bucket is the primary throttle, since this
+        // endpoint is otherwise unauthenticated and can be used to mail-bomb any address.
+        $ipKey = 'fs_signup_verify_ip_' . wp_hash(Helper::getIp());
+        $emailKey = 'fs_signup_verify_email_' . wp_hash($email);
+
+        /*
+         * Site-wide ceiling on signup verification mail, as a circuit breaker against a
+         * distributed attacker who rotates both source IP and target address and so never
+         * trips either bucket above. Deliberately generous: this is the one bucket a
+         * legitimate signup rush shares, and tripping it turns signup off for everyone,
+         * so it is sized to be unreachable by organic traffic and filterable for sites
+         * that genuinely run hotter.
+         *
+         * @since v2.2.2
+         * @param int $limit Signup verification emails allowed site-wide per hour.
+         */
+        $globalLimit = (int) apply_filters('fluent_support/signup_verification_hourly_limit', 100);
+
+        // Order matters: PHP short-circuits, so the global counter is only incremented by
+        // requests that already cleared the IP and email gates. Were it checked first, a
+        // flood from a single IP would burn the site-wide budget with requests that are
+        // about to be rejected anyway, handing an attacker a cheap way to trip the breaker
+        // and lock out every legitimate signup.
+        if (Helper::hitRateLimit($ipKey, 20)
+            || Helper::hitRateLimit($emailKey, 5)
+            || Helper::hitRateLimit('fs_signup_verify_global', $globalLimit, HOUR_IN_SECONDS)
+        ) {
+            wp_send_json([
+                'message' => __('Too many verification code requests. Please try again later.', 'fluent-support')
+            ], 429);
+        }
+
         try {
             $verifcationCode = str_pad(random_int(100123, 900987), 6, 0, STR_PAD_LEFT);
         } catch (\Exception $e) {
@@ -25,20 +66,27 @@ class EmailVerificationHandler
         $data = array(
             'login_hash'       => $hash,
             'status'           => 'issued',
+            'email'            => strtolower(trim($formData['email'])),
             'ip_address'       => Helper::getIp(),
             'use_type'         => 'signup_verification',
             'used_count'       => 0,
             'two_fa_code_hash' => wp_hash_password($verifcationCode),
-            'valid_till'       => gmdate('Y-m-d H:i:s', current_time('timestamp') + 10 * 60),
+            'valid_till'       => gmdate('Y-m-d H:i:s', current_time('timestamp') + self::CODE_TTL_SECONDS),
             'created_at'       => current_time('mysql'),
             'updated_at'       => current_time('mysql')
         );
 
-        Meta::insert([
+        $savedRecord = Meta::create([
             'object_type' => 'fs_login_hashes',
             'key'         => $hash,
             'value'       => maybe_serialize($data)
         ]);
+
+        if (!$savedRecord || !$savedRecord->exists) {
+            wp_send_json([
+                'message' => __('Unable to send verification code. Please try again later.', 'fluent-support')
+            ], 500);
+        }
 
         // translators: %s is the site name
         $mailSubject = apply_filters("fluent_support/signup_verification_mail_subject", sprintf(__('Your registration verification code for %s', 'fluent-support'), get_bloginfo('name')));

@@ -497,9 +497,7 @@ class SettingsController extends Controller
 
         $url = add_query_arg($data, 'https://wpmanageninja.com/');
 
-        wp_remote_post($url, [
-            'sslverify' => false
-        ]);
+        wp_remote_post($url);
     }
 
     /**
@@ -736,6 +734,7 @@ class SettingsController extends Controller
                 'has_config'    => true,
                 'is_configured' => $dropBoxConfigured,
                 'require_pro'   => !defined('FLUENTSUPPORTPRO'),
+                'upgrade_url'   => Helper::getUpgradeUrl('feature_lock_dropbox'),
                 'icon'          => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/dbox.svg',
                 'description'   => __('Upload and store the files to your Dropbox Storage.', 'fluent-support')
             ],
@@ -745,7 +744,7 @@ class SettingsController extends Controller
                 'has_config'    => true,
                 'is_configured' => $googleDriveConfigured,
                 'require_pro'   => !defined('FLUENTSUPPORTPRO'),
-                'upgrade_url'   => 'https://fluentsupport.com/pricing',
+                'upgrade_url'   => Helper::getUpgradeUrl('feature_lock_google_drive'),
                 'description'   => __('Upload and store the files to your Google Drive Storage.', 'fluent-support'),
                 'icon'          => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/drive.svg',
             ],
@@ -755,7 +754,7 @@ class SettingsController extends Controller
                 'has_config'    => true,
                 'is_configured' => $cloudflareR2Configured,
                 'require_pro'   => !defined('FLUENTSUPPORTPRO'),
-                'upgrade_url'   => 'https://fluentsupport.com/pricing',
+                'upgrade_url'   => Helper::getUpgradeUrl('feature_lock_cloudflare_r2'),
                 'description'   => __('Upload and store the files to Cloudflare R2 Storage with zero egress fees.', 'fluent-support'),
                 'icon'          => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/cloudflare-r2.svg',
             ],
@@ -765,7 +764,7 @@ class SettingsController extends Controller
                 'has_config'    => true,
                 'is_configured' => $amazonS3Configured,
                 'require_pro'   => !defined('FLUENTSUPPORTPRO'),
-                'upgrade_url'   => 'https://fluentsupport.com/pricing',
+                'upgrade_url'   => Helper::getUpgradeUrl('feature_lock_amazon_s3'),
                 'description'   => __('Upload and store the files to Amazon S3 cloud storage.', 'fluent-support'),
                 'icon'          => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/amazon-s3.svg',
             ]

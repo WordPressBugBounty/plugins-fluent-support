@@ -98,8 +98,18 @@ class InternalNotificationHandler
             return;
         }
 
+        if ((int) $ticket->agent_id !== (int) $assignedAgent->id) {
+            return;
+        }
+
+        $accessibleAgents = $this->filterTicketAccessibleAgents([$assignedAgent], $ticket);
+
+        if (!$accessibleAgents) {
+            return;
+        }
+
         $assignerId = (!empty($assigner) && !empty($assigner->id)) ? (int) $assigner->id : null;
-        $recipientIds = (new RecipientResolver())->extractRecipientPersonIds([$assignedAgent]);
+        $recipientIds = (new RecipientResolver())->extractRecipientPersonIds($accessibleAgents);
 
         if (!$recipientIds) {
             return;

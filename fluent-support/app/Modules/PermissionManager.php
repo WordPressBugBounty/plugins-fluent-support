@@ -121,6 +121,10 @@ class PermissionManager
 
         $allPermissions = self::pluginPermissions();
 
+        // Allowlist (never a denylist): only known plugin permissions may be written.
+        // The privilege-ceiling invariant (an actor may only grant permissions it holds)
+        // is enforced upstream by AgentPolicy, which limits agent mutations to
+        // administrators — the only entry point that reaches this write (FS-SEC-003).
         $permissions = array_values(array_intersect($allPermissions, $permissions));
 
         $exclusionRules = self::getExclusionRules();

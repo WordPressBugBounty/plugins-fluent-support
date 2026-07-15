@@ -35,25 +35,59 @@ class AgentTicketPolicy extends Policy
     }
 
     /**
-     * Bulk actions: delete requires fst_delete_tickets, others require manage permission.
+     * Contact search backs the Add Ticket flow, so any agent who can manage
+     * tickets needs it to work.
+     */
+    public function searchContact(Request $request)
+    {
+        return PermissionManager::canManageTickets();
+    }
+
+    /**
+     * Bulk actions: delete requires fst_delete_tickets plus manage permission
+     * (mirroring deleteTicket), others require manage permission.
      */
     public function doBulkActions(Request $request)
     {
         $action = $request->getSafe('bulk_action', 'sanitize_text_field');
 
         if ($action === 'delete_tickets') {
-            return PermissionManager::currentUserCan('fst_delete_tickets');
+            return PermissionManager::currentUserCan('fst_delete_tickets')
+                && PermissionManager::canManageTickets();
         }
 
         return PermissionManager::canManageTickets();
     }
 
     /**
-     * Delete ticket requires explicit delete permission.
+     * Delete ticket requires explicit delete permission and manage permission.
+     * View-only and draft agents resolve to full ticket visibility, so the
+     * delete capability alone would let them delete any ticket.
      */
     public function deleteTicket(Request $request)
     {
-        return PermissionManager::currentUserCan('fst_delete_tickets');
+        return PermissionManager::currentUserCan('fst_delete_tickets')
+            && PermissionManager::canManageTickets();
+    }
+
+    /**
+     * Delete an individual response: requires explicit delete permission and
+     * manage permission, mirroring deleteTicket. Per-ticket access is enforced
+     * in the controller via ensureCanAccessTicket().
+     */
+    public function deleteResponse(Request $request)
+    {
+        return PermissionManager::currentUserCan('fst_delete_tickets')
+            && PermissionManager::canManageTickets();
+    }
+
+    /**
+     * Update an individual response: requires manage permission. Author/type
+     * and per-ticket access rules are enforced in the controller.
+     */
+    public function updateResponse(Request $request)
+    {
+        return PermissionManager::canManageTickets();
     }
 
     /**

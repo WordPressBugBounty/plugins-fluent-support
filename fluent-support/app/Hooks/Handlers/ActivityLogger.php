@@ -180,7 +180,7 @@ class ActivityLogger
                 return;
             }
 
-            $description = sprintf('%s deleted %s(#%d) at %s', $this->getPersonMarkup($agent), $ticketData['title'], $ticketData['id'], current_time('mysql'));
+            $description = sprintf('%s deleted %s(#%d) at %s', $this->getPersonMarkup($agent), esc_html($ticketData['title']), $ticketData['id'], current_time('mysql'));
             $log = [
                 'event_type' => 'fluent_support/ticket_deleted',
                 'person_id' => $agent->id,
@@ -203,7 +203,7 @@ class ActivityLogger
     {
         if (!$ticketText) {
             // translators: %s is the ticket title
-            $ticketText = sprintf(__('Ticket: %s', 'fluent-support'), $ticket->title);
+            $ticketText = sprintf(__('Ticket: %s', 'fluent-support'), esc_html($ticket->title));
         }
 
         return '<a class="fs_link_trans fs_tk" href="#view_ticket">' . $ticketText . '</a>';
@@ -224,6 +224,6 @@ class ActivityLogger
         if (isset($person->person_type) && $person->person_type == 'customer') {
             $route = 'view_customer';
         }
-        return '<a class="fs_link_trans fs_pr" href="#' . $route . '">' . $person->full_name . '</a>';
+        return '<a class="fs_link_trans fs_pr" href="#' . $route . '">' . esc_html($person->full_name) . '</a>';
     }
 }

@@ -1462,6 +1462,63 @@ class Helper
         return $ipAddress;
     }
 
+    /**
+     * Atomically increments the counter for $rateLimitKey and reports whether the
+     * limit is now exceeded. On sites with a persistent external object cache
+     * (Redis/Memcached), wp_cache_incr() is a real atomic increment, so concurrent
+     * requests can't race past the limit. Without one, this falls back to a plain
+     * transient read/write (same best-effort behavior as the rest of this codebase's
+     * rate limiters, e.g. AuthController::incrementLoginAttempts).
+     *
+     * Note the counter is incremented before it is compared, so the returned value
+     * already accounts for the current request.
+     */
+    public static function hitRateLimit($rateLimitKey, $limit, $window = null)
+    {
+        $window = $window ?: 15 * MINUTE_IN_SECONDS;
+
+        if (wp_using_ext_object_cache()) {
+            $group = 'fs_rate_limit';
+            if (false === wp_cache_get($rateLimitKey, $group)) {
+                wp_cache_add($rateLimitKey, 0, $group, $window);
+            }
+            $attempts = wp_cache_incr($rateLimitKey, 1, $group);
+
+            // Fail closed: if the cache backend couldn't increment (evicted key, hiccup),
+            // treat the request as rate-limited rather than silently letting it through.
+            if ($attempts === false) {
+                return true;
+            }
+
+            return $attempts > $limit;
+        }
+
+        $now = time();
+        $record = get_transient($rateLimitKey);
+
+        // A record without a live deadline means the window is over (or the record predates
+        // this format), so the count starts again. Anything else keeps the deadline it was
+        // created with.
+        //
+        // The `<=` must not be loosened to `<`: it is what guarantees the TTL below is at
+        // least 1. A request landing exactly on the deadline would otherwise compute a TTL
+        // of 0, and set_transient() reads 0 as "never expires" — wedging this limiter shut
+        // permanently.
+        if (!is_array($record) || empty($record['expires']) || $record['expires'] <= $now) {
+            $record = ['count' => 0, 'expires' => $now + $window];
+        }
+
+        $record['count']++;
+
+        // The TTL is the time left until the original deadline, never the full window:
+        // set_transient() rewrites expiry on every call, so passing $window here would let
+        // rejected requests push the deadline forward and keep a tripped limiter tripped
+        // for as long as traffic kept arriving.
+        set_transient($rateLimitKey, $record, $record['expires'] - $now);
+
+        return $record['count'] > $limit;
+    }
+
     /** @internal Not called from core controllers — available for Pro/hook usage. */
     public static function isCfIp($ip = '')
     {
@@ -1568,6 +1625,30 @@ class Helper
     {
         $settings = Helper::getOption('_ticket_form_settings', []);
         return Arr::get($settings, 'product_required_field') === 'yes';
+    }
+
+    /**
+     * Build a fluentsupport.com upgrade/pricing link tagged with UTM params
+     * per the standard "Upgrade to Pro" link spec (utm_source is always
+     * "fluent-support"; utm_medium reflects free vs pro install).
+     */
+    public static function getUpgradeUrl($content, $args = [])
+    {
+        $args = wp_parse_args($args, [
+            'campaign' => 'upgrade_pro',
+            'base_url' => 'https://fluentsupport.com/pricing'
+        ]);
+
+        $params = [
+            'utm_source'   => 'fluent-support',
+            'utm_medium'   => defined('FLUENTSUPPORTPRO') ? 'pro_plugin' : 'free_plugin',
+            'utm_campaign' => $args['campaign'],
+            'utm_content'  => $content,
+            'utm_term'     => FLUENT_SUPPORT_VERSION,
+            'utm_id'       => ''
+        ];
+
+        return add_query_arg($params, $args['base_url']);
     }
 
     /** @internal Not called from core controllers — available for Pro/hook usage. */

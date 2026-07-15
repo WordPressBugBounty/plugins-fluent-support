@@ -337,7 +337,7 @@ class TicketHelper
             'max_file_upload'            => Helper::getBusinessSettings('max_file_upload', 3),
             'support_products'           => Product::select(['id', 'title'])->get(),
             'ticket_tags'                => TicketTag::select(['id', 'title'])->get()->toArray(),
-            'mailboxes'                  => MailBox::select(['id', 'name', 'settings'])->get(),
+            'mailboxes'                  => MailBox::getAccessibleBoxes(),
             'ticket_statuses'            => Helper::ticketStatuses(),
         ];
 

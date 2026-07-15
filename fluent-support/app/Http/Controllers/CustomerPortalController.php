@@ -337,7 +337,7 @@ class CustomerPortalController extends Controller
         $approvalStatus = $request->getSafe('approval_status', 'sanitize_text_field');
 
         try {
-            return $customerPortalService->addUserFeedback($approvalStatus, $conversationID);
+            return $customerPortalService->addUserFeedback($approvalStatus, $conversationID, $ticket->id);
         } catch (Exception $e) {
             return $this->sendError([
                 'message'    => Helper::getSafeErrorMessage($e),

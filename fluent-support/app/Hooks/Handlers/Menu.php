@@ -256,7 +256,7 @@ class Menu
             $secondaryItems[] = [
                 'key'       => 'upgrade_to_pro',
                 'label'     => 'Upgrade to Pro',
-                'permalink' => 'https://fluentsupport.com'
+                'permalink' => Helper::getUpgradeUrl('sidebar_cta')
             ];
         }
 
@@ -325,7 +325,7 @@ class Menu
             Vite::injectViteClient();
         }, 1);
 
-        wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '2.4.3');
+        wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '3.4.12');
 
         if (is_rtl()) {
             wp_enqueue_style('fluent_support_admin_app_rtl', $assets . 'admin/css/alpha-admin-rtl.css', [], FLUENT_SUPPORT_VERSION);
@@ -451,7 +451,11 @@ class Menu
             'ticket_statuses_group'      => Helper::ticketStatusGroups(),
             'changeable_ticket_statuses' => Helper::changeableTicketStatuses(),
             'admin_priorities'           => Helper::adminTicketPriorities(),
-            'mailboxes'                  => MailBox::select(['id', 'name', 'settings'])->get(),
+            'mailboxes'                  => MailBox::getAccessibleBoxes(),
+            // Whether the site has any inbox at all, regardless of what this agent may see.
+            // `mailboxes` is restriction-filtered and can legitimately be empty, so it cannot
+            // double as the "is Fluent Support set up yet?" signal the setup wizard keys off.
+            'has_mailboxes'              => MailBox::count() > 0,
             'me'                         => $me,
             'pref'                       => [
                 'go_back_after_reply' => 'yes'
@@ -485,6 +489,7 @@ class Menu
         }
 
         $appVars['has_pro'] = defined('FLUENTSUPPORTPRO_PLUGIN_VERSION');
+        $appVars['version'] = FLUENT_SUPPORT_VERSION;
         if ($appVars['has_pro']) {
             $appVars['agent_feedback_rating'] = Helper::getBusinessSettings('agent_feedback_rating', 'no');
             $appVars['open_ai_integration'] = Helper::openAIIntegrationStatus();

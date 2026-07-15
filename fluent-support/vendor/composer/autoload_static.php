@@ -103,6 +103,7 @@ class ComposerStaticInitcef8a62a26e2e43e6d3efc5a3d6e4d83
         'FluentSupport\\App\\Http\\Policies\\ActivityLoggerPolicy' => __DIR__ . '/../..' . '/app/Http/Policies/ActivityLoggerPolicy.php',
         'FluentSupport\\App\\Http\\Policies\\AdminSensitivePolicy' => __DIR__ . '/../..' . '/app/Http/Policies/AdminSensitivePolicy.php',
         'FluentSupport\\App\\Http\\Policies\\AdminSettingsPolicy' => __DIR__ . '/../..' . '/app/Http/Policies/AdminSettingsPolicy.php',
+        'FluentSupport\\App\\Http\\Policies\\AgentPolicy' => __DIR__ . '/../..' . '/app/Http/Policies/AgentPolicy.php',
         'FluentSupport\\App\\Http\\Policies\\AgentTicketPolicy' => __DIR__ . '/../..' . '/app/Http/Policies/AgentTicketPolicy.php',
         'FluentSupport\\App\\Http\\Policies\\PortalPolicy' => __DIR__ . '/../..' . '/app/Http/Policies/PortalPolicy.php',
         'FluentSupport\\App\\Http\\Policies\\PublicPolicy' => __DIR__ . '/../..' . '/app/Http/Policies/PublicPolicy.php',

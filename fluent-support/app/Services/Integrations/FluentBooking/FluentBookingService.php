@@ -144,7 +144,7 @@ class FluentBookingService
      * @throws \Exception
      * @return array
      */
-    public function getAvailabilitySlots($eventId, $range = 'next_3_days', $timezone = '', $duration = null, Ticket $ticket = null, $selectedDates = [], $calendarMonth = '')
+    public function getAvailabilitySlots($eventId, $range = 'next_3_days', $timezone = '', $duration = null, ?Ticket $ticket = null, $selectedDates = [], $calendarMonth = '')
     {
         if (!$this->isActive()) {
             throw new \Exception(esc_html__('FluentBooking is not installed or active.', 'fluent-support'));
@@ -366,7 +366,7 @@ class FluentBookingService
      * @param Ticket|null $ticket
      * @return string
      */
-    public static function getEventUrl($event, Ticket $ticket = null)
+    public static function getEventUrl($event, ?Ticket $ticket = null)
     {
         $calendarBaseUrl = $event->calendar->getLandingPageUrl(true);
 

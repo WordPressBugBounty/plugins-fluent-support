@@ -10,6 +10,19 @@ use FluentSupport\App\Services\ProfileInfoService;
 
 trait CustomerTrait
 {
+    /**
+     * Identity columns that must never be mass-assigned on update.
+     *
+     * On create these are forced by the model's `creating` hook, but `update()`
+     * bypasses that hook, so they have to be filtered out here instead.
+     *
+     * @var array
+     */
+    private static $immutableUpdateKeys = [
+        'hash',        // portal identity token
+        'user_id',     // WordPress user linkage
+        'person_type', // customer/agent record type, enforces the global scope
+    ];
 
     /**
      * This getCustomers method will return all customers
@@ -293,13 +306,19 @@ trait CustomerTrait
         $user = get_user_by('email', $data['email']);
 
         if ($user && !empty($customFieldsKeys)) {
-            $data['user_id'] = $user->ID;
+            // Never trust the submitted email to pick the account: an email edit
+            // must not silently re-bind this record to whoever owns that address.
+            $linkedUserId = $this->resolveUserLinkage($customer, (int) $user->ID);
 
-            //Update Custom field data for user
-            foreach ($customFieldsKeys as $key) {
-                if (isset($customFormValue[$key])) {
-                    $fieldValue = $customFormValue[$key];
-                    update_user_meta($user->ID, $key, $fieldValue);
+            if ($linkedUserId) {
+                $data['user_id'] = $linkedUserId;
+
+                //Update Custom field data for user
+                foreach ($customFieldsKeys as $key) {
+                    if (isset($customFormValue[$key])) {
+                        $fieldValue = $customFormValue[$key];
+                        update_user_meta($linkedUserId, $key, $fieldValue);
+                    }
                 }
             }
         }
@@ -478,6 +497,45 @@ trait CustomerTrait
 
 
     /**
+     * Decide which WordPress account this customer record may be linked to.
+     *
+     * Binding a support record to a WP account is an identity change: the portal
+     * resolves the logged-in customer by `user_id` (see Helper::getCurrentCustomer),
+     * so a re-bind hands this record's tickets to the newly bound account. It is
+     * therefore restricted to administrators and refused when the account already
+     * belongs to another customer. When a re-bind is not allowed the existing
+     * linkage is kept, so ordinary email corrections still go through.
+     *
+     * @param object $customer
+     * @param int $targetUserId WP user matching the submitted email
+     * @return int user id to link, or 0 for none
+     */
+    private function resolveUserLinkage($customer, $targetUserId)
+    {
+        $currentUserId = (int) $customer->user_id;
+
+        // Already linked to this account, nothing to authorize.
+        if ($targetUserId === $currentUserId) {
+            return $currentUserId;
+        }
+
+        if (!current_user_can('manage_options')) {
+            return $currentUserId;
+        }
+
+        // Conflict: that account is already bound to a different customer record.
+        $alreadyLinked = static::where('id', '!=', $customer->id)
+            ->where('user_id', $targetUserId)
+            ->first();
+
+        if ($alreadyLinked) {
+            return $currentUserId;
+        }
+
+        return $targetUserId;
+    }
+
+    /**
      * This takeValidKeysForUpdate method will take valid keys data for update
      * @since 1.5.7
      * @param array $data
@@ -485,9 +543,9 @@ trait CustomerTrait
      */
     private function takeValidKeysForUpdate($data)
     {
-        $validKeys = $this->getFillable();
-        unset($validKeys['hash']);
-        unset($validKeys['user_id']);
+        // $fillable is a numerically indexed list, so the immutable columns are
+        // values rather than keys and have to be removed with array_diff().
+        $validKeys = array_diff($this->getFillable(), self::$immutableUpdateKeys);
 
         return Arr::only($data, $validKeys);
     }

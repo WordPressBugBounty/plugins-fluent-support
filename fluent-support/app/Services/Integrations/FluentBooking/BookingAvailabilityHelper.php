@@ -124,7 +124,7 @@ class BookingAvailabilityHelper
      * @throws \Exception
      * @return array
      */
-    public function fetchFormattedDays($event, $rangeData, $timezone, Ticket $ticket = null, $duration = null)
+    public function fetchFormattedDays($event, $rangeData, $timezone, ?Ticket $ticket = null, $duration = null)
     {
         $timeSlotService = \FluentBooking\App\Hooks\Handlers\TimeSlotServiceHandler::initService($event->calendar, $event);
 
@@ -402,7 +402,7 @@ class BookingAvailabilityHelper
      * @param int|null    $duration
      * @return array
      */
-    private function formatDays($availableSpots, $rangeData, $timezone, $event, Ticket $ticket = null, $duration = null)
+    private function formatDays($availableSpots, $rangeData, $timezone, $event, ?Ticket $ticket = null, $duration = null)
     {
         if (!$availableSpots || !is_array($availableSpots)) {
             return [];

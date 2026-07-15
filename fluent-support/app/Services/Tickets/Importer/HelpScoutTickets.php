@@ -85,13 +85,14 @@ class HelpScoutTickets extends BaseImporter
     // This method will get all tickets from Help Scout
     private function getTickets($page)
     {
-        $request = wp_remote_get(
+        $request = wp_safe_remote_get(
             $this->apiUrl . 'conversations?mailbox=' . $this->mailbox_id . '&page=' . $page . '&status=all',
             [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->accessToken
                 ],
-                'timeout' => 60
+                'timeout' => 60,
+                'redirection' => 0
             ]
         );
 
@@ -115,13 +116,14 @@ class HelpScoutTickets extends BaseImporter
     private function bindOrginalTicketAndReplies($ticketId)
     {
         try{
-            $request = wp_remote_get(
+            $request = wp_safe_remote_get(
                 $this->apiUrl. 'conversations/' . $ticketId . '?embed=threads',
                 [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $this->accessToken
                     ],
-                    'timeout' => 60
+                    'timeout' => 60,
+                    'redirection' => 0
                 ]
             );
 
@@ -247,21 +249,23 @@ class HelpScoutTickets extends BaseImporter
             $remoteUrl = $attachment['_links']['web']['href'];
             $fileName = basename($remoteUrl);
 
-            $filePath = $this->downloadFile($remoteUrl, $baseDir);
+            $filePath = Common::downloadFile($remoteUrl, $baseDir, $fileName);
 
-            if ($filePath) {
-                $fileInfo = wp_check_filetype($filePath);
-                $fileUrl = $wpUploadDir['baseurl'] . '/fluent-support/helpscout-ticket-'. $this->originId . '/' . $fileName;
-
-                $formattedAttachments[] = [
-                    'full_url'  => $fileUrl,
-                    'title'     => $fileName,
-                    'file_path' => $filePath,
-                    'driver'    => 'local',
-                    'status'    => 'active',
-                    'file_type' => (!empty($fileInfo['type'])) ? $fileInfo['type'] : ''
-                ];
+            if (is_wp_error($filePath) || !$filePath) {
+                continue;
             }
+
+            $fileInfo = wp_check_filetype($filePath);
+            $fileUrl = $wpUploadDir['baseurl'] . '/fluent-support/helpscout-ticket-'. $this->originId . '/' . basename($filePath);
+
+            $formattedAttachments[] = [
+                'full_url'  => $fileUrl,
+                'title'     => $fileName,
+                'file_path' => $filePath,
+                'driver'    => 'local',
+                'status'    => 'active',
+                'file_type' => (!empty($fileInfo['type'])) ? $fileInfo['type'] : ''
+            ];
         }
         return $formattedAttachments;
     }
@@ -279,37 +283,5 @@ class HelpScoutTickets extends BaseImporter
     public function deleteTickets($page)
     {
         return;
-    }
-
-    // Download a file from a remote URL and create a new directory for this if not exists
-    // Then save the file to the new directory and move this directory to a new given directory
-    private function downloadFile($remoteUrl, $baseDir)
-    {
-        $fileName = basename($remoteUrl);
-        $filePath = $baseDir . $fileName;
-
-        if (!file_exists($baseDir)) {
-            mkdir($baseDir, 0777, true);
-        }
-
-        if (!file_exists($filePath)) {
-            $response = wp_remote_get($remoteUrl, [
-                'timeout' => 60,
-                'stream' => false
-            ]);
-
-            if (is_wp_error($response)) {
-                return false;
-            }
-
-            $file_contents = wp_remote_retrieve_body($response);
-            if (empty($file_contents)) {
-                return false;
-            }
-
-            file_put_contents($filePath, $file_contents);
-        }
-
-        return $filePath;
     }
 }

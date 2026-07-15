@@ -71,6 +71,7 @@ return array(
     'FluentSupport\\App\\Http\\Policies\\ActivityLoggerPolicy' => $baseDir . '/app/Http/Policies/ActivityLoggerPolicy.php',
     'FluentSupport\\App\\Http\\Policies\\AdminSensitivePolicy' => $baseDir . '/app/Http/Policies/AdminSensitivePolicy.php',
     'FluentSupport\\App\\Http\\Policies\\AdminSettingsPolicy' => $baseDir . '/app/Http/Policies/AdminSettingsPolicy.php',
+    'FluentSupport\\App\\Http\\Policies\\AgentPolicy' => $baseDir . '/app/Http/Policies/AgentPolicy.php',
     'FluentSupport\\App\\Http\\Policies\\AgentTicketPolicy' => $baseDir . '/app/Http/Policies/AgentTicketPolicy.php',
     'FluentSupport\\App\\Http\\Policies\\PortalPolicy' => $baseDir . '/app/Http/Policies/PortalPolicy.php',
     'FluentSupport\\App\\Http\\Policies\\PublicPolicy' => $baseDir . '/app/Http/Policies/PublicPolicy.php',

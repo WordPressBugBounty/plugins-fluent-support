@@ -13,11 +13,10 @@ class Maintenance
         }
 
         $response = wp_remote_post($this->getApiUrl(), [
-            'body'      => [
+            'body'    => [
                 'payload' => $this->getData()
             ],
-            'sslverify' => false,
-            'cookies'   => []
+            'cookies' => []
         ]);
 
         if (is_wp_error($response)) {
