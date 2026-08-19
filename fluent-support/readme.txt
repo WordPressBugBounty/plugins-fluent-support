@@ -2,8 +2,8 @@
 Contributors: techjewel, wpmanageninja, adreastrian
 Tags: wordpress support ticket, Support Ticket, support plugin, helpdesk, customer support plugin
 Requires at least: 5.6
-Tested up to: 7.0
-Stable tag: 2.3.1
+Tested up to: 7.1
+Stable tag: 2.3.2
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -286,6 +286,13 @@ No external connections are established, and all processing occurs within your o
 9. All Customers
 
 == Changelog ==
+
+= 2.3.2 (Date: August 19, 2026) =
+* Compatibility with WordPress 7.1
+* Fixed: Security through ongoing audits and hardening.
+* Fixed: Missing FluentBoards documentation URL to integration statuses.
+* Improved: Updated the Gemini model list in AI Model Setup
+
 = 2.3.1 (Date: July 15, 2026) =
 * Fixed: Security through ongoing audits and hardening.
 * Fixed: Low-contrast text and input fields in the "Generate Responses with AI" popover when using dark mode

@@ -88,7 +88,7 @@ class MCPHelper
 
         if (!is_iterable($items)) {
             $type = is_object($items) ? get_class($items) : gettype($items);
-            throw new \Exception('MCPHelper::formatTicketList() expects a paginator, Collection, or array of tickets, got ' . $type);
+            throw new \Exception('MCPHelper::formatTicketList() expects a paginator, Collection, or array of tickets, got ' . esc_html($type));
         }
 
         $tickets = [];

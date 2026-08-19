@@ -11,12 +11,19 @@ class AgentTicketPolicy extends Policy
     /**
      * Default policy check: GET requests require view permission, POST/PUT/DELETE require manage permission.
      *
+     * Use getMethod() (WP_REST_Request::get_method()), never method() — that one
+     * returns $_SERVER['REQUEST_METHOD'] raw. WordPress dispatches on the
+     * `?_method=` / `X-HTTP-Method-Override` value but leaves the raw server
+     * value alone, so reading it here let a view-only agent run a write handler
+     * under the read capability (FS-SEC-025).
+     *
      * @param \FluentSupport\Framework\Request\Request $request
      * @return Boolean
      */
     public function verifyRequest(Request $request)
     {
-        if ($request->method() === 'GET') {
+        // @phpstan-ignore-next-line -- proxied to WP_REST_Request by Request::__call()
+        if ($request->getMethod() === 'GET') {
             $status = PermissionManager::userCan([
                 'fst_view_tickets', 
                 'fst_draft_reply', 
@@ -25,7 +32,8 @@ class AgentTicketPolicy extends Policy
                 'fst_manage_other_tickets'
             ]);
         } else {
-            // Non-GET requests require manage permission by default.
+            // Non-GET requests require manage permission by default. An
+            // unreadable verb also lands here, which is the safe side.
             // Routes safe for draft/view-only agents have dedicated policy methods
             // (e.g. createResponse, createOrUpdatDraft, storeOrUpdateLabelSearch).
             $status = PermissionManager::canManageTickets();

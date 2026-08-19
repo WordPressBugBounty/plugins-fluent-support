@@ -325,7 +325,7 @@ class Menu
             Vite::injectViteClient();
         }, 1);
 
-        wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '3.4.12');
+        wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '3.4.13');
 
         if (is_rtl()) {
             wp_enqueue_style('fluent_support_admin_app_rtl', $assets . 'admin/css/alpha-admin-rtl.css', [], FLUENT_SUPPORT_VERSION);

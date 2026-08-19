@@ -500,7 +500,7 @@ class ZendeskTickets extends BaseImporter
         // run the help center and REST API on their own domain. We still require
         // https and reject any loopback/private/link-local target.
         if (!Common::isSafeRemoteUrl($domain)) {
-            throw new \InvalidArgumentException(__('Invalid Zendesk domain. Use a https:// URL pointing to your Zendesk instance.', 'fluent-support'));
+            throw new \InvalidArgumentException(esc_html__('Invalid Zendesk domain. Use a https:// URL pointing to your Zendesk instance.', 'fluent-support'));
         }
 
         $this->domain = $domain;

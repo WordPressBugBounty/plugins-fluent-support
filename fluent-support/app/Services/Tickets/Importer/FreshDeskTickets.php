@@ -333,7 +333,7 @@ class FreshDeskTickets extends BaseImporter
         // portal domains, and the API is reachable through them too. We still
         // require https and reject any loopback/private/link-local target.
         if (!Common::isSafeRemoteUrl($domain)) {
-            throw new \InvalidArgumentException(__('Invalid Freshdesk domain. Use a https:// URL pointing to your Freshdesk portal.', 'fluent-support'));
+            throw new \InvalidArgumentException(esc_html__('Invalid Freshdesk domain. Use a https:// URL pointing to your Freshdesk portal.', 'fluent-support'));
         }
 
         $this->domain = $domain;

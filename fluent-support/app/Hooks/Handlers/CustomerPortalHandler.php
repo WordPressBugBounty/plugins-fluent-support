@@ -242,7 +242,7 @@ class CustomerPortalHandler
             Vite::injectViteClient();
         }, 1);
 
-        wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '3.4.12');
+        wp_enqueue_script('dompurify', $assets . 'libs/purify/purify.min.js', [], '3.4.13');
         wp_enqueue_script('fs_tk_customer_portal', Vite::getEnqueuePath('portal/js/app.js'), ['jquery'], FLUENT_SUPPORT_VERSION, true);
 
         if (is_rtl()) {

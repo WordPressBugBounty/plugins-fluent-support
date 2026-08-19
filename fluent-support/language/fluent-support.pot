@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Fluent Support\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-15 13:02+0000\n"
+"POT-Creation-Date: 2026-08-19 13:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: \n"
@@ -47,7 +47,7 @@ msgid " in this ticket"
 msgstr ""
 
 #: app/Http/Controllers/TicketController.php:398
-#: app/Services/Tickets/TicketService.php:210
+#: app/Services/Tickets/TicketService.php:221
 msgid " initialized this ticket"
 msgstr ""
 
@@ -245,12 +245,6 @@ msgstr ""
 msgid "A New Era of eCommerce with WordPress"
 msgstr ""
 
-#: app/Http/Controllers/AuthController.php:579
-msgid ""
-"A password reset link was already sent to this account recently. Please "
-"check your email, including the spam folder, or try again in a few minutes."
-msgstr ""
-
 #: app/Services/Helper.php:1134
 msgid ""
 "A project management tool designed to streamline workflows and collaboration "
@@ -395,15 +389,15 @@ msgstr ""
 
 #: app/Models/Customer.php:52 app/Models/Traits/CustomerTrait.php:121
 #: app/Models/Traits/CustomerTrait.php:123
-#: app/Hooks/Handlers/AuthHandler.php:395
 #: app/Hooks/Handlers/AuthHandler.php:397
+#: app/Hooks/Handlers/AuthHandler.php:399
 msgid "Address Line 1"
 msgstr ""
 
 #: app/Models/Customer.php:53 app/Models/Traits/CustomerTrait.php:128
 #: app/Models/Traits/CustomerTrait.php:130
-#: app/Hooks/Handlers/AuthHandler.php:402
 #: app/Hooks/Handlers/AuthHandler.php:404
+#: app/Hooks/Handlers/AuthHandler.php:406
 msgid "Address Line 2"
 msgstr ""
 
@@ -719,8 +713,8 @@ msgstr ""
 
 #: app/Models/Customer.php:54 app/Models/Traits/CustomerTrait.php:135
 #: app/Models/Traits/CustomerTrait.php:137
-#: app/Hooks/Handlers/AuthHandler.php:409
 #: app/Hooks/Handlers/AuthHandler.php:411
+#: app/Hooks/Handlers/AuthHandler.php:413
 #: app/Hooks/Handlers/PrivacyHandler.php:240
 msgid "City"
 msgstr ""
@@ -833,7 +827,7 @@ msgstr ""
 
 #: app/Models/Customer.php:57 app/Models/Traits/CustomerTrait.php:156
 #: app/Models/Traits/CustomerTrait.php:157
-#: app/Hooks/Handlers/AuthHandler.php:430
+#: app/Hooks/Handlers/AuthHandler.php:432
 #: app/Hooks/Handlers/PrivacyHandler.php:252
 msgid "Country"
 msgstr ""
@@ -1071,7 +1065,7 @@ msgid "Email"
 msgstr ""
 
 #: app/Hooks/Handlers/AuthHandler.php:364
-#: app/Hooks/Handlers/AuthHandler.php:451
+#: app/Hooks/Handlers/AuthHandler.php:453
 #: app/Services/Integrations/FluentForm/FeedIntegration.php:178
 msgid "Email Address"
 msgstr ""
@@ -1582,7 +1576,7 @@ msgid "Helpdesk ticket management abilities for Fluent Support."
 msgstr ""
 
 #. %s is the user's first name
-#: app/Http/Controllers/AuthController.php:603
+#: app/Http/Controllers/AuthController.php:584
 #, php-format
 msgid "Hi %s,"
 msgstr ""
@@ -1600,7 +1594,13 @@ msgstr ""
 msgid "id is required"
 msgstr ""
 
-#: app/Http/Controllers/AuthController.php:608
+#: app/Http/Controllers/AuthController.php:620
+msgid ""
+"If an account matches that username or email, a password reset link has been "
+"sent. Please check your inbox, including the spam folder."
+msgstr ""
+
+#: app/Http/Controllers/AuthController.php:589
 msgid ""
 "If you did not request to reset your password, please ignore this email."
 msgstr ""
@@ -1823,11 +1823,6 @@ msgstr ""
 
 #: app/Http/Controllers/TicketController.php:1021
 msgid "Invalid ticket status."
-msgstr ""
-
-#: app/Http/Controllers/AuthController.php:512
-#: app/Http/Controllers/AuthController.php:537
-msgid "Invalid username or email"
 msgstr ""
 
 #: app/Http/Controllers/AuthController.php:280
@@ -2260,10 +2255,6 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#: app/Http/Controllers/AuthController.php:550
-msgid "Password reset is not allowed for this user"
-msgstr ""
-
 #: app/Services/Helper.php:1082
 msgid "Paymattic"
 msgstr ""
@@ -2298,10 +2289,6 @@ msgstr ""
 
 #: app/Services/Helper.php:183
 msgid "Photos"
-msgstr ""
-
-#: app/Http/Controllers/AuthController.php:625
-msgid "Please check your email for the reset link"
 msgstr ""
 
 #: app/Hooks/Handlers/TwoFaHandler.php:243
@@ -2511,13 +2498,13 @@ msgid "Reset password"
 msgstr ""
 
 #. %s is the site name
-#: app/Http/Controllers/AuthController.php:568
+#: app/Http/Controllers/AuthController.php:551
 #, php-format
 msgid "Reset your password for %s"
 msgstr ""
 
 #. %s is the site name
-#: app/Http/Controllers/AuthController.php:600
+#: app/Http/Controllers/AuthController.php:581
 #, php-format
 msgid "Reset your password for %s support portal"
 msgstr ""
@@ -2619,7 +2606,7 @@ msgstr ""
 msgid "See all available times"
 msgstr ""
 
-#: app/Hooks/Handlers/AuthHandler.php:432
+#: app/Hooks/Handlers/AuthHandler.php:434
 msgid "Select a Country"
 msgstr ""
 
@@ -2745,7 +2732,7 @@ msgstr ""
 msgid "Someone"
 msgstr ""
 
-#: app/Http/Controllers/AuthController.php:604
+#: app/Http/Controllers/AuthController.php:585
 msgid ""
 "Someone has requested a new password for the following account on WordPress:"
 msgstr ""
@@ -2766,7 +2753,7 @@ msgstr ""
 msgid "Something went wrong."
 msgstr ""
 
-#: app/Services/Helper.php:1915
+#: app/Services/Helper.php:1934
 #: app/Http/Controllers/FluentBotController.php:227
 msgid "Something went wrong. Please try again later."
 msgstr ""
@@ -2831,6 +2818,11 @@ msgstr ""
 
 #: app/Http/Controllers/McpSettingsController.php:55
 msgid "Sorry, you do not have permission to change the MCP setting."
+msgstr ""
+
+#: app/Services/Tickets/TicketService.php:286
+msgid ""
+"Sorry, you do not have permission to create a ticket in this business box"
 msgstr ""
 
 #: app/Http/Controllers/TicketController.php:1470
@@ -2902,8 +2894,8 @@ msgstr ""
 
 #: app/Models/Customer.php:55 app/Models/Traits/CustomerTrait.php:142
 #: app/Models/Traits/CustomerTrait.php:144
-#: app/Hooks/Handlers/AuthHandler.php:423
 #: app/Hooks/Handlers/AuthHandler.php:425
+#: app/Hooks/Handlers/AuthHandler.php:427
 #: app/Hooks/Handlers/PrivacyHandler.php:248
 msgid "State"
 msgstr ""
@@ -3090,10 +3082,6 @@ msgstr ""
 
 #: app/Services/Helper.php:1057
 msgid "The ultimate WordPress platform for digital products"
-msgstr ""
-
-#: app/Http/Controllers/AuthController.php:530
-msgid "There is no account with that username or email address."
 msgstr ""
 
 #: app/Hooks/Handlers/EmailVerificationHandler.php:102
@@ -3608,7 +3596,7 @@ msgid "Username"
 msgstr ""
 
 #. %s is the username
-#: app/Http/Controllers/AuthController.php:606
+#: app/Http/Controllers/AuthController.php:587
 #, php-format
 msgid "Username: %s"
 msgstr ""
@@ -3821,7 +3809,7 @@ msgid "Your account is not active. Please contact support."
 msgstr ""
 
 #: app/Hooks/Handlers/AuthHandler.php:366
-#: app/Hooks/Handlers/AuthHandler.php:453
+#: app/Hooks/Handlers/AuthHandler.php:455
 msgid "Your Email Address"
 msgstr ""
 
@@ -3902,8 +3890,8 @@ msgstr ""
 msgid "Zendesk API URL is not allowed."
 msgstr ""
 
-#: app/Services/Helper.php:218 app/Hooks/Handlers/AuthHandler.php:416
-#: app/Hooks/Handlers/AuthHandler.php:418
+#: app/Services/Helper.php:218 app/Hooks/Handlers/AuthHandler.php:418
+#: app/Hooks/Handlers/AuthHandler.php:420
 #: app/Hooks/Handlers/PrivacyHandler.php:244
 msgid "Zip"
 msgstr ""

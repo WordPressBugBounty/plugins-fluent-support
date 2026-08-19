@@ -508,9 +508,7 @@ class AuthController extends Controller
         }
 
         if (!$user_data) {
-            return $this->sendError([
-                'message' => __('Invalid username or email', 'fluent-support')
-            ]);
+            return $this->sendResetPassResponse();
         }
 
         $user_data = apply_filters('lostpassword_user_data', $user_data, $errors);
@@ -520,22 +518,15 @@ class AuthController extends Controller
         $errors = apply_filters('lostpassword_errors', $errors, $user_data);
 
         if ($errors->has_errors()) {
-            return $this->sendError([
-                'message' => $errors->get_error_message()
-            ]);
+            return $this->sendResetPassResponse();
         }
 
         if (!$user_data) {
-            return $this->sendError([
-                'message' => __('There is no account with that username or email address.', 'fluent-support')
-            ]);
+            return $this->sendResetPassResponse();
         }
 
         if (is_multisite() && !is_user_member_of_blog($user_data->ID, get_current_blog_id())) {
-
-            return $this->sendError([
-                'message' => __('Invalid username or email', 'fluent-support')
-            ]);
+            return $this->sendResetPassResponse();
         }
 
         // Redefining user_login ensures we return the right case in the email.
@@ -545,16 +536,8 @@ class AuthController extends Controller
 
         $allow = apply_filters('allow_password_reset', true, $user_data->ID);
 
-        if (!$allow) {
-            return $this->sendError([
-                'message' => __('Password reset is not allowed for this user', 'fluent-support')
-            ]);
-        }
-
-        if (is_wp_error($allow)) {
-            return $this->sendError([
-                'message' => $allow->get_error_message()
-            ]);
+        if (!$allow || is_wp_error($allow)) {
+            return $this->sendResetPassResponse();
         }
 
 
@@ -575,9 +558,7 @@ class AuthController extends Controller
         $cooldownKey = 'fs_reset_pass_sent_' . wp_hash($user_data->ID);
 
         if (get_transient($cooldownKey)) {
-            return $this->sendError([
-                'message' => __('A password reset link was already sent to this account recently. Please check your email, including the spam folder, or try again in a few minutes.', 'fluent-support')
-            ], 429);
+            return $this->sendResetPassResponse();
         }
 
         set_transient($cooldownKey, 1, 5 * MINUTE_IN_SECONDS);
@@ -621,8 +602,22 @@ class AuthController extends Controller
 
         wp_mail($user_data->user_email, $mailSubject, $message, $headers);
 
+        return $this->sendResetPassResponse();
+    }
+
+    /**
+     * Single response for every password reset outcome.
+     *
+     * Whether the account exists, is disallowed, is not a member of this site or is
+     * inside the resend cooldown, the caller sees the same thing — otherwise the form
+     * confirms which usernames and email addresses are real.
+     *
+     * @return mixed
+     */
+    protected function sendResetPassResponse()
+    {
         return $this->sendSuccess([
-            'message' => __('Please check your email for the reset link', 'fluent-support')
+            'message' => __('If an account matches that username or email, a password reset link has been sent. Please check your inbox, including the spam folder.', 'fluent-support')
         ]);
     }
 

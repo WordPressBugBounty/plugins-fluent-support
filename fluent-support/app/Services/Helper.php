@@ -1132,7 +1132,7 @@ class Helper
                 'logo'           => FLUENT_SUPPORT_PLUGIN_URL . 'assets/images/icons/integrations/fluent-boards.png',
                 'is_integrated'   =>  defined('FLUENT_BOARDS'),
                 'description'    => __('A project management tool designed to streamline workflows and collaboration through customizable, kanban-style boards.', 'fluent-support'),
-                'doc_url'       => '',
+                'doc_url'       => 'https://docs.fluentsupport.com/fluentboards-integrations#fluentboards-integration',
             ],
             'fluent-booking'  => [
                 'title'          => __('FluentBooking', 'fluent-support'),

@@ -164,6 +164,13 @@ class TicketService
             $mailbox = MailBox::findOrFail($ticketData['mailbox_id']);
         }
 
+        // The target box is caller-supplied. Returns [] when no agent is logged in,
+        // so cron/email piping/API callers are unaffected.
+        $restrictedBoxes = (new AgentTicketAccess())->getRestrictedMailboxIds();
+
+        // Reject an explicitly forbidden target up front, before any filter runs.
+        $this->assertMailboxAllowed($ticketData, $restrictedBoxes);
+
         if (!empty($ticketData['product_id'])) {
             $ticketData['product_source'] = 'local';
         }
@@ -180,6 +187,10 @@ class TicketService
         }
 
         $ticketData = apply_filters('fluent_support/create_ticket_data', $ticketData, $customer);
+
+        // Re-check the final target: a routing filter may have moved the ticket into a
+        // box this agent cannot reach. This is the value that actually gets persisted.
+        $this->assertMailboxAllowed($ticketData, $restrictedBoxes);
 
         do_action('fluent_support/before_ticket_create', $ticketData, $customer);
 
@@ -251,6 +262,30 @@ class TicketService
         do_action('fluent_support/ticket_created_behalf_of_customer', $createdTicket, $customer, $agent);
 
         return $createdTicket;
+    }
+
+    /**
+     * Block ticket creation in a business box the acting agent is restricted from.
+     *
+     * $restrictedBoxes is resolved once per create and passed in, so both the
+     * pre-filter and post-filter checks read the same agent meta.
+     *
+     * @param array $ticketData
+     * @param array $restrictedBoxes Already int-normalized by AgentTicketAccess
+     * @return void
+     * @throws \Exception
+     */
+    protected function assertMailboxAllowed($ticketData, $restrictedBoxes)
+    {
+        if (empty($restrictedBoxes) || empty($ticketData['mailbox_id'])) {
+            return;
+        }
+
+        if (in_array((int) $ticketData['mailbox_id'], $restrictedBoxes, true)) {
+            throw new \Exception(
+                esc_html__('Sorry, you do not have permission to create a ticket in this business box', 'fluent-support')
+            );
+        }
     }
 
     // Callers own authorization — this also runs in system contexts (developer API, GDPR erasure, cron) with no current user.
